@@ -25,6 +25,7 @@ module.exports = function(app, config){
 
           try{
             var decoded = jwt.verify(res.body.access_token, config.accessToken.secret);
+            console.log(decoded);
             expect(decoded.sub).to.equal("su9527");
           }catch(err){
             throw err;

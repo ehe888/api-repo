@@ -11,6 +11,7 @@ module.exports = function(options){
   var app = express();
   var db = require("../models")(options.db);
 
+  //TODO: We can use config options to speicify which middleware to include
   require("./controllers/AuthController")(app, {
     db: db
   });
