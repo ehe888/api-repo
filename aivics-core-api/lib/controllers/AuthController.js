@@ -19,13 +19,9 @@ module.exports = function(app, options){
   */
   router.post("/login", function(req, res, next){
     var config = req.x_app_config;
-
     var accessTokenSecret = config.accessToken.secret
       ,accessTokenExpiresIn = config.accessToken.expiresIn
       ,accessTokenAlgorithm = config.accessToken.algorithm;
-
-    console.log("algorithm", accessTokenAlgorithm);
-
 
     //TODO: Save the token into DB for invalidate operation
     var claims = {
