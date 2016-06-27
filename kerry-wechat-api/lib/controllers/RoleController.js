@@ -1,7 +1,7 @@
 /**
  * System User Authentication controller
  */
-module.exports = function(app, options){
+module.exports = function(app, db, options){
   var _ = require("lodash"),
      debug = require('debug')('core-api'),
      express = require('express'),

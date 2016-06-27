@@ -2,7 +2,7 @@
  * System User Authentication controller
  */
 
-module.exports = function(app, options){
+module.exports = function(app, db, options){
   var _ = require("lodash"),
      debug = require('debug')('core-api'),
      express = require('express'),
@@ -18,7 +18,7 @@ module.exports = function(app, options){
    * Grant roles to user
    */
   router.post("/:username/grant", function(req, res, next){
-
+    
   })
 
   /**
@@ -28,7 +28,7 @@ module.exports = function(app, options){
 
   })
 
-  
+
 
   /**
    * GET user profile - Only SUPER_USER should be allowed to do this
@@ -45,7 +45,7 @@ module.exports = function(app, options){
   })
 
   /**
-   * 查询系统用户 - Only SUPER_USER should be allowed to do this
+  * 查询系统用户 - Only SUPER_USER should be allowed to do this
   * PATH: /sysusers
   * return system roles
   * TODO：filter and pagination
