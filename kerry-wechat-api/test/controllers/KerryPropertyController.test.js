@@ -155,5 +155,29 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("提交物业", function(done){
+      request(app)
+        .post("/api/properties/create")
+        .send({
+          name: 'test11',
+          app_id: 'test2',
+          telephone: '13111111311',
+          province: 'test',
+          city: 'test',
+          street: 'test',
+          start_time: (new Date()),
+          end_time: (new Date()),
+          zipcode: 'test',
+          isjde: false
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+
+        })
+        .end(done);
+    })
+
   });
 }
