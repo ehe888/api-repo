@@ -8,6 +8,9 @@ module.exports = function(app, db, options){
      util = require('util'),
      path = require('path'),
      jwt = require('jsonwebtoken'),
+     sequelize = db.sequelize,  //The sequelize instance
+     Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
+     SysRole =  sequelize.model("SysRole"),
      models = options.db;
 
   var router = express.Router();
@@ -30,6 +33,31 @@ module.exports = function(app, db, options){
      }]
     });
   });
+
+  //创建后台角色
+  router.post("/create_role", function(req, res, next) {
+    var param = req.body;
+    var name = param.name;
+
+    SysRole.create({
+      name: name
+    })
+    .then(function(sysRole) {
+      return res.json({
+        success: true,
+        sysRole: sysRole
+      });
+    })
+    .catch(function(err) {
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
 
   app.use("/roles", router);
 }
