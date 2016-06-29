@@ -45,7 +45,7 @@ module.exports = function(app, db, options){
     .then(function(property) {
       return res.json({
         success: true,
-        property: property
+        data: property
       });
     })
     .catch(function(err) {
@@ -96,7 +96,7 @@ module.exports = function(app, db, options){
         .then(function(property) {
           return res.json({
             success: true,
-            property: property
+            data: property
           })
         })
         .catch(function(err) {
@@ -161,7 +161,7 @@ module.exports = function(app, db, options){
     .then(function(properties) {
       return res.json({
         success: true,
-        properties: properties
+        data: properties
       })
     })
     .catch(function(err) {

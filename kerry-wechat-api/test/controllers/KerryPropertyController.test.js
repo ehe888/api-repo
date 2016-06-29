@@ -30,7 +30,7 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
-          expect(res.body.property).to.exist;
+          expect(res.body.data).to.exist;
 
         })
         .end(done);
@@ -61,7 +61,7 @@ module.exports = function(app, db, config){
         .expect(function(res) {
 
           expect(res.body.success).to.be.true;
-          expect(res.body.properties.length).to.be.above(0);
+          expect(res.body.data.length).to.be.above(0);
         })
         .end(done);
     })
@@ -76,7 +76,7 @@ module.exports = function(app, db, config){
         .expect(function(res) {
 
           expect(res.body.success).to.be.true;
-          expect(res.body.properties.length).to.equal(0);
+          expect(res.body.data.length).to.equal(0);
         })
         .end(done);
     })
@@ -120,8 +120,8 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res) {
           expect(res.body.success).to.be.true;
-          expect(res.body.property).to.exist;
-          var property = res.body.property;
+          expect(res.body.data).to.exist;
+          var property = res.body.data;
           expect(property.name).to.equal('test1');
         })
         .end(done);
