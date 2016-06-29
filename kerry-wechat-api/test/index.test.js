@@ -38,3 +38,4 @@ require("./Sequelize.test")(db, config.sequelize )
 require("./controllers/SysController.test")(app, db, config);
 require("./controllers/AuthController.test")(app, db, config);
 require("./controllers/RoleController.test")(app, db, config);
+require("./controllers/KerryPropertyController.test")(app, db, config);
