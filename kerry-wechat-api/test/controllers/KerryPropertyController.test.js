@@ -36,14 +36,47 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("POST提交物业失败", function(done){
+      request(app)
+        .post("/api/properties/create")
+        .send({
+          name: 'test2',
+          app_id: 'test',
+          telephone: '13111111111',
+          province: 'test',
+          city: 'test',
+          isjde: false
+        })
+        .expect(500)
+        .end(done);
+    })
+
     it("查询物业", function(done) {
       request(app)
-        .get("/api/properties/query")
+        .post("/api/properties/query")
+        .send({
+          name: 'test'
+        })
         .expect(200)
         .expect(function(res) {
 
           expect(res.body.success).to.be.true;
           expect(res.body.properties.length).to.be.above(0);
+        })
+        .end(done);
+    })
+
+    it("查询关键字不存在的物业", function(done) {
+      request(app)
+        .post("/api/properties/query")
+        .send({
+          name: 'test22'
+        })
+        .expect(200)
+        .expect(function(res) {
+
+          expect(res.body.success).to.be.true;
+          expect(res.body.properties.length).to.equal(0);
         })
         .end(done);
     })

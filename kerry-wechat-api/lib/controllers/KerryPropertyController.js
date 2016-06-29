@@ -148,9 +148,16 @@ module.exports = function(app, db, options){
     })
   })
 
-  router.get('/query', function(req, res, next) {
+  router.post('/query', function(req, res, next) {
+    var name = req.body.name || '';
     KerryProperty
-    .findAll()
+    .findAll({
+      where: {
+        name: {
+          $like: '%'+name+'%'
+        }
+      }
+    })
     .then(function(properties) {
       return res.json({
         success: true,
