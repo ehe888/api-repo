@@ -66,7 +66,7 @@ module.exports = function(app, db, options){
   */
   router.post("/create", function(req, res, next){
     var param = req.body;
-    
+
 
     SysUser.create({
       username:param.username,
@@ -79,7 +79,7 @@ module.exports = function(app, db, options){
       userType:param.userType
     })
     .then(function(sysUser){
-
+      
     })
     .catch(function(err){
 
