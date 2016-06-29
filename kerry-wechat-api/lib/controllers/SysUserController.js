@@ -18,7 +18,7 @@ module.exports = function(app, db, options){
    * Grant roles to user
    */
   router.post("/:username/grant", function(req, res, next){
-    
+
   })
 
   /**
@@ -59,6 +59,33 @@ module.exports = function(app, db, options){
      }]
     });
   });
+
+
+  /**
+  *查询系统用户
+  */
+  router.post("/create", function(req, res, next){
+    var param = req.body;
+    
+
+    SysUser.create({
+      username:param.username,
+      password:param.password,
+      email:param.email,
+      mobile:param.mobile,
+      headimage:param.headimage,
+      firstName:param.firstName,
+      lastName:param.lastName,
+      userType:param.userType
+    })
+    .then(function(sysUser){
+
+    })
+    .catch(function(err){
+
+    })
+  });
+
 
   app.use("/sysusers", router);
 }
