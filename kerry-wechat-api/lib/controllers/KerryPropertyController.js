@@ -19,7 +19,7 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body;
     var name = param.name,
-        app_id = param.app_id,
+        app_id = param.appId,
         telephone = param.telephone,
         province = param.province,
         city = param.city,
@@ -63,7 +63,7 @@ module.exports = function(app, db, options){
     var param = req.body;
     var id = param.id,
         name = param.name,
-        app_id = param.app_id,
+        app_id = param.appId,
         telephone = param.telephone,
         province = param.province,
         city = param.city,

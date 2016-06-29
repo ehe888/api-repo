@@ -160,7 +160,7 @@ module.exports = function(app, db, config){
         .post("/api/properties/create")
         .send({
           name: 'test11',
-          app_id: 'test2',
+          appId: 'test2',
           telephone: '13111111311',
           province: 'test',
           city: 'test',
