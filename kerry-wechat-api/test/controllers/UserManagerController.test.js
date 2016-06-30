@@ -11,8 +11,7 @@ module.exports = function(app, db, config){
 
   describe("API平台系统查询业主", function(){
 
-    it("查询业主", function(done){
-
+    before(function(done){
       var test_data = [
         {
           name: 'test1',
@@ -47,32 +46,66 @@ module.exports = function(app, db, config){
       db.sequelize.model("Users").bulkCreate(test_data)
       .then(function(instance){
         expect(instance).to.exist;
-
-        request(app)
-          .post("/api/user_settings/query")
-          .send({
-            name: '',
-            offset: 2,
-            limit: 2
-          })
-          .expect(200)
-          .expect(function(res){
-            console.log(res.body)
-            expect(res.body.success).to.be.true;
-            expect(res.body.data).to.exist;
-            expect(res.body.data.length).to.equal(2);
-            expect(res.body.count).to.equal(4);
-            expect(res.body.data[0].id).to.equal(3);
-          })
-          .end(done);
-
+        done()
       })
       .catch(function(err) {
-        done();
+        done(err);
       })
+    });
 
+    it("查询业主", function(done){
 
+      request(app)
+        .post("/api/user_settings/query")
+        .send({
+          name: '',
+          offset: 2,
+          limit: 2
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+          expect(res.body.data.length).to.equal(2);
+          expect(res.body.count).to.equal(4);
+          expect(res.body.data[0].id).to.equal(3);
+        })
+        .end(done);
     })
+
+    it("更新不存在的业主", function(done){
+
+      request(app)
+        .post("/api/user_settings/update")
+        .send({
+          id: 100,
+          expire_date: (new Date())
+        })
+        .expect(404)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.false;
+        })
+        .end(done);
+    })
+
+    it("更新业主到期时间", function(done){
+      var now = new Date()
+      request(app)
+        .post("/api/user_settings/update")
+        .send({
+          id: 1,
+          expire_date: now
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(new Date(res.body.data.expire_date).getTime()).to.equal(now.getTime())
+        })
+        .end(done);
+    })
+
+
   })
 
 }

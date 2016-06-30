@@ -45,6 +45,54 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post('/update', function(req, res, next) {
+    var param = req.body,
+        expire_date = param.expire_date,
+        id = param.id;
+    Users.findOne({
+      where: {
+        id: id
+      }
+    })
+    .then(function(user){
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          errMsg: '用户不存在'
+        })
+      }else {
+        user.update({
+          expire_date: expire_date
+        })
+        .then(function(user) {
+          return res.json({
+            success: true,
+            data: user
+          })
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+      }
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
 
 
   app.use("/user_settings", router);
