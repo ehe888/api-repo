@@ -17,7 +17,7 @@ module.exports = function(app, db, config){
         .post("/api/properties/create")
         .send({
           name: 'test',
-          app_id: 'test',
+          appId: 'test',
           telephone: '13111111111',
           province: 'test',
           city: 'test',
@@ -41,7 +41,7 @@ module.exports = function(app, db, config){
         .post("/api/properties/create")
         .send({
           name: 'test2',
-          app_id: 'test',
+          appId: 'test',
           telephone: '13111111111',
           province: 'test',
           city: 'test',
@@ -87,7 +87,7 @@ module.exports = function(app, db, config){
         .send({
           id: '123',
           name: 'test',
-          app_id: 'test',
+          appId: 'test',
           telephone: '13111111111',
           province: 'test',
           city: 'test',
@@ -107,7 +107,7 @@ module.exports = function(app, db, config){
         .send({
           id: '1',
           name: 'test1',
-          app_id: 'test',
+          appId: 'test',
           telephone: '13111111111',
           province: 'test',
           city: 'test',
