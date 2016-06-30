@@ -21,7 +21,7 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
-          expect(res.body.sysRole).to.exist;
+          expect(res.body.data).to.exist;
 
         })
         .end(done);
@@ -37,7 +37,7 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
-          expect(res.body.sysRole.name).to.equal("updateTest");
+          expect(res.body.data.name).to.equal("updateTest");
         })
         .end(done);
     })

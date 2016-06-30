@@ -45,7 +45,7 @@ module.exports = function(app, db, options){
     .then(function(sysRole) {
       return res.json({
         success: true,
-        sysRole: sysRole
+        data: sysRole
       });
     })
     .catch(function(err) {
@@ -76,7 +76,7 @@ module.exports = function(app, db, options){
       .then(function(sysRole){
         return res.json({
           success:true,
-          sysRole:sysRole
+          data:sysRole
         });
       })
       .catch(function(err){
@@ -127,7 +127,7 @@ module.exports = function(app, db, options){
  router.get("/delete", function(req, res, next) {
    var param = req.query;
    var id = param.id;
-   
+
    SysRole.destroy({
      where:{
        id:id
