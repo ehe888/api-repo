@@ -41,3 +41,5 @@ require("./controllers/RoleController.test")(app, db, config);
 require("./controllers/KerryPropertyController.test")(app, db, config);
 require("./controllers/UserManagerController.test")(app, db, config);
 require("./controllers/SysUserController.test")(app, db, config);
+require("./controllers/UnitController.test")(app, db, config);
+require("./controllers/UserPropertyBindController.test")(app, db, config);

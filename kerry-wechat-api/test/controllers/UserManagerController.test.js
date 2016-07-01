@@ -15,21 +15,18 @@ module.exports = function(app, db, config){
       var test_data = [
         {
           name: 'test1',
-          openid: '12345635',
           mobile: '123457674444',
           reg_code: '5555355',
           bind_date: (new Date())
         },
         {
           name: 'test2',
-          openid: '12563',
           mobile: '12322454444',
           reg_code: '5325555',
           bind_date: (new Date())
         },
         {
           name: 'test3',
-          openid: '1263',
           mobile: '1235454444',
           reg_code: '551555',
           bind_date: (new Date())
