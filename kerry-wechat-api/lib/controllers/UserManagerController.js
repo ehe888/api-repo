@@ -30,7 +30,9 @@ module.exports = function(app, db, options){
       return res.json({
         success: true,
         data: results.rows,
-        count: count
+        count: count,
+        offset: offset,
+        limit: limit
       })
     })
     .catch(function(err) {
