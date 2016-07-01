@@ -93,6 +93,29 @@ module.exports = function(app, db, options){
 
   })
 
+  router.post('/delete_bind', function(req, res, next) {
+    var param = req.body,
+        id = param.id;
+    Users.destroy({
+      where: {
+        id: id
+      }
+    })
+    .then(function() {
+      return res.json({
+        success: true
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
+
 
 
   app.use("/user_settings", router);
