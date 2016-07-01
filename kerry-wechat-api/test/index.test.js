@@ -40,3 +40,4 @@ require("./controllers/AuthController.test")(app, db, config);
 require("./controllers/RoleController.test")(app, db, config);
 require("./controllers/KerryPropertyController.test")(app, db, config);
 require("./controllers/UserManagerController.test")(app, db, config);
+require("./controllers/SysUserController.test")(app, db, config);
