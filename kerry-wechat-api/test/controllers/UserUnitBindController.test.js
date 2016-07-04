@@ -22,7 +22,18 @@ module.exports = function(app, db, config){
       db.sequelize.model("UserUnit").create(test_data)
       .then(function(instance){
         expect(instance).to.exist;
-        done()
+
+        db.sequelize.model("WechatUsers").createWechatUser("wx_asfasdfasdfasdfasdfasdf",
+                        "asdfasdfasdfasdfasdf", "hallohallo", 1, "Shanghai", "Shanghai",
+                        "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46"
+          ).then(function(instance){
+            expect(instance).to.exist;
+            done();
+          })
+          .catch(function(err){
+            console.log(err);
+          })
+
       })
       .catch(function(err) {
         done(err);
@@ -38,7 +49,8 @@ module.exports = function(app, db, config){
           unit_number: '11-503',
           name: 'test1',
           reg_code: '5555355',
-          mobile: '123457674444'
+          mobile: '123457674444',
+          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf'
         })
         .expect(200)
         .expect(function(res){
@@ -52,53 +64,17 @@ module.exports = function(app, db, config){
 
       db.sequelize.model("UserUnitBinding").findOne({
         username: '123456',
-        unit_id: 1,
-        user_id: 1
+        unit_id: 1
       })
       .then(function(bind) {
         expect(bind).to.exist;
         expect(bind.username).to.equal('123456');
         expect(bind.unit_id).to.equal(1)
-        expect(bind.user_id).to.equal(1)
         done();
       })
       .catch(function(err) {
         done(err)
       })
-    })
-
-    it("用户名称错误, 无法绑定", function(done) {
-      request(app)
-        .post("/api/bind/bind")
-        .send({
-          username: '123456',
-          unit_number: '11-503',
-          name: 'test10',
-          reg_code: '5555355',
-          mobile: '123457674444'
-        })
-        .expect(403)
-        .expect(function(res){
-          expect(res.body.success).to.be.false;
-        })
-        .end(done);
-    })
-
-    it("用户手机错误, 无法绑定", function(done) {
-      request(app)
-        .post("/api/bind/bind")
-        .send({
-          username: '123456',
-          unit_number: '11-503',
-          name: 'test1',
-          reg_code: '5555355',
-          mobile: '1234576274444'
-        })
-        .expect(403)
-        .expect(function(res){
-          expect(res.body.success).to.be.false;
-        })
-        .end(done);
     })
 
     it("用户注册码错误, 无法绑定", function(done) {

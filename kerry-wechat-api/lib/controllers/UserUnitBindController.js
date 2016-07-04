@@ -20,14 +20,13 @@ module.exports = function(app, db, options){
         reg_code = param.reg_code,
         name = param.name,
         mobile = param.mobile,
-        username = param.username;
+        username = param.username,
+        wechat_user_id = param.wechat_user_id;
 
     //先查询用户是否存在
     Users.findOne({
       where: {
-        name: name,
         reg_code: reg_code,
-        mobile: mobile
       }
     })
     .then(function(user) {
@@ -76,8 +75,11 @@ module.exports = function(app, db, options){
 
                 UserUnitBinding.create({
                   username: username,
-                  user_id: user_id,
-                  unit_id: unit_id
+                  mobile: mobile,
+                  master_username: user.name,
+                  expire_date: user.expire_date,
+                  unit_id: unit_id,
+                  wechat_user_id: wechat_user_id
                 })
                 .then(function(bind) {
                   return res.json({
