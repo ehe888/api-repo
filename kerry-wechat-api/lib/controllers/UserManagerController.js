@@ -29,7 +29,17 @@ module.exports = function(app, db, options){
         as: 'user_unit',
         include: [{
           model: sequelize.model("Units"),
-          as: 'unit'
+          as: 'unit',
+          include: [{
+            model: sequelize.model("SysUser"),
+            as: 'sys_user',
+            attributes: ['first_name', 'last_name', 'email']
+          },
+          {
+            model: sequelize.model("KerryProperty"),
+            as: 'property',
+            attributes:['name']
+          }]
         }]
       }]
     })
