@@ -9,7 +9,7 @@ module.exports = function(app, db, options){
      Units =  sequelize.model("Units"),
      Users = sequelize.model("Users"),
      UserUnit = sequelize.model("UserUnit"),
-     UserPropertyBind = sequelize.model("UserPropertyBind")
+     UserUnitBinding = sequelize.model("UserUnitBinding")
 
   var router = express.Router();
 
@@ -20,7 +20,7 @@ module.exports = function(app, db, options){
         reg_code = param.reg_code,
         name = param.name,
         mobile = param.mobile,
-        openid = param.openid;
+        username = param.username;
 
     //先查询用户是否存在
     Users.findOne({
@@ -72,29 +72,17 @@ module.exports = function(app, db, options){
               }
               else {
                 //条件全部满足, 讲该用户绑定到微信Openid, 插入一条记录到user_property_bind
-                user.update({
-                  openid: openid
+
+
+                UserUnitBinding.create({
+                  username: username,
+                  user_id: user_id,
+                  unit_id: unit_id
                 })
-                .then(function(user) {
-
-                  UserPropertyBind.create({
-                    openid: openid,
-                    property_id: unit.property_id
+                .then(function(bind) {
+                  return res.json({
+                    success: true
                   })
-                  .then(function(bind) {
-                    return res.json({
-                      success: true
-                    })
-                  })
-                  .catch(function(err) {
-                    console.error(err)
-                    return res.status(500).json({
-                      success: false
-                      ,errMsg: err.message
-                      ,errors: err
-                    })
-                  })
-
                 })
                 .catch(function(err) {
                   console.error(err)

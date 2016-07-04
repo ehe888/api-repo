@@ -20,7 +20,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/UserManagerController")(subapp, db, options);
   require("./controllers/SysUserController")(subapp, db, options);
   require("./controllers/UnitController")(subapp, db, options)
-  require("./controllers/UserPropertyBindController")(subapp, db, options)
+  require("./controllers/UserUnitBindController")(subapp, db, options)
 
   app.use( path || "/api", subapp);
 

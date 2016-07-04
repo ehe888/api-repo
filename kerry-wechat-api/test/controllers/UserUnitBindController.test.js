@@ -34,7 +34,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          openid: '123456',
+          username: '123456',
           unit_number: '11-503',
           name: 'test1',
           reg_code: '5555355',
@@ -50,14 +50,16 @@ module.exports = function(app, db, config){
 
     it("验证用户绑定成功", function(done) {
 
-      db.sequelize.model("UserPropertyBind").findOne({
-        openid: '123456',
-        property_id: 1
+      db.sequelize.model("UserUnitBinding").findOne({
+        username: '123456',
+        unit_id: 1,
+        user_id: 1
       })
       .then(function(bind) {
         expect(bind).to.exist;
-        expect(bind.openid).to.equal('123456');
-        expect(bind.property_id).to.equal(1)
+        expect(bind.username).to.equal('123456');
+        expect(bind.unit_id).to.equal(1)
+        expect(bind.user_id).to.equal(1)
         done();
       })
       .catch(function(err) {
@@ -69,7 +71,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          openid: '123456',
+          username: '123456',
           unit_number: '11-503',
           name: 'test10',
           reg_code: '5555355',
@@ -86,7 +88,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          openid: '123456',
+          username: '123456',
           unit_number: '11-503',
           name: 'test1',
           reg_code: '5555355',
@@ -103,7 +105,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          openid: '123456',
+          username: '123456',
           unit_number: '11-503',
           name: 'test1',
           reg_code: '355',
@@ -120,7 +122,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          openid: '123456',
+          username: '123456',
           unit_number: '-503',
           name: 'test1',
           reg_code: '5555355',
@@ -138,7 +140,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          openid: '123456',
+          username: '123456',
           unit_number: '12-503',
           name: 'test1',
           reg_code: '5555355',
