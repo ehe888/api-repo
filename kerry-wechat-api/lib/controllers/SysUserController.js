@@ -153,7 +153,11 @@ module.exports = function(app, db, options){
         username:{
           $like:"%"+username+"%"
         }
-      }
+      },
+      include:[{
+        model: sequelize.model("KerryProperty"),
+        as: 'WorkingProperty'
+      }]
     })
     .then(function(sysUsers){
       return res.json({
