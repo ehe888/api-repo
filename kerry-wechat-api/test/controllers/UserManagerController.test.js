@@ -55,7 +55,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/user_settings/query")
         .send({
-          name: '',
+          name: 'test1',
           offset: 2,
           limit: 2
         })

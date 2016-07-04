@@ -6,7 +6,8 @@ module.exports = function(app, db, options){
      path = require('path'),
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
-     Users =  sequelize.model("Users");
+     Users =  sequelize.model("Users"),
+     UserUnit = sequelize.model("UserUnit");
 
   var router = express.Router();
 
@@ -16,31 +17,30 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20;
 
-    Users.findAndCountAll({
-      where: {
-        name: {
-          $like: '%'+name+'%'
-        }
-      },
+    UserUnit.findAndCountAll({
       offset: offset,
       limit: limit,
       include: [{
-        model: sequelize.model("UserUnit"),
-        as: 'user_unit',
+        model: sequelize.model("Units"),
+        as: 'unit',
         include: [{
-          model: sequelize.model("Units"),
-          as: 'unit',
-          include: [{
-            model: sequelize.model("SysUser"),
-            as: 'sys_user',
-            attributes: ['first_name', 'last_name', 'email']
-          },
-          {
-            model: sequelize.model("KerryProperty"),
-            as: 'property',
-            attributes:['name']
-          }]
+          model: sequelize.model("SysUser"),
+          as: 'sys_user',
+          attributes: ['first_name', 'last_name', 'email']
+        },
+        {
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          attributes:['name']
         }]
+      }, {
+        model: Users,
+        as: 'user',
+        where: {
+          name: {
+            $like: '%'+name+'%'
+          }
+        }
       }]
     })
     .then(function(results) {
@@ -63,6 +63,54 @@ module.exports = function(app, db, options){
       })
 
     })
+
+    // Users.findAndCountAll({
+    //   where: {
+    //     name: {
+    //       $like: '%'+name+'%'
+    //     }
+    //   },
+    //   offset: offset,
+    //   limit: limit,
+    //   include: [{
+    //     model: sequelize.model("UserUnit"),
+    //     as: 'user_unit',
+    //     include: [{
+    //       model: sequelize.model("Units"),
+    //       as: 'unit',
+    //       include: [{
+    //         model: sequelize.model("SysUser"),
+    //         as: 'sys_user',
+    //         attributes: ['first_name', 'last_name', 'email']
+    //       },
+    //       {
+    //         model: sequelize.model("KerryProperty"),
+    //         as: 'property',
+    //         attributes:['name']
+    //       }]
+    //     }]
+    //   }]
+    // })
+    // .then(function(results) {
+    //   var count = results.count;
+    //   return res.json({
+    //     success: true,
+    //     data: results.rows,
+    //     count: count,
+    //     offset: offset,
+    //     limit: limit
+    //   })
+    // })
+    // .catch(function(err) {
+    //
+    //   console.error(err)
+    //   return res.status(500).json({
+    //     success: false
+    //     ,errMsg: err.message
+    //     ,errors: err
+    //   })
+    // })
+
   })
 
   router.post('/update', function(req, res, next) {

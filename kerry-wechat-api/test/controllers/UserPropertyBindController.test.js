@@ -156,10 +156,11 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/user_settings/query")
         .send({
-          name: '',
+          name: 'test1',
         })
         .expect(200)
         .expect(function(res){
+          console.log(res.body)
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
         })
