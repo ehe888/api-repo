@@ -23,7 +23,15 @@ module.exports = function(app, db, options){
         }
       },
       offset: offset,
-      limit: limit
+      limit: limit,
+      include: [{
+        model: sequelize.model("UserUnit"),
+        as: 'user_unit',
+        include: [{
+          model: sequelize.model("Units"),
+          as: 'unit'
+        }]
+      }]
     })
     .then(function(results) {
       var count = results.count;

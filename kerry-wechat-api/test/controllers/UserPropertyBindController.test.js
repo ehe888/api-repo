@@ -151,6 +151,21 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("查询业主", function(done){
+
+      request(app)
+        .post("/api/user_settings/query")
+        .send({
+          name: '',
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+        })
+        .end(done);
+    })
+
   })
 
 }
