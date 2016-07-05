@@ -3,12 +3,12 @@
 module.exports = [
     {
       name: "ALL",
-      httpMethod: "/^(get|post|put|delete|option)$/ig",
+      httpMethod: "*",
       httpPath: "/^\/.*/"
     },
     {
       name: "创建角色",
-      httpMethod: "/^(post)$/ig",
+      httpMethod: "POST",
       httpPath: "/^\/wxapi\/roles.*/"
     }
 ]
