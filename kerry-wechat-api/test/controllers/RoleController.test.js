@@ -16,13 +16,21 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/roles/create")
         .send({
-          name: 'test1111'
+          name: 'test11112234',
+          permissions:[{
+            name:'abc',
+            httpMethod:'*',
+            httpPath:'ghf'
+          },{
+            name:'abc1',
+            httpMethod:'GET',
+            httpPath:'ghf1'
+          }]
         })
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
-
         })
         .end(done);
     })
@@ -46,13 +54,13 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/roles/queryRoles")
         .send({
-          name: 'update'
+          name: 'test11112234'
         })
         .expect(200)
         .expect(function(res){
           console.log(res.body.data);
           expect(res.body.success).to.be.true;
-          expect(res.body.data[0].name).to.equal("updateTest");
+          expect(res.body.data[0].name).to.equal("test11112234");
         })
         .end(done);
     })
@@ -73,11 +81,10 @@ module.exports = function(app, db, config){
 
     it("PGET删除角色", function(done){
       request(app)
-        .get("/api/roles/delete?id=2")
+        .get("/api/roles/delete?id=18")
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
-          expect(res.body.rows).to.above(0);
         })
         .end(done);
     })
