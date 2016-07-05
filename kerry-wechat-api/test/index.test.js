@@ -32,7 +32,6 @@ app.use(function(req, res, next){
 
 var kerryApp = require("../lib/")(app, "/api", db, {})
 
-console.log(config);
 
 require("./Sequelize.test")(db, config.sequelize )
 require("./controllers/SysController.test")(app, db, config);

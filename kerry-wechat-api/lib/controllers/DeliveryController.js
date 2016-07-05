@@ -49,6 +49,37 @@ module.exports = function(app, db, options){
 
   })
 
+  router.post("/create", function(req, res, next) {
+    var param = req.body,
+        openid = param.openid,
+        content = param.content,
+        unit_id = param.unit_id;
+
+    //TODO, 推送模板消息
+    PushMessageLog.create({
+      openid: openid,
+      template_id: 1,
+      content: content,
+      template_type: 'delivery',
+      unit_id: unit_id
+    })
+    .then(function(log) {
+      return res.json({
+        success: true,
+        data: log
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
 
   app.use("/delivery", router);
 }

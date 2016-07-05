@@ -60,5 +60,21 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("后台添加快递推送记录", function(done) {
+      request(app)
+        .post("/api/delivery/create")
+        .send({
+          openid: '123456',
+          unit_id: 1,
+          content: '123456789'
+        })
+        .expect(200)
+        .expect(function(res){
+          var result = res.body
+          expect(result.success).to.be.true
+        })
+        .end(done);
+    })
+
   })
 }
