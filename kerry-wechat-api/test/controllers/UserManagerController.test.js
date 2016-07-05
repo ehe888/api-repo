@@ -40,14 +40,19 @@ module.exports = function(app, db, config){
         }
       ]
 
-      db.sequelize.model("Users").bulkCreate(test_data)
-      .then(function(instance){
-        expect(instance).to.exist;
-        done()
+
+      db.sequelize.transaction(function(t) {
+        return db.sequelize.model("Users").bulkCreate(test_data)
+                .then(function(instance){
+                  expect(instance).to.exist;
+                  done()
+                })
+                .catch(function(err) {
+                  done(err);
+                })
       })
-      .catch(function(err) {
-        done(err);
-      })
+
+
     });
 
     it("查询业主", function(done){
