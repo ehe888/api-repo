@@ -22,6 +22,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/UnitController")(subapp, db, options)
   require("./controllers/UserUnitBindController")(subapp, db, options)
   require("./controllers/SysPermissionController")(subapp, db, options)
+  require("./controllers/DeliveryController")(subapp, db, options)
 
   app.use( path || "/api", subapp);
 
