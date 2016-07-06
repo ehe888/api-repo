@@ -109,7 +109,8 @@ router.post("/update", function(req, res, next) {
     })
     .then(function(sysRole){
       sysRole.permissions.forEach(function(data){
-          param.permissions = _.remove(param.permissions,function(paramData){
+           _.remove(param.permissions,function(paramData){
+                console.log(data.name+'  '+ paramData.name);
           return data.name == paramData.name
         })
       })
