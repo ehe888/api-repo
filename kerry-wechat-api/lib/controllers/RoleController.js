@@ -120,7 +120,7 @@ router.post("/update", function(req, res, next) {
           success:true
         })
       })
-      .catch(function(){
+      .catch(function(err){
         return res.status(500).json({
           success:false,
           errMsg:err.message,
