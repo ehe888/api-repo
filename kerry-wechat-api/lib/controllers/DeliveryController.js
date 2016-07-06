@@ -12,6 +12,7 @@ module.exports = function(app, db, options){
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      Template =  sequelize.model("Template"),
      PushMessageLog = sequelize.model("PushMessageLog"),
+     Units = sequelize.model("Units"),
      models = options.db;
 
   var router = express.Router();
@@ -56,32 +57,76 @@ module.exports = function(app, db, options){
 
   router.post("/create", function(req, res, next) {
     var param = req.body,
-        openid = param.openid,
         content = param.content,
-        unit_id = param.unit_id;
+        unit_number = param.unit_number;
 
     //TODO, 推送模板消息
-    PushMessageLog.create({
-      openid: openid,
-      template_id: 1,
-      content: content,
-      template_type: 'delivery',
-      unit_id: unit_id
+    Units.findOne({
+      where: {
+        unit_number: unit_number
+      },
+      include: [{
+        model: sequelize.model("UserUnitBinding"),
+        as: 'user_unit_binding',
+        include: [{
+          model: sequelize.model("WechatUsers"),
+          as: 'wechat_user'
+        }]
+      }]
     })
-    .then(function(log) {
-      return res.json({
-        success: true,
-        data: log
-      })
+    .then(function(unit) {
+
+      if (!unit) {
+        return res.json({
+          success: false,
+          errMsg: '找不到该房屋'
+        })
+      }
+      else if (unit.user_unit_binding) {
+        var logs = [];
+        for (var i = 0; i < unit.user_unit_binding.length; i++) {
+          var user_unit_binding = unit.user_unit_binding[i];
+
+          if (user_unit_binding.wechat_user) {
+            var wechat_user = user_unit_binding.wechat_user;
+            var openid = wechat_user.wechatId;
+            logs.push({
+              openid: openid,
+              template_id: 1,
+              content: content,
+              template_type: 'delivery',
+              unit_id: unit.id
+            })
+          }
+        }
+
+        PushMessageLog.bulkCreate(logs)
+        .then(function(results) {
+          console.log(results)
+          return res.json({
+            success: true,
+            data: logs
+          })
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+
+      }
+      else {
+        return res.json({
+          success: false,
+          errMsg: '该房屋没有绑定用户!'
+        })
+      }
+
     })
-    .catch(function(err) {
-      console.error(err)
-      return res.status(500).json({
-        success: false
-        ,errMsg: err.message
-        ,errors: err
-      })
-    })
+
 
   })
 

@@ -57,7 +57,6 @@ module.exports = function(app, db, config){
           var result = res.body
           console.log(res.body)
           expect(result.success).to.be.true
-          expect(res.body.data[0].unit).to.exist;
         })
         .end(done);
     })
@@ -66,13 +65,13 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/delivery/create")
         .send({
-          openid: '123456',
-          unit_id: 1,
+          unit_number: '11-503',
           content: '123456789'
         })
         .expect(200)
         .expect(function(res){
           var result = res.body
+          console.log(result)
           expect(result.success).to.be.true
         })
         .end(done);
