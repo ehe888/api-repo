@@ -51,6 +51,7 @@ module.exports = function(app, db, options){
       SysRoleUser.getUserRoles(user.username)
         .then(function(roleUsers){
           var roles = [];
+          console.log(roleUsers)
           if(!_.isEmpty(roleUsers)){
             for(var i=0; i < roleUsers.length; i++ ){
               roles.push(roleUsers[i].role.name);
