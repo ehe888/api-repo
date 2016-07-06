@@ -105,7 +105,7 @@ router.post("/update", function(req, res, next) {
   })
   .then(function(sysRole){
     sysRole.update({
-      name:name
+      name:param.name
     })
     .then(function(sysRole){
       sysRole.permissions.forEach(function(data){
