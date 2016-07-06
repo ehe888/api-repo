@@ -1,0 +1,25 @@
+{
+  "accessToken": {
+    "secret": "thisisasecret",
+    "expiresIn": 72000,
+    "algorithm": "HS512"
+  },
+  "sequelize": {
+    "username": "pguser1",
+    "password": "123456",
+    "database": "kerry_digital_dev",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "timezone": "+08:00",
+    "sync": {
+      "force": false,
+      "logging": "console.log"
+    },
+    "benchmark": true,
+    "define": {
+      "paranoid": true,
+      "underscored": true,
+      "underscoredAll": true
+    }
+  }
+}
