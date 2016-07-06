@@ -47,6 +47,7 @@ module.exports = function(app, db, config){
         .expect(function(res){
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
+          
         })
         .end(done);
     })

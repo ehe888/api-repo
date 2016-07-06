@@ -57,6 +57,7 @@ module.exports = function(app, db, config){
           var result = res.body
           console.log(res.body)
           expect(result.success).to.be.true
+          expect(res.body.data[0].unit).to.exist;
         })
         .end(done);
     })

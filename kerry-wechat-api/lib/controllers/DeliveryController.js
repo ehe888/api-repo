@@ -26,6 +26,10 @@ module.exports = function(app, db, options){
       where: {
         template_type: 'delivery'
       },
+      include: [{
+        model: sequelize.model("Units"),
+        as: 'unit'
+      }],
       offset: offset,
       limit: limit
     })
