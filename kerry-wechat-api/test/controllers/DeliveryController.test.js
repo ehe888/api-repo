@@ -55,6 +55,7 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res){
           var result = res.body
+          console.log(res.body)
           expect(result.success).to.be.true
         })
         .end(done);

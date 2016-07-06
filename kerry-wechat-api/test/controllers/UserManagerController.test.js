@@ -60,13 +60,13 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/user_settings/query")
         .send({
-          name: 'test1',
-          offset: 2,
+          name: '',
+          offset: 0,
           limit: 2
         })
         .expect(200)
         .expect(function(res){
-          console.log(res.body.data)
+          console.log(res.body)
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
         })

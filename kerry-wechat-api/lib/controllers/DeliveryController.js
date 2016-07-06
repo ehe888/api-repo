@@ -22,20 +22,21 @@ module.exports = function(app, db, options){
         offset = param.offset,
         limit = param.limit
 
-    PushMessageLog.findAll({
+    PushMessageLog.findAndCountAll({
       where: {
         template_type: 'delivery'
       },
       offset: offset,
       limit: limit
     })
-    .then(function(logs) {
-      // console.log(logs)
+    .then(function(results) {
+      var count = results.count;
       return res.json({
         success: true,
-        data: logs,
+        data: results.rows,
         offset: offset,
-        limit: limit
+        limit: limit,
+        count: count
       })
     })
     .catch(function(err) {
