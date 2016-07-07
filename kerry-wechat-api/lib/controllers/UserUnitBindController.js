@@ -7,8 +7,8 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      Units =  sequelize.model("Units"),
-     Users = sequelize.model("Users"),
-     UserUnit = sequelize.model("UserUnit"),
+     Users = sequelize.model("KerryUsers"),
+     KerryUserUnit = sequelize.model("KerryUserUnit"),
      UserUnitBinding = sequelize.model("UserUnitBinding")
 
   var router = express.Router();
@@ -55,9 +55,9 @@ module.exports = function(app, db, options){
           else {
             //找得到unit, 查询user_unit是否有对应关系
             var unit_id = unit.id
-            UserUnit.findOne({
+            KerryUserUnit.findOne({
               where: {
-                user_id: user_id,
+                kerry_user_id: user_id,
                 unit_id: unit.id
               }
             })

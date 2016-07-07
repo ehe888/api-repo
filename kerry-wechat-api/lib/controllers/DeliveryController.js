@@ -70,7 +70,7 @@ module.exports = function(app, db, options){
         model: sequelize.model("UserUnitBinding"),
         as: 'user_unit_binding',
         include: [{
-          model: sequelize.model("WechatUsers"),
+          model: sequelize.model("User"),
           as: 'wechat_user'
         }]
       }]

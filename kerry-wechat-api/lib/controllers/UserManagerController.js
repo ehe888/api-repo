@@ -6,8 +6,8 @@ module.exports = function(app, db, options){
      path = require('path'),
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
-     Users =  sequelize.model("Users"),
-     UserUnit = sequelize.model("UserUnit");
+     KerryUsers =  sequelize.model("KerryUsers"),
+     KerryUserUnit = sequelize.model("KerryUserUnit");
 
   var router = express.Router();
 
@@ -17,7 +17,7 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20;
 
-    UserUnit.findAndCountAll({
+    KerryUserUnit.findAndCountAll({
       offset: offset,
       limit: limit,
       include: [{
@@ -34,8 +34,8 @@ module.exports = function(app, db, options){
           attributes:['name']
         }]
       }, {
-        model: Users,
-        as: 'user',
+        model: KerryUsers,
+        as: 'kerry_user',
         where: {
           name: {
             $like: '%'+name+'%'
@@ -117,7 +117,7 @@ module.exports = function(app, db, options){
     var param = req.body,
         expire_date = param.expire_date,
         id = param.id;
-    Users.findOne({
+    KerryUsers.findOne({
       where: {
         id: id
       }
@@ -164,7 +164,7 @@ module.exports = function(app, db, options){
   router.post('/delete_bind', function(req, res, next) {
     var param = req.body,
         id = param.id;
-    Users.destroy({
+    KerryUsers.destroy({
       where: {
         id: id
       }

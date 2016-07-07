@@ -15,15 +15,15 @@ module.exports = function(app, db, config){
     before(function(done) {
 
       var test_data = {
-        user_id: 1,
+        kerry_user_id: 1,
         unit_id: 1
       }
 
-      db.sequelize.model("UserUnit").create(test_data)
+      db.sequelize.model("KerryUserUnit").create(test_data)
       .then(function(instance){
         expect(instance).to.exist;
 
-        db.sequelize.model("WechatUsers").createWechatUser("wx_asfasdfasdfasdfasdfasdf",
+        db.sequelize.model("User").createWechatUser("wx_asfasdfasdfasdfasdfasdf",
                         "asdfasdfasdfasdfasdf", "hallohallo", 1, "Shanghai", "Shanghai",
                         "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46"
           ).then(function(instance){

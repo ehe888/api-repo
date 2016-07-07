@@ -42,7 +42,7 @@ module.exports = function(app, db, config){
 
 
       db.sequelize.transaction(function(t) {
-        return db.sequelize.model("Users").bulkCreate(test_data)
+        return db.sequelize.model("KerryUsers").bulkCreate(test_data)
                 .then(function(instance){
                   expect(instance).to.exist;
                   done()
