@@ -83,6 +83,15 @@ module.exports = function(app, db, options){
     });
   });
 
+  router.post("/", function(req, res, next) {
+    var config = req.x_app_config;
+    var decoded = jwt.verify(req.body.access_token, config.accessToken.secret);
+    return res.json({
+      success: true,
+      data: decoded
+    })
+  })
+
   /**
   * PATH: /auth/logout
   * Remove or Disable previously retrived accessToken

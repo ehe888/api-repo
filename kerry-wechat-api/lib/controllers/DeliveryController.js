@@ -32,7 +32,8 @@ module.exports = function(app, db, options){
         as: 'unit'
       }],
       offset: offset,
-      limit: limit
+      limit: limit,
+      order: 'id desc'
     })
     .then(function(results) {
       var count = results.count;
