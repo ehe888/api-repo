@@ -17,27 +17,40 @@ var router = express.Router();
 //查询角色
 router.post("/queryWechatUsers", function(req, res, next) {
  var param = req.body;
- var username = param.username;
+ var username = param.username || "",
+     offset = param.offset || 0,
+     limit = param.limit || 20;
 
- UserUnitBinding.findAll({
+ UserUnitBinding.findAndCountAll({
    where :{
      username:{
        $like:"%"+username+"%"
-     }
+     },
    },
    include:[{
      model: sequelize.model("User"),
      as: 'wechat_user'
    },{
      model:sequelize.model("Units"),
-     as: 'unit'
-   }]
+     as: 'unit',
+     include: [{
+       model: sequelize.model("SysUser"),
+       as: 'sys_user'
+     }]
+   }],
+   offset: offset,
+   limit: limit,
+   order: ' id desc'
  })
- .then(function(UserUnitBindings){
+ .then(function(results){
+   var count = results.count;
    return res.json({
-     success:true,
-     data:UserUnitBindings
-   });
+     success: true,
+     data: results.rows,
+     count: count,
+     offset: offset,
+     limit: limit
+   })
  })
  .catch(function(err){
    return res.status(500).json({

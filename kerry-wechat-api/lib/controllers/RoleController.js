@@ -153,7 +153,7 @@ router.post("/update", function(req, res, next) {
 //查询角色
 router.post("/queryRoles", function(req, res, next) {
  var param = req.body;
- var name = param.name;
+ var name = param.name || "";
 
  SysRole.findAll({
    where :{
