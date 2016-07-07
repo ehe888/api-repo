@@ -15,6 +15,8 @@ module.exports = function(app, db, options){
      Units = sequelize.model("Units"),
      models = options.db;
 
+  var SendTemplateMessage = require('../Utils/SendTemplateMessage')
+
   var router = express.Router();
 
   router.post("/", function(req, res, next) {
@@ -59,7 +61,10 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body,
         content = param.content,
-        unit_number = param.unit_number;
+        unit_number = param.unit_number,
+        topcolor = param.topcolor,
+        url = param.url,
+        app_id = req.query.app_id
 
     //TODO, 推送模板消息
     Units.findOne({
@@ -84,40 +89,64 @@ module.exports = function(app, db, options){
         })
       }
       else if (unit.user_unit_binding) {
-        var logs = [];
-        for (var i = 0; i < unit.user_unit_binding.length; i++) {
-          var user_unit_binding = unit.user_unit_binding[i];
 
-          if (user_unit_binding.wechat_user) {
-            var wechat_user = user_unit_binding.wechat_user;
-            var openid = wechat_user.wechatId;
-            logs.push({
-              openid: openid,
-              template_id: 1,
-              content: content,
-              template_type: 'delivery',
-              unit_id: unit.id
+        Template.findOne({
+          where: {
+            template_type: 'delivery'
+          }
+        })
+        .then(function(template) {
+
+          if (!template) {
+            return res.status(500).json({
+              success: false,
+              errMsg: '没有找到相应模板'
             })
           }
-        }
 
-        PushMessageLog.bulkCreate(logs)
-        .then(function(results) {
-          console.log(results)
-          return res.json({
-            success: true,
-            data: logs
-          })
-        })
-        .catch(function(err) {
-          console.error(err)
-          return res.status(500).json({
-            success: false
-            ,errMsg: err.message
-            ,errors: err
-          })
-        })
+          var logs = [],
+              openids = [];
+          for (var i = 0; i < unit.user_unit_binding.length; i++) {
+            var user_unit_binding = unit.user_unit_binding[i];
 
+            if (user_unit_binding.wechat_user) {
+              var wechat_user = user_unit_binding.wechat_user;
+              var openid = wechat_user.wechatId;
+              logs.push({
+                openid: openid,
+                template_id: template.id,
+                content: content,
+                template_type: 'delivery',
+                unit_id: unit.id
+              })
+              openids.push(openid)
+            }
+          }
+
+          PushMessageLog.bulkCreate(logs)
+          .then(function(results) {
+            console.log(results)
+
+            var bearer = req.headers['authorization'];
+            var access_token = bearer.substring("Bearer".length).trim();
+            console.log(access_token)
+            SendTemplateMessage(openids, content, template.template_id, url, topcolor, access_token, app_id, function() {
+              return res.json({
+                success: true,
+                data: logs
+              })
+            })
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.status(500).json({
+              success: false
+              ,errMsg: err.message
+              ,errors: err
+            })
+          })
+
+        })
       }
       else {
         return res.json({

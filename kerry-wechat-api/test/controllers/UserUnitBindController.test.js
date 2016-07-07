@@ -23,9 +23,9 @@ module.exports = function(app, db, config){
       .then(function(instance){
         expect(instance).to.exist;
 
-        db.sequelize.model("User").createWechatUser("wx_asfasdfasdfasdfasdfasdf",
-                        "asdfasdfasdfasdfasdf", "hallohallo", 1, "Shanghai", "Shanghai",
-                        "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46"
+        db.sequelize.model("User").createWechatUser("ossPrw6Uu6gK69mwwyv151LbPgJE",
+                        "ossPrw6Uu6gK69mwwyv151LbPgJE", "hallohallo", 1, "Shanghai", "Shanghai",
+                        "http://wx.qlogo.cn/mmopen/PiajxSqBRaEKw2WtoLPzTUwBulgeCMZ3YlJnlT0h3CzHwOicnb7H73LVTAwFickWWw35rGhJtdvjp25DvgpTZkabg/0"
           ).then(function(instance){
             expect(instance).to.exist;
             done();
@@ -50,7 +50,7 @@ module.exports = function(app, db, config){
           name: 'test1',
           reg_code: '5555355',
           mobile: '123457674444',
-          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf'
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
         })
         .expect(200)
         .expect(function(res){

@@ -63,10 +63,11 @@ module.exports = function(app, db, config){
 
     it("后台添加快递推送记录", function(done) {
       request(app)
-        .post("/api/delivery/create")
+        .post("/api/delivery/create?app_id=wxa0c45fc6d9e269ed")
+        .set('authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdSIsInJvbGVzIjpbIui2hee6p-eUqOaItyJdLCJ1dCI6IkNPUlAiLCJpYXQiOjE0Njc4NjQ0NDgsImV4cCI6MjMzMTg2NDQ0OH0.xqHsJB9OPFQiPIgUyNF31ucjPdTqJlPhw8blklrYBCA')
         .send({
           unit_number: '11-503',
-          content: '123456789'
+          content: '{"first":{"value":"亲爱的业主，您好，您有1份快递已经被人代领。", "color":"#000000"},"keyword1":{"value":"1133…dds", "color":"#173177"},"keyword2":{"value":"test", "color":"#173177"},"remark":{"value":"如有疑问，请联系物业服务中心，联系电话：023-88888888", "color":"#173177"}}'
         })
         .expect(200)
         .expect(function(res){
