@@ -45,9 +45,8 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/bind/bind")
         .send({
-          username: '123456',
           unit_number: '11-503',
-          name: 'test1',
+          username: '123456',
           reg_code: '5555355',
           mobile: '123457674444',
           wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
@@ -61,7 +60,6 @@ module.exports = function(app, db, config){
     })
 
     it("验证用户绑定成功", function(done) {
-
       db.sequelize.model("UserUnitBinding").findOne({
         username: '123456',
         unit_id: 1
@@ -87,7 +85,7 @@ module.exports = function(app, db, config){
           reg_code: '355',
           mobile: '123457674444'
         })
-        .expect(403)
+        .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.false;
         })
@@ -104,7 +102,7 @@ module.exports = function(app, db, config){
           reg_code: '5555355',
           mobile: '123457674444'
         })
-        .expect(403)
+        .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.false;
         })
@@ -122,7 +120,7 @@ module.exports = function(app, db, config){
           reg_code: '5555355',
           mobile: '123457674444'
         })
-        .expect(403)
+        .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.false;
         })
