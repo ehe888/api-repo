@@ -15,18 +15,18 @@ module.exports = function(app, db, config){
     // before(function(done) {
     //
     //   db.sequelize.model("Units").create({
-    //     unit_number:'11#101',
+    //     unit_number:'11#102',
     //     active:1,
     //     property_id:1
     //   })
     //   .then(function(unit){
     //     db.sequelize.model("WechatUsers").create({
-    //       username:'ceshiyongli',
+    //       username:'ceshiyongli1',
     //       password:'123456'
     //     })
     //     .then(function(user){
     //       db.sequelize.model("UserUnitBinding").create({
-    //         username:'ceshiyongli',
+    //         username:'ceshiyongli1',
     //         mobile:'18661198949',
     //         unit_id:unit.id,
     //         wechat_user_id:user.username
@@ -50,11 +50,13 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/wechatUsers/queryWechatUsers")
         .send({
-          username: 'ceshi'
+          username: 'ceshi',
+          offset:0,
+          limit:20
         })
         .expect(200)
         .expect(function(res){
-          console.log(res.body.data);
+          console.log(res.body);
           expect(res.body.success).to.be.true;
         })
         .end(done);
