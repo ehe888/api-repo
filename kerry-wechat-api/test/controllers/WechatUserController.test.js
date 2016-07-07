@@ -62,7 +62,7 @@ module.exports = function(app, db, config){
 
     it("POST删除微信用户", function(done){
       request(app)
-        .get("/api/wechatUsers/delete?id=2")
+        .get("/api/wechatUsers/delete?id=1")
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;

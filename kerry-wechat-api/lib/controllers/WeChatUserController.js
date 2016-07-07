@@ -7,7 +7,7 @@ var _ = require("lodash"),
    jwt = require('jsonwebtoken'),
    sequelize = db.sequelize,  //The sequelize instance
    Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
-   WechatUsers =  sequelize.model("WechatUsers"),
+   WechatUsers =  sequelize.model("User"),
    UserUnitBinding =  sequelize.model("UserUnitBinding"),
    models = options.db;
 
@@ -26,7 +26,7 @@ router.post("/queryWechatUsers", function(req, res, next) {
      }
    },
    include:[{
-     model: sequelize.model("WechatUsers"),
+     model: sequelize.model("User"),
      as: 'wechat_user'
    },{
      model:sequelize.model("Units"),
