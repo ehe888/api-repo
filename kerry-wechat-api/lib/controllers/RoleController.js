@@ -40,7 +40,7 @@ router.post("/create", function(req, res, next) {
     var param = req.body;
     var id ;
 
-    return SysRole.create({
+    SysRole.create({
       name: param.name
     })
     .then(function(sysRole) {
