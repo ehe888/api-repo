@@ -7,8 +7,10 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      Units =  sequelize.model("Units"),
-     Users = sequelize.model("KerryUsers"),
+     Users = sequelize.model("User"),
+     KerryUsers = sequelize.model("KerryUsers"),
      KerryUserUnit = sequelize.model("KerryUserUnit"),
+     KerryProperty = sequelize.model("KerryProperty"),
      UserUnitBinding = sequelize.model("UserUnitBinding")
 
   var router = express.Router();
@@ -18,88 +20,110 @@ module.exports = function(app, db, options){
     var param = req.body,
         unit_number = param.unit_number,
         reg_code = param.reg_code,
-        name = param.name,
-        mobile = param.mobile,
         username = param.username,
+        mobile = param.mobile,
+        appId = param.appId,
         wechat_user_id = param.wechat_user_id;
 
-    //先查询用户是否存在
-    Users.findOne({
-      where: {
-        reg_code: reg_code,
+    KerryProperty.finOne({
+      where:{
+        appId：appId
       }
     })
-    .then(function(user) {
-      if (!user) {
-        return res.status(403).json({
-          success: false,
-          errMsg: '找不到该用户!'
-        })
-      }
-      else {
-        //有用户, 查询unit是否存在
-        var user_id = user.id;
-        Units.findOne({
-          where: {
-            unit_number: unit_number
+    .then(function(property){
+      if(property){
+        Units.findOne({   //根据单元号查询单元对象
+          where:{
+            unit_number:unit_number,
+            property_id: property.id
           }
         })
-        .then(function(unit) {
-
-          if (!unit) {
-            return res.status(403).json({
-              success: false,
-              errMsg: '找不到该房屋号!'
-            })
-          }
-          else {
-            //找得到unit, 查询user_unit是否有对应关系
-            var unit_id = unit.id
-            KerryUserUnit.findOne({
-              where: {
-                kerry_user_id: user_id,
-                unit_id: unit.id
+        .then(function(unit){
+          if(unit){
+            KerryUsers.findOne({  //根据注册码查询业主数据
+              where:{
+                reg_code:reg_code
               }
             })
-            .then(function(user_unit) {
-
-              if (!user_unit) {
-                return res.status(403).json({
-                  success: false,
-                  errMsg: '该用户和房屋号没有关系!'
+            .then(function(kerryUser){
+              if(kerryUser){
+                KerryUserUnit.findOne({ //根据单元ID以及业主ID 查询是否已经绑定两者
+                  where:{
+                    kerry_user_id:kerryUser.id,
+                    unit_id:unit.id
+                  }
                 })
-              }
-              else {
-                //条件全部满足, 讲该用户绑定到微信Openid, 插入一条记录到user_property_bind
-
-
-                UserUnitBinding.create({
-                  username: username,
-                  mobile: mobile,
-                  master_username: user.name,
-                  expire_date: user.expire_date,
-                  unit_id: unit_id,
-                  wechat_user_id: wechat_user_id
+                .then(function(kerryUserUnit){
+                  if(kerryUserUnit){
+                    Users.findOne({ //根据微信用户username查询信息 判断该微信用户是否已经授权登陆
+                      username:wechat_user_id
+                    })
+                    .then(function(user){
+                      var is_master = kerryUser.name == username?true:false;
+                      if(user){
+                        UserUnitBinding.create({  //创建微信与单元绑定关系
+                          username:username,
+                          mobile:mobile,
+                          wechat_user_id:wechat_user_id,
+                          unit_id:unit.id,
+                          master_username:kerryUser.name,
+                          expire_date:kerryUser.expire_date,
+                          is_master:is_master
+                        })
+                        .then(function(UserUnitBinding){
+                          return res.json({
+                            success:true
+                          })
+                        })
+                        .catch(function(err){
+                          return res.status(500).json({
+                            success: false
+                            ,errMsg: err.message
+                            ,errors: err
+                          })
+                        })
+                      }
+                      else{
+                        return res.json({
+                          success:false,
+                          errMsg:'该微信号未登陆！'
+                        })
+                      }
+                    })
+                    .catch(function(err){
+                      throw err;
+                      return res.status(500).json({
+                        success: false
+                        ,errMsg: err.message
+                        ,errors: err
+                      })
+                    })
+                  }
+                  else{
+                    return res.json({
+                      success:false,
+                      errMsg:'该注册码不存在！'
+                    })
+                  }
                 })
-                .then(function(bind) {
-                  return res.json({
-                    success: true
-                  })
-                })
-                .catch(function(err) {
-                  console.error(err)
+                .catch(function(err){
+                  throw err;
                   return res.status(500).json({
                     success: false
                     ,errMsg: err.message
                     ,errors: err
                   })
                 })
-
               }
-
+              else{
+                return res.json({
+                  success:false,
+                  errMsg:'该注册码与房屋没有绑定！'
+                })
+              }
             })
-            .catch(function(err) {
-              console.error(err)
+            .catch(function(err){
+              throw err;
               return res.status(500).json({
                 success: false
                 ,errMsg: err.message
@@ -107,9 +131,15 @@ module.exports = function(app, db, options){
               })
             })
           }
+          else{
+            return res.json({
+              success:false,
+              errMsg:'该单元号不存在！'
+            })
+          }
         })
-        .catch(function(err) {
-          console.error(err)
+        .catch(function(err){
+          throw err;
           return res.status(500).json({
             success: false
             ,errMsg: err.message
@@ -117,16 +147,46 @@ module.exports = function(app, db, options){
           })
         })
       }
+      else{
+        return res.json({
+          success:false,
+          errMsg:'该物业小区不存在！'
+        })
+      }
     })
-    .catch(function(err) {
-      console.error(err)
+    .catch(function(err){
       return res.status(500).json({
         success: false
         ,errMsg: err.message
         ,errors: err
       })
     })
+  })
 
+
+  //查询已经绑定的数据
+  router.post("/queryUserUnitBind", function(req, res, next) {
+   var param = req.body;
+   var username = param.username;
+
+   UserUnitBinding.findAll({
+     where:{
+       username:username
+     }
+   })
+   .then(function(userUnitBindings){
+     return res.json({
+       success:true,
+       data:userUnitBindings
+     })
+   })
+   .catch(function(err){
+     return res.status(500).json({
+       success:false,
+       errMsg:err.message,
+       errors:err
+     })
+   })
   })
 
 
