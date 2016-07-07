@@ -47,7 +47,7 @@ module.exports = function(app, db, config){
         .expect(function(res){
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
-          
+
         })
         .end(done);
     })
@@ -65,6 +65,21 @@ module.exports = function(app, db, config){
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
           expect(res.body.data.sys_user_id).to.equal(2)
+        })
+        .end(done);
+    })
+
+    it("查询所有单元", function(done) {
+      request(app)
+        .post("/api/units/query")
+        .send({
+          unit_number: '11'
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+
         })
         .end(done);
     })

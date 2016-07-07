@@ -46,6 +46,35 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/query_all", function(req, res, next) {
+    var param = req.body,
+        unit_number = param.unit_number;
+    Units.findAll({
+      attributes:['id', 'unit_number'],
+      where: {
+        unit_number: {
+          $like: '%'+unit_number+'%'
+        }
+      }
+    })
+    .then(function(units) {
+      return res.json({
+        success: true,
+        data: units
+      })
+    })
+    .catch(function(err) {
+
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
   router.post("/update", function(req, res, next) {
     var param = req.body,
         id = param.id,
