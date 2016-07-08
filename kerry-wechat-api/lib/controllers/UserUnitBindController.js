@@ -27,7 +27,7 @@ module.exports = function(app, db, options){
 
     KerryProperty.finOne({
       where:{
-        appId：appId
+        appId:appId
       }
     })
     .then(function(property){
