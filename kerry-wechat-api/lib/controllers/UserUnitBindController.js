@@ -27,7 +27,7 @@ module.exports = function(app, db, options){
 
     KerryProperty.findOne({
       where:{
-        appId:appId
+        app_id:appId
       }
     })
     .then(function(property){
