@@ -167,12 +167,16 @@ module.exports = function(app, db, options){
   //查询已经绑定的数据
   router.post("/queryUserUnitBind", function(req, res, next) {
    var param = req.body;
-   var username = param.username;
+   var wechat_user_id = param.wechat_user_id;
 
    UserUnitBinding.findAll({
      where:{
-       username:username
-     }
+       wechat_user_id:wechat_user_id
+     },
+     include: [{
+       model: Units,
+       as: 'unit'
+     }]
    })
    .then(function(userUnitBindings){
      return res.json({

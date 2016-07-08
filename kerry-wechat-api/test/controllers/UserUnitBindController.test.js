@@ -49,6 +49,7 @@ module.exports = function(app, db, config){
           username: '123456',
           reg_code: '5555355',
           mobile: '123457674444',
+          appId: 'test',
           wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
         })
         .expect(200)
@@ -130,9 +131,9 @@ module.exports = function(app, db, config){
     it("查询业主", function(done){
 
       request(app)
-        .post("/api/user_settings/query")
+        .post("/api/bind/queryUserUnitBind")
         .send({
-          name: 'test1',
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
         })
         .expect(200)
         .expect(function(res){
