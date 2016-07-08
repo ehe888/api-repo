@@ -25,7 +25,7 @@ module.exports = function(app, db, options){
         appId = param.appId,
         wechat_user_id = param.wechat_user_id;
 
-    KerryProperty.finOne({
+    KerryProperty.findOne({
       where:{
         appId:appId
       }
