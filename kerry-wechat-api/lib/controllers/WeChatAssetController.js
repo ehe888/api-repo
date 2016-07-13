@@ -29,7 +29,8 @@ router.post("/", function(req, res, next) {
   .then(function(asset) {
 
     if (!asset) {
-      var url = req.protocol+"://"+req.hostname+'/wxapi/asset/get_media_asset?app_id='+appId
+      var host = req.protocol+"://"+req.hostname
+      var url = host +'/wxapi/asset/get_media_asset?app_id='+appId
       var option = {
         uri: url,
         method: 'POST',
@@ -45,16 +46,16 @@ router.post("/", function(req, res, next) {
       rp(option)
         .then(function(data) {
           if (data.success) {
-            var media_url = data.data;
+            var filename = data.data;
             WechatAssets.create({
               media_id: media_id,
-              url: '/upload/'+media_url,
+              url: '/upload/'+filename,
               app_id: appId
             })
             .then(function(asset) {
               return res.json({
                 success: true,
-                data: asset.url
+                data: host+asset.url
               })
             })
             .catch(function(err) {
@@ -83,7 +84,7 @@ router.post("/", function(req, res, next) {
     else {
       return res.json({
         success: true,
-        data: asset.url
+        data: host+asset.url
       })
     }
 
