@@ -24,6 +24,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/SysPermissionController")(subapp, db, options)
   require("./controllers/DeliveryController")(subapp, db, options)
   require("./controllers/WeChatUserController")(subapp, db, options)
+  require("./controllers/WechatAssetController")(subapp, db, options)
 
   app.use( path || "/api", subapp);
 
