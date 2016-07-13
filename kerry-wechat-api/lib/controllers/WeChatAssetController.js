@@ -29,9 +29,9 @@ router.post("/", function(req, res, next) {
   .then(function(asset) {
 
     if (!asset) {
-      var url = '/wxapi/asset/get_media_asset?app_id='+appId
+      var url = req.protocol+"://"+req.hostname+'/wxapi/asset/get_media_asset?app_id='+appId
       var option = {
-        url: url,
+        uri: url,
         method: 'POST',
         json: {
           media_id: media_id,

@@ -1,6 +1,6 @@
 {
   "name": "kerry-wechat-api",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "description": "Kerry Wechat WebAPI ",
   "main": "lib/index.js",
   "scripts": {
