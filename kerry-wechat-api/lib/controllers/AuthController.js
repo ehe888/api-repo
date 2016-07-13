@@ -92,10 +92,10 @@ module.exports = function(app, db, options){
         username: name
       },
       include: [{
-        model: models.KerryProperty,
+        model: sequelize.model("KerryProperty"),
         as: 'WorkingProperty'
       },{
-        model: models.Units,
+        model: sequelize.model("Units"),
         as: 'unit'
       }]
     })
