@@ -31,7 +31,7 @@ router.post("/", function(req, res, next) {
     if (!asset) {
       var url = '/wxapi/asset/get_media_asset?app_id='+appId
       var option = {
-        uri: url,
+        url: url,
         method: 'POST',
         json: {
           media_id: media_id,
