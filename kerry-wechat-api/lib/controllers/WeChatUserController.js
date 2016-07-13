@@ -66,44 +66,14 @@ router.get("/delete", function(req, res, next) {
  var param = req.query;
  var id = param.id;
 
- UserUnitBinding.findOne({
+ UserUnitBinding.destroy({
    where:{
      id:id
    }
  })
- .then(function(userUnitBinding){
-   console.log(userUnitBinding)
-
-   WechatUsers.destroy({
-     where:{
-       username:userUnitBinding.wechat_user_id
-     }
-   })
-   .then(function(rows){
-     UserUnitBinding.destroy({
-       where:{
-         id:id
-       }
-     })
-     .then(function(row){
-       return res.json({
-         success:true
-       })
-     })
-     .catch(function(err){
-       return res.status(500).json({
-         success:false,
-         errMsg:err.message,
-         errors:err
-       })
-     })
-   })
-   .catch(function(err){
-     return res.status(500).json({
-       success:false,
-       errMsg:err.message,
-       errors:err
-     })
+ .then(function(row){
+   return res.json({
+     success:true
    })
  })
  .catch(function(err){
