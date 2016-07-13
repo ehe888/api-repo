@@ -85,10 +85,40 @@ module.exports = function(app, db, options){
 
   router.post("/", function(req, res, next) {
     var config = req.x_app_config;
-    var decoded = jwt.verify(req.body.access_token, config.accessToken.secret);
-    return res.json({
-      success: true,
-      data: decoded
+    var decoded = req.identity;
+    var name = decoded.sub;
+    SysUser.findOne({
+      where: {
+        username: name
+      },
+      include: [{
+        model: models.KerryProperty,
+        as: 'WorkingProperty'
+      },{
+        model: models.Units,
+        as: 'unit'
+      }]
+    })
+    .then(function(sysuser) {
+      if (!sysuser) {
+        return res.json({
+          success: false,
+          errMsg: 'SYS USER NOT FOUND'
+        })
+      }
+      return res.json({
+        success: true,
+        data: sysuser
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err);
+      return res.status(403).json({
+                                   success: false
+                                   ,errMsg: err.message
+                                   ,errors: err
+                                  });
     })
   })
 
