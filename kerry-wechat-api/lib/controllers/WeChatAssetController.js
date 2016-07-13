@@ -19,7 +19,7 @@ router.post("/", function(req, res, next) {
       appId = param.appId
 
   var bearer = req.headers['authorization'];
-
+  var host = req.protocol+"://"+req.hostname
   WechatAssets.findOne({
     where: {
       media_id: media_id,
@@ -29,7 +29,7 @@ router.post("/", function(req, res, next) {
   .then(function(asset) {
 
     if (!asset) {
-      var host = req.protocol+"://"+req.hostname
+
       var url = host +'/wxapi/asset/get_media_asset?app_id='+appId
       var option = {
         uri: url,
