@@ -29,46 +29,46 @@ module.exports = function(app, db, options){
     })
     .then(function(propertyBill) {
       id = propertyBill.id;
-      param.property_bill_lines.forEach(function(data){
-        data.property_bill_id = id;
-      })
+      if(param.property_bill_lines){
+        param.property_bill_lines.forEach(function(data){
+          data.property_bill_id = id;
+        })
 
-      PropertyBillLine.bulkCreate(param.property_bill_lines)
-      .then(function(){
-        PropertyBill.findOne({
-          where:{
-            id:id
-          },
-          include:[{
-            model: sequelize.model("PropertyBillLine"),
-            as: 'property_bill_lines'
-          }]
-        })
-        .then(function(propertyBill){
-          return res.json({
-            success:true,
-            data:propertyBill
+        PropertyBillLine.bulkCreate(param.property_bill_lines)
+        .then(function(){
+          PropertyBill.findOne({
+            where:{
+              id:id
+            },
+            include:[{
+              model: sequelize.model("PropertyBillLine"),
+              as: 'property_bill_lines'
+            }]
+          })
+          .then(function(propertyBill){
+            return res.json({
+              success:true,
+              data:propertyBill
+            })
+          })
+          .catch(function(err){
+            console.log(err)
+            return res.status(500).json({
+              success: false,
+              errMsg: err.message,
+              errors: err
+            })
           })
         })
-        .catch(function(err){
-          console.log(err)
-          return res.status(500).json({
-            success: false,
-            errMsg: err.message,
-            errors: err
-          })
+      }
+      else{
+        return res.json({
+          success:true,
+          data:propertyBill
         })
-      })
-      .catch(function(err){
-        console.log(err)
-        return res.status(500).json({
-          success: false,
-          errMsg: err.message,
-          errors: err
-        })
-      })
+      }
     })
-    .catch(function(err) {
+    .catch(function(err){
       console.log(err)
       return res.status(500).json({
         success: false,
@@ -76,7 +76,16 @@ module.exports = function(app, db, options){
         errors: err
       })
     })
+    })
+  .catch(function(err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      errMsg: err.message,
+      errors: err
+    })
   })
+})
 
   //修改账单
   router.post("/update", function(req, res, next) {
@@ -93,16 +102,20 @@ module.exports = function(app, db, options){
     })
     .then(function(propertyBill) {
       if (propertyBill) {
-        propertyBill.property_bill_lines.forEach(function(data){
-             _.remove(param.property_bill_lines,function(paramData){
-                  console.log(data.id+'  '+ paramData.id);
-            return data.id == paramData.id
+        if(propertyBill.property_bill_lines){
+          propertyBill.property_bill_lines.forEach(function(data){
+               _.remove(param.property_bill_lines,function(paramData){
+                    console.log(data.id+'  '+ paramData.id);
+              return data.id == paramData.id
+            })
           })
-        })
+        }
 
-        param.property_bill_lines.forEach(function(data){
-          data.property_id = param.id;
-        })
+        if(param.property_bill_lines){
+          param.property_bill_lines.forEach(function(data){
+            data.property_id = param.id;
+          })
+        }
 
         PropertyBillLine.bulkCreate(param.property_bill_lines)
         .then(function(){
