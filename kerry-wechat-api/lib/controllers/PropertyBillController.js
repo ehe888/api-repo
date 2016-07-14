@@ -177,22 +177,36 @@ module.exports = function(app, db, options){
 
   //查询账单
   router.post('/queryPropertyBills', function(req, res, next) {
-    var bill_number = req.body.bill_number || '';
-    PropertyBill.findAll({
+    var param = req.body,
+        bill_number = param.bill_number || '',
+        offset = param.offset || 0,
+        limit = param.limit || 20;
+
+    PropertyBill.findAndCountAll({
       where: {
         bill_number: {
           $like: '%'+bill_number+'%'
         }
       },
       include:[{
+        model: sequelize.model("Units"),
+        as: 'unit'
+      },{
         model: sequelize.model("PropertyBillLine"),
         as: 'property_bill_lines'
-      }]
+      }],
+      offset: offset,
+      limit: limit,
+      order: ' id desc'
     })
-    .then(function(propertyBills) {
+    .then(function(results) {
+      var count = results.count;
       return res.json({
         success: true,
-        data: propertyBills
+        data: results.rows,
+        count: count,
+        offset: offset,
+        limit: limit
       })
     })
     .catch(function(err) {
