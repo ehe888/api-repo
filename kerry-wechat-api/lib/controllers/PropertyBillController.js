@@ -78,14 +78,6 @@ module.exports = function(app, db, options){
       })
     })
     })
-  .catch(function(err) {
-    console.log(err)
-    return res.status(500).json({
-      success: false,
-      errMsg: err.message,
-      errors: err
-    })
-  })
 })
 
   //修改账单
