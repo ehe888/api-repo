@@ -11,6 +11,7 @@ module.exports = function(app, db, options){
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      PropertyBill =  sequelize.model("PropertyBill"),
      PropertyBillLine = sequelize.model("PropertyBillLine"),
+     Units = sequelize.model("Units"),
      models = options.db;
 
   var router = express.Router();
@@ -206,18 +207,243 @@ module.exports = function(app, db, options){
   })
 
   //上传CSV账单
+  //field1: 费用类型,
+  //field2: 账单开始日期,
+  //field3: 账单结束日期,
+  //field4: 本期金额,
+  //field5: 建筑物,
+  //field6: 单元,
+  //field7: 租户地址号,
+  //field8: 租户名称,
+  //field9: 合同号
   router.post('/upload', function(req, res, next) {
     var param = req.body,
-        lines = param.data;
-    console.log(lines);
+        rows = param.data;
+    var bill_lines = {};
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (row.field2 == '账单开始日期') {
+        continue;
+      }
 
-    return res.json({
-      success: true
+      var start = row.field2+"",
+          end = row.field3+"";
+      var start_time = start.substring(0, 4)+"-"+start.substring(4, 6)+"-"+start.substring(6, 8),
+          end_time = end.substring(0, 4)+"-"+end.substring(4, 6)+"-"+end.substring(6, 8)
+
+      var description = row.field1,
+          start_date = new Date(start_time),
+          end_date = new Date(end_time),
+          gross_amount = (row.field4+'').replace(',', ''),
+          unit_number = row.field5 + row.field6;
+      if (!bill_lines[unit_number]) {
+        bill_lines[unit_number] = [];
+      }
+      bill_lines[unit_number].push({
+        description: description,
+        start_date: start_date,
+        end_date: end_date,
+        gross_amount: gross_amount,
+        unit_number: unit_number,
+        is_pay: false
+      })
+    }
+
+    //通过CSV中的建筑编号+单元号, 查询系统里对应的单元id;
+    searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
+
+      var billLines = [];
+      var unitKeys = Object.keys(bill_lines)
+      for (var i = 0; i < unitKeys.length; i++) {
+        var lines = bill_lines[unitKeys[i]];
+        billLines = _.concat(lines, billLines);
+      }
+      console.log(billLines)
+      //查询系统是否有相应的账单和账单行, 根据description, 单元号, 日期查询, 如果有的话update, 没有的话create
+      searchAndUpdateBillLines(billLines, 0, function() {
+        return res.json({
+          success: true
+        })
+      })
     })
 
   })
 
+  //查询billLines中的单元号, 找出unit_id, 添加到billLines中对应该unit_number的对象中
+  function searchUnitIdByUnitNumbers(billLines, index, callback) {
 
+    var unitNumbers = Object.keys(billLines);
+
+    if (index >= unitNumbers.length) {
+      return callback(billLines);
+    }
+
+    var unit_number = unitNumbers[index];
+    Units.findOne({
+      where: {
+        unit_number: unit_number
+      }
+    })
+    .then(function(unit) {
+      if (!unit) {
+        console.error("unit did not find: "+unit_number);
+        searchUnitIdByUnitNumbers(billLines, ++index, callback)
+      }
+      var unit_id = unit.id;
+      var lines = billLines[unit_number];
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        line.unit_id = unit_id
+      }
+      searchUnitIdByUnitNumbers(billLines, ++index, callback)
+    })
+    .catch(function(error) {
+      console.error("unit find error: " + unit_number)
+      console.error(error);
+      searchUnitIdByUnitNumbers(billLines, ++index, callback)
+    })
+
+  }
+
+  //先根据Unit_id, year, month查询是否有bill,
+  //如果有的话,
+  //  查询是否有相同订单号, 根据description, 单元号
+  //    如果有, 那么update
+  //    如果没有, create
+  //如果没有, 新建账单记录, 再create账单行
+  function searchAndUpdateBillLines(billLines, index, callback) {
+    if (index >= billLines.length) {
+      return callback();
+    }
+
+    var billLine = billLines[index],
+        unit_id = billLine.unit_id,
+        year = billLine.start_date.getFullYear(),
+        month = billLine.start_date.getMonth()+1,
+        gross_amount = parseFloat(billLine.gross_amount),
+        description = billLine.description;
+    PropertyBill.findOne({
+      where: {
+        year: year,
+        month: month,
+        unit_id: unit_id
+      }
+    })
+    .then(function(bill) {
+
+      if (bill) {
+        var billId = bill.id;
+        PropertyBillLine.findOne({
+          where: {
+            description: description,
+            property_bill_id: billId
+          }
+        })
+        .then(function(line) {
+
+          if (line) {
+            line.update({
+              gross_amount: gross_amount
+            })
+            .then(function(line) {
+              return searchAndUpdateBillLines(billLines, ++index, callback);
+            })
+            .catch(function(error) {
+              console.log("update billLine error: " + error);
+              console.error({
+                id: line.id,
+                gross_amount: gross_amount,
+                description: description,
+                property_bill_id: billId
+              })
+              return searchAndUpdateBillLines(billLines, ++index, callback)
+            })
+          }
+          else {
+            PropertyBillLine.create({
+              gross_amount: gross_amount,
+              description: description,
+              is_pay: false,
+              property_bill_id: billId
+            })
+            .then(function(line) {
+              return searchAndUpdateBillLines(billLines, ++index, callback)
+            })
+            .catch(function(error) {
+              console.log("create billLine error: " + error);
+              console.error({
+                gross_amount: gross_amount,
+                description: description,
+                property_bill_id: billId
+              })
+              return searchAndUpdateBillLines(billLines, ++index, callback)
+            })
+          }
+
+        })
+        .catch(function(error) {
+          console.log("find billLine error: " + error);
+          console.error({
+            description: description,
+            property_bill_id: billId
+          })
+          return searchAndUpdateBillLines(billLines, ++index, callback)
+        })
+
+      }
+      else {
+        PropertyBill.create({
+          bill_number: ' ',
+          year: year,
+          month: month,
+          unit_id: unit_id
+        })
+        .then(function(bill) {
+          var billId = bill.id;
+          PropertyBillLine.create({
+            gross_amount: gross_amount,
+            description: description,
+            is_pay: false,
+            property_bill_id: billId
+          })
+          .then(function(line) {
+            return searchAndUpdateBillLines(billLines, ++index, callback)
+          })
+          .catch(function(error) {
+            console.log("create billLine error: " + error);
+            console.error({
+              gross_amount: gross_amount,
+              description: description,
+              property_bill_id: billId
+            })
+            return searchAndUpdateBillLines(billLines, ++index, callback)
+          })
+        })
+        .catch(function(error) {
+          console.error("create bill error: " + error)
+          console.error({
+            year: year,
+            month: month,
+            unit_id: unit_id
+          })
+          return searchAndUpdateBillLines(billLines, ++index, callback)
+        })
+
+      }
+
+    })
+    .catch(function(error) {
+      console.error("find bill error: " + error)
+      console.error({
+        year: year,
+        month: month,
+        unit_id: unit_id
+      })
+      return searchAndUpdateBillLines(billLines, ++index, callback)
+    })
+
+
+  }
 
   app.use("/propertyBills", router);
 }

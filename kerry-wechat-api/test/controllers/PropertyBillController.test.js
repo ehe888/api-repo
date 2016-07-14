@@ -103,20 +103,168 @@ module.exports = function(app, db, config){
         })
         .end(done);
     })
-    //
-    // it("POST查询角色-失败", function(done){
-    //   request(app)
-    //     .post("/api/roles/queryRoles")
-    //     .send({
-    //       name: '111'
-    //     })
-    //     .expect(200)
-    //     .expect(function(res){
-    //       expect(res.body.success).to.be.true;
-    //       expect(res.body.data.length).to.below(1);
-    //     })
-    //     .end(done);
-    // })
-    //
+
+    it("上传csv", function(done) {
+      var requestData = [
+        { field1: '费用类型',
+          field2: '账单开始日期',
+          field3: '账单结束日期',
+          field4: '本期金额',
+          field5: '建筑物',
+          field6: '单元',
+          field7: '租户地址号',
+          field8: '租户名称',
+          field9: '合同号' },
+        { field1: '水费',
+          field2: 20160401,
+          field3: 20160430,
+          field4: 694.6,
+          field5: 'A0001',
+          field6: '103A',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 },
+        { field1: '电费',
+          field2: 20160401,
+          field3: 20160430,
+          field4: '15,592.00',
+          field5: 'A0001',
+          field6: '103A',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 },
+        { field1: '电费',
+          field2: 20160401,
+          field3: 20160430,
+          field4: '5,592.00',
+          field5: 'A0001',
+          field6: '103A',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 },
+        { field1: '管理费',
+          field2: 20160601,
+          field3: 20160630,
+          field4: '3,676.00',
+          field5: 'A0001',
+          field6: '103A',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 },
+        { field1: '公共部位占用费',
+          field2: 20150901,
+          field3: 20150930,
+          field4: 800,
+          field5: 'A0001',
+          field6: '103C',
+          field7: 10090306,
+          field8: 'XXX',
+          field9: 115027 },
+        { field1: '公共部位占用费',
+          field2: 20151001,
+          field3: 20151023,
+          field4: 645.16,
+          field5: 'A0001',
+          field6: '103C',
+          field7: 10090306,
+          field8: 'XXX',
+          field9: 115027 }
+        ];
+
+        request(app)
+          .post("/api/propertyBills/upload")
+          .send({
+            data: requestData
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
+    it("上传csv, 不存在的单元号, 同步忽略", function(done) {
+      var requestData = [
+        { field1: '水费',
+          field2: 20160401,
+          field3: 20160430,
+          field4: 694.6,
+          field5: 'A0001',
+          field6: '103d',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 }
+        ];
+
+        request(app)
+          .post("/api/propertyBills/upload")
+          .send({
+            data: requestData
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
+    it("上传csv, 存在账单, 插入数据到账单行", function(done) {
+      var requestData = [
+        { field1: 'test',
+          field2: 20160401,
+          field3: 20160430,
+          field4: 694.6,
+          field5: 'A0001',
+          field6: '103A',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 }
+        ];
+
+        request(app)
+          .post("/api/propertyBills/upload")
+          .send({
+            data: requestData
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
+    it("上传csv, 存在账单行, 更新", function(done) {
+      var requestData = [
+        { field1: 'test',
+          field2: 20160401,
+          field3: 20160430,
+          field4: 1000,
+          field5: 'A0001',
+          field6: '103A',
+          field7: 10010549,
+          field8: 'XXX',
+          field9: 103631 }
+        ];
+
+        request(app)
+          .post("/api/propertyBills/upload")
+          .send({
+            data: requestData
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
   });
 }

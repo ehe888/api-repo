@@ -24,6 +24,16 @@ module.exports = function(app, db, config){
           unit_number: "12-503",
           property_id: 1,
           sys_user_id: 2
+        },
+        {
+          unit_number: "A0001103A",
+          property_id: 1,
+          sys_user_id: 1
+        },
+        {
+          unit_number: "A0001103C",
+          property_id: 1,
+          sys_user_id: 2
         }
       ]
 
