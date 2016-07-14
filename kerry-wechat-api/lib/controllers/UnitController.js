@@ -106,7 +106,7 @@ module.exports = function(app, db, options){
 
   })
 
-  router.post("/delete", funciton(req, res, next) {
+  router.post("/delete", function(req, res, next) {
     var param = req.body,
         id = param.id;
     Units.destroy({
