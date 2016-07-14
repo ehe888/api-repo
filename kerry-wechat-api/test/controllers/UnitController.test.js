@@ -29,11 +29,6 @@ module.exports = function(app, db, config){
           unit_number: "A0001103A",
           property_id: 1,
           sys_user_id: 1
-        },
-        {
-          unit_number: "A0001103C",
-          property_id: 1,
-          sys_user_id: 2
         }
       ]
 
@@ -45,6 +40,23 @@ module.exports = function(app, db, config){
       .catch(function(err) {
         done(err);
       })
+    })
+
+    it("新建单元", function(done) {
+      request(app)
+        .post("/api/units/create")
+        .send({
+          unit_number: "A0001103C",
+          property_id: 1,
+          sys_user_id: 2
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+
+        })
+        .end(done);
     })
 
     it("查询单元", function(done){

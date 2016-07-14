@@ -10,6 +10,33 @@ module.exports = function(app, db, options){
 
   var router = express.Router();
 
+  router.post("/create", function(req, res, next) {
+    var param = req.body,
+        unit_number = param.unit_number,
+        sys_user_id = param.sys_user_id,
+        property_id = param.property_id;
+    Units.create({
+      unit_number: unit_number,
+      sys_user_id: sys_user_id,
+      property_id: property_id
+    })
+    .then(function(unit) {
+      return res.json({
+        success: true,
+        data: unit
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
   router.post("/query", function(req, res, next) {
     var param = req.body,
         unit_number = param.unit_number || '',
@@ -22,6 +49,10 @@ module.exports = function(app, db, options){
           $like: '%'+unit_number+'%'
         }
       },
+      include: [{
+        model: sequelize.model("SysUser"),
+        as: 'sys_user',
+      }],
       offset: offset,
       limit: limit
     })
