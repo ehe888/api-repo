@@ -11,7 +11,16 @@ module.exports = function(app, db, options){
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      PropertyBill =  sequelize.model("PropertyBill"),
      PropertyBillLine = sequelize.model("PropertyBillLine"),
-     models = options.db;
+     models = options.db,
+     iconv = require('iconv-lite'),
+     multer = require('multer')
+
+  var Converter = require("csvtojson").Converter;
+  var converter = new Converter({
+   noheader:true
+  });
+
+  var upload = multer();
 
   var router = express.Router();
 
@@ -203,6 +212,40 @@ module.exports = function(app, db, options){
         ,errors: err
       })
     })
+  })
+
+  //上传CSV账单
+  router.post('/upload', upload.single('media'), function(req, res, next) {
+    try {
+      var csvBuffer = req.file.buffer;
+      var csvString = iconv.decode(csvBuffer, 'GBK')
+      // var csvString = csvBuffer.toString('utf-8')
+      console.log(csvString)
+      converter.fromString(csvString, function(err, result) {
+        if (err) {
+          console.error(err);
+          debug(err)
+          return res.json({
+            success: false,
+            errMsg: err.message,
+            error: err
+          })
+        }
+        console.log(result);
+        return res.json({
+          success: true
+        })
+      })
+
+    }catch(err) {
+      console.error(err);
+      debug(err)
+      return res.json({
+        success: false,
+        errMsg: err.message,
+        error: err
+      })
+    }
   })
 
 
