@@ -106,10 +106,35 @@ module.exports = function(app, db, options){
 
   })
 
+  router.post("/delete", funciton(req, res, next) {
+    var param = req.body,
+        id = param.id;
+    Units.destroy({
+      where: {
+        id: id
+      }
+    })
+    .then(function() {
+      return res.json({
+        success: true
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
   router.post("/update", function(req, res, next) {
     var param = req.body,
         id = param.id,
-        sys_user_id = param.sys_user_id
+        sys_user_id = param.sys_user_id,
+        unit_number = param.unit_number;
 
     Units.findOne({
       id: id
@@ -122,6 +147,7 @@ module.exports = function(app, db, options){
         })
       }else {
         unit.update({
+          unit_number: unit_number,
           sys_user_id: sys_user_id
         })
         .then(function(instance) {
