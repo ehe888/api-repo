@@ -305,7 +305,7 @@ module.exports = function(app, db, options){
     .then(function(unit) {
       if (!unit) {
         console.error("unit did not find: "+unit_number);
-        searchUnitIdByUnitNumbers(billLines, ++index, callback)
+        return searchUnitIdByUnitNumbers(billLines, ++index, callback)
       }
       var unit_id = unit.id;
       var lines = billLines[unit_number];
@@ -313,12 +313,12 @@ module.exports = function(app, db, options){
         var line = lines[i];
         line.unit_id = unit_id
       }
-      searchUnitIdByUnitNumbers(billLines, ++index, callback)
+      return searchUnitIdByUnitNumbers(billLines, ++index, callback)
     })
     .catch(function(error) {
       console.error("unit find error: " + unit_number)
       console.error(error);
-      searchUnitIdByUnitNumbers(billLines, ++index, callback)
+      return searchUnitIdByUnitNumbers(billLines, ++index, callback)
     })
 
   }
