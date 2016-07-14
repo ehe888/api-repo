@@ -77,8 +77,7 @@ module.exports = function(app, db, options){
         errors: err
       })
     })
-    })
-})
+  })
 
   //修改账单
   router.post("/update", function(req, res, next) {
