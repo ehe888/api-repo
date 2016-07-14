@@ -1,6 +1,6 @@
 {
   "name": "kerry-wechat-api",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "description": "Kerry Wechat WebAPI ",
   "main": "lib/index.js",
   "scripts": {
@@ -9,13 +9,10 @@
   "author": "eric.leihe@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "csvtojson": "^1.0.0",
     "express": "^4.14.0",
-    "iconv-lite": "^0.4.13",
     "jsonwebtoken": "^7.0.1",
     "kerry-wechat-model": "~0.0.4",
     "lodash": "^4.13.1",
-    "multer": "^1.1.0",
     "pg": "^5.1.0",
     "request-promise": "^3.0.0",
     "sequelize": "^3.23.3",
