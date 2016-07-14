@@ -146,7 +146,7 @@ module.exports = function(app, db, options){
   //查询后台用户
   router.post("/querySysUsers", function(req, res, next) {
     var param = req.body;
-    var username = param.username;
+    var username = param.username || "";
 
     SysUser.findAll({
       where :{
