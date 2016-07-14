@@ -53,6 +53,7 @@ module.exports = function(app, db, options){
         model: sequelize.model("SysUser"),
         as: 'sys_user',
       }],
+      order: 'id desc',
       offset: offset,
       limit: limit
     })
@@ -137,7 +138,9 @@ module.exports = function(app, db, options){
         unit_number = param.unit_number;
 
     Units.findOne({
-      id: id
+      where: {
+        id: id
+      }
     })
     .then(function(unit) {
       if (!unit) {
