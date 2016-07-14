@@ -45,9 +45,11 @@ router.post("/create", function(req, res, next) {
     })
     .then(function(sysRole) {
       id = sysRole.id;
-      param.permissions.forEach(function(data){
-        data.role_id = id;
-      })
+      if(param.permissions){
+        param.permissions.forEach(function(data){
+          data.role_id = id;
+        })
+      }
 
       SysRolePermission.bulkCreate(param.permissions)
       .then(function(){
@@ -108,17 +110,21 @@ router.post("/update", function(req, res, next) {
       name:param.name
     })
     .then(function(sysRole){
-      sysRole.permissions.forEach(function(data){
-           _.remove(param.permissions,function(paramData){
-                console.log(data.name+'  '+ paramData.name);
-          return data.name == paramData.name
+      if(sysRole.permissions){
+        sysRole.permissions.forEach(function(data){
+             _.remove(param.permissions,function(paramData){
+                  console.log(data.name+'  '+ paramData.name);
+            return data.name == paramData.name
+          })
         })
-      })
+      }
 
-      param.permissions.forEach(function(data){
-        data.role_id = id;
-      })
-
+      if(param.permissions){
+        param.permissions.forEach(function(data){
+          data.role_id = id;
+        })
+      }
+      
       SysRolePermission.bulkCreate(param.permissions)
       .then(function(){
         return res.json({
