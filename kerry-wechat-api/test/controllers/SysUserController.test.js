@@ -17,14 +17,15 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/sysusers/create")
         .send({
-          username:'testUser',
+          username:'testUser1',
           password:'123456',
           email:'12345678901@qq.com',
           mobile:'13584936920',
           headimage:'',
           firstName:'firstName',
           lastName:'lastName',
-          userType:'CORP'
+          userType:'PROPERTY',
+          working_property_id: 1
         })
         .expect(200)
         .expect(function(res){
@@ -57,13 +58,14 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/sysusers/querySysUsers")
         .send({
-          username: 'test'
+          username: '',
+          appId: 'wxa0c45fc6d9e269ed'
         })
         .expect(200)
         .expect(function(res){
-          console.log(res.body.data);
+          console.log(res.body);
           expect(res.body.success).to.be.true;
-          expect(res.body.data[0].username).to.equal("testUser");
+          expect(res.body.data[0].username).to.equal("testUser1");
         })
         .end(done);
     })

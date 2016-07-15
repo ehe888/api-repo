@@ -11,49 +11,48 @@ module.exports = function(app, db, config){
 
   describe("API平台系统查询业主", function(){
 
-    before(function(done){
-      var test_data = [
-        {
-          name: 'test1',
-          mobile: '123457674444',
-          reg_code: '5555355',
-          bind_date: (new Date())
-        },
-        {
-          name: 'test2',
-          mobile: '12322454444',
-          reg_code: '5325555',
-          bind_date: (new Date())
-        },
-        {
-          name: 'test3',
-          mobile: '1235454444',
-          reg_code: '551555',
-          bind_date: (new Date())
-        },
-        {
-          name: 'test4',
-          openid: '1563',
-          mobile: '1234544434',
-          reg_code: '555355',
-          bind_date: (new Date())
-        }
-      ]
+    // before(function(done){
+    //   var test_data = [
+    //     {
+    //       name: 'test1',
+    //       mobile: '123457674444',
+    //       reg_code: '5555355',
+    //       bind_date: (new Date())
+    //     },
+    //     {
+    //       name: 'test2',
+    //       mobile: '12322454444',
+    //       reg_code: '5325555',
+    //       bind_date: (new Date())
+    //     },
+    //     {
+    //       name: 'test3',
+    //       mobile: '1235454444',
+    //       reg_code: '551555',
+    //       bind_date: (new Date())
+    //     },
+    //     {
+    //       name: 'test4',
+    //       openid: '1563',
+    //       mobile: '1234544434',
+    //       reg_code: '555355',
+    //       bind_date: (new Date())
+    //     }
+    //   ]
+    //
+    //
+    //   db.sequelize.transaction(function(t) {
+    //     return db.sequelize.model("KerryUsers").bulkCreate(test_data)
+    //             .then(function(instance){
+    //               expect(instance).to.exist;
+    //               done()
+    //             })
+    //             .catch(function(err) {
+    //               done(err);
+    //             })
+    //   })
 
-
-      db.sequelize.transaction(function(t) {
-        return db.sequelize.model("KerryUsers").bulkCreate(test_data)
-                .then(function(instance){
-                  expect(instance).to.exist;
-                  done()
-                })
-                .catch(function(err) {
-                  done(err);
-                })
-      })
-
-
-    });
+    // });
 
     it("查询业主", function(done){
 
@@ -62,7 +61,8 @@ module.exports = function(app, db, config){
         .send({
           name: '',
           offset: 0,
-          limit: 2
+          limit: 2,
+          appId: 'wxa0c45fc6d9e269ed'
         })
         .expect(200)
         .expect(function(res){

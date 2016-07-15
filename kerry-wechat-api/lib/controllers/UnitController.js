@@ -52,6 +52,12 @@ module.exports = function(app, db, options){
       include: [{
         model: sequelize.model("SysUser"),
         as: 'sys_user',
+      }, {
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          appId: param.appId
+        }
       }],
       order: 'id desc',
       offset: offset,

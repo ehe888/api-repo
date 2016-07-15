@@ -31,7 +31,14 @@ module.exports = function(app, db, options){
       },
       include: [{
         model: sequelize.model("Units"),
-        as: 'unit'
+        as: 'unit',
+        include: [{
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          where: {
+            appId: param.appId
+          }
+        }]
       }],
       offset: offset,
       limit: limit,
@@ -66,7 +73,7 @@ module.exports = function(app, db, options){
         url = param.url,
         app_id = req.query.app_id
 
-    //TODO, 推送模板消息
+
     Units.findOne({
       where: {
         unit_number: unit_number

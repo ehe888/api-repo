@@ -36,6 +36,12 @@ router.post("/queryWechatUsers", function(req, res, next) {
      include: [{
        model: sequelize.model("SysUser"),
        as: 'sys_user'
+     }, {
+       model: sequelize.model("KerryProperty"),
+       as: 'property',
+       where: {
+         appId: param.appId
+       }
      }]
    }],
    offset: offset,

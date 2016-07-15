@@ -31,7 +31,10 @@ module.exports = function(app, db, options){
         {
           model: sequelize.model("KerryProperty"),
           as: 'property',
-          attributes:['name']
+          attributes:['name'],
+          where: {
+            appId: param.appId
+          }
         }]
       }, {
         model: KerryUsers,

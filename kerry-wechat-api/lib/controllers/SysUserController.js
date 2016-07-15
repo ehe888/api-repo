@@ -85,7 +85,8 @@ module.exports = function(app, db, options){
       headimage:param.headimage,
       firstName:param.firstName,
       lastName:param.lastName,
-      userType:param.userType
+      userType:param.userType,
+      working_property_id: param.working_property_id
     })
     .then(function(sysUser){
       return res.json({
@@ -94,6 +95,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err){
+      console.error(err)
       return res.status(500).json({
         success:false,
         errMsg:err.message,
@@ -156,7 +158,10 @@ module.exports = function(app, db, options){
       },
       include:[{
         model: sequelize.model("KerryProperty"),
-        as: 'WorkingProperty'
+        as: 'WorkingProperty',
+        where: {
+          appId: param.appId
+        }
       }]
     })
     .then(function(sysUsers){

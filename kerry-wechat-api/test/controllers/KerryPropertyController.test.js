@@ -16,12 +16,12 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/properties/create")
         .send({
-          name: 'test',
-          appId: 'test',
-          telephone: '13111111111',
+          name: 'tes1t21',
+          appId: 'test3',
+          telephone: '13311312111',
           province: 'test',
           city: 'test',
-          street: 'test',
+          street: 'tes2t',
           start_time: (new Date()),
           end_time: (new Date()),
           zipcode: 'test',
@@ -55,11 +55,12 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/properties/query")
         .send({
-          name: 'test'
+          name: 'test',
+          appId: 'test1'
         })
         .expect(200)
         .expect(function(res) {
-
+          console.log(res.body)
           expect(res.body.success).to.be.true;
           expect(res.body.data.length).to.be.above(0);
         })
@@ -159,12 +160,12 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/properties/create")
         .send({
-          name: 'test11',
+          name: 'te2st11',
           appId: 'test2',
-          telephone: '13111111311',
-          province: 'test',
-          city: 'test',
-          street: 'test',
+          telephone: '13113111311',
+          province: 'te2st',
+          city: 't3est',
+          street: 't1est',
           start_time: (new Date()),
           end_time: (new Date()),
           zipcode: 'test',

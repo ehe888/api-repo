@@ -155,7 +155,8 @@ module.exports = function(app, db, options){
       where: {
         name: {
           $like: '%'+name+'%'
-        }
+        },
+        appId: req.body.appId
       }
     })
     .then(function(properties) {

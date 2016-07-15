@@ -50,9 +50,10 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/wechatUsers/queryWechatUsers")
         .send({
-          username: 'ceshi',
+          username: '',
           offset:0,
-          limit:20
+          limit:20,
+          appId: 'wxa0c45fc6d9e269ed'
         })
         .expect(200)
         .expect(function(res){
@@ -71,5 +72,6 @@ module.exports = function(app, db, config){
         })
         .end(done);
     })
+
   });
 }
