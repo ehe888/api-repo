@@ -224,6 +224,71 @@ module.exports = function(app, db, options){
     })
   })
 
+  //根据wechat_username查询账单
+  router.post("/queryUserBills", function(req, res, next) {
+    var param = req.body;
+    var wechat_user_id = param.wechat_user_id,
+        unit_id = param.unit_id,
+        year = param.year;
+
+    sequelize.model("UserUnitBinding").findAll({
+      where:{
+        wechat_user_id:wechat_user_id,
+        unit_id: unit_id
+      }
+    })
+    .then(function(userUnitBindings){
+
+      if (!userUnitBindings) {
+        return res.json({
+          success: false,
+          errMsg: '请先绑定单元!'
+        })
+      }
+
+      PropertyBill.findAll({
+        where: {
+          unit_id: unit_id,
+          year: year
+        },
+        include:[{
+          model: sequelize.model("Units"),
+          as: 'unit'
+        },{
+          model: sequelize.model("PropertyBillLine"),
+          as: 'property_bill_lines'
+        }],
+        order: ' year,month desc'
+      })
+      .then(function(bills) {
+        return res.json({
+          success: true,
+          data: bills
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+
+
+    })
+    .catch(function(err){
+      console.error(err)
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+
+  })
+
   //上传CSV账单
   //field1: 费用类型,
   //field2: 账单开始日期,

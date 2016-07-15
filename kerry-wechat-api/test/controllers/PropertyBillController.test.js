@@ -20,7 +20,7 @@ module.exports = function(app, db, config){
           year:date.getFullYear(),
           month:date.getMonth(),
           is_push:false,
-          unit_id:3,
+          unit_id:1,
           property_bill_lines:[{
             description:"11111111111111",
             taxable_amount:100,
@@ -95,6 +95,22 @@ module.exports = function(app, db, config){
         .post("/api/propertyBills/queryPropertyBills")
         .send({
           bill_number:'B'
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body.data);
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
+    it("根据userid查询账单", function(done) {
+      request(app)
+        .post("/api/propertyBills/queryUserBills")
+        .send({
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
+          unit_id: 1,
+          year: 2016
         })
         .expect(200)
         .expect(function(res){
