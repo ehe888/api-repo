@@ -54,7 +54,7 @@ module.exports = function(app, db, options){
       }
     })
     .then(function(line) {
-      PropertyBillLine.update({
+      line.update({
         description:param.description,
         taxable_amount:param.taxable_amount,
         tax:param.tax,
