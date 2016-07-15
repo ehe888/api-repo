@@ -24,6 +24,7 @@ module.exports = function(app, db, options){
       description:param.description,
       taxable_amount:param.taxable_amount,
       tax:param.tax,
+      property_bill_id:param.property_bill_id,
       gross_amount:param.gross_amount,
       expire_date:param.expire_date
     })
