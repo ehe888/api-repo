@@ -47,3 +47,4 @@ require("./controllers/DeliveryController.test")(app, db, config);
 require("./controllers/WechatUserController.test")(app, db, config);
 require("./controllers/WechatAssetController.test")(app, db, config)
 require("./controllers/PropertyBillController.test")(app, db, config);
+require("./controllers/PropertyBillLineController.test")(app, db, config);
