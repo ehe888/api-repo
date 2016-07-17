@@ -89,7 +89,7 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
-    it("更新业主到期时间", function(done){
+    it("更新业主", function(done){
       var now = new Date()
       request(app)
         .post("/api/user_settings/update")
@@ -101,6 +101,24 @@ module.exports = function(app, db, config){
         .expect(function(res){
           expect(res.body.success).to.be.true;
           expect(new Date(res.body.data.expire_date).getTime()).to.equal(now.getTime())
+        })
+        .end(done);
+    })
+
+    it("创建业主", function(done) {
+      var now = new Date();
+      request(app)
+        .post("/api/user_settings/create")
+        .send({
+          name: 'test',
+          mobile: '15111111111',
+          reg_code: '1234567890',
+          unit_number: '12-503',
+          expire_date: now
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
         })
         .end(done);
     })

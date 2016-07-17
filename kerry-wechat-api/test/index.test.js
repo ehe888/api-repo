@@ -38,7 +38,7 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/AuthController.test")(app, db, config);
 // require("./controllers/RoleController.test")(app, db, config);
 // require("./controllers/KerryPropertyController.test")(app, db, config);
-// require("./controllers/UserManagerController.test")(app, db, config);
+require("./controllers/UserManagerController.test")(app, db, config);
 // require("./controllers/SysUserController.test")(app, db, config);
 // require("./controllers/UnitController.test")(app, db, config);
 // require("./controllers/UserUnitBindController.test")(app, db, config);
@@ -46,5 +46,5 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/DeliveryController.test")(app, db, config);
 // require("./controllers/WechatUserController.test")(app, db, config);
 // require("./controllers/WechatAssetController.test")(app, db, config)
-require("./controllers/PropertyBillController.test")(app, db, config);
-require("./controllers/PropertyBillLineController.test")(app, db, config);
+// require("./controllers/PropertyBillController.test")(app, db, config);
+// require("./controllers/PropertyBillLineController.test")(app, db, config);

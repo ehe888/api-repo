@@ -7,6 +7,7 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      KerryUsers =  sequelize.model("KerryUsers"),
+     Units = sequelize.model("Units"),
      KerryUserUnit = sequelize.model("KerryUserUnit");
 
   var router = express.Router();
@@ -118,7 +119,10 @@ module.exports = function(app, db, options){
 
   router.post('/update', function(req, res, next) {
     var param = req.body,
-        expire_date = param.expire_date,
+        expire_date = param.expire_date || '',
+        name = param.name || '',
+        reg_code = param.reg_code || '',
+        mobile = param.mobile || '',
         id = param.id;
     KerryUsers.findOne({
       where: {
@@ -133,9 +137,20 @@ module.exports = function(app, db, options){
           errMsg: '用户不存在'
         })
       }else {
-        user.update({
-          expire_date: expire_date
-        })
+        var updateOptioin = {};
+        if (expire_date && expire_date.length > 0) {
+          updateOptioin.expire_date = expire_date
+        }
+        if (name && name.length > 0) {
+          updateOptioin.name = name
+        }
+        if (reg_code && reg_code.length > 0) {
+          updateOptioin.reg_code = reg_code
+        }
+        if (mobile && mobile.length > 0) {
+          updateOptioin.mobile = mobile
+        }
+        user.update(updateOptioin)
         .then(function(user) {
           return res.json({
             success: true,
@@ -185,6 +200,95 @@ module.exports = function(app, db, options){
         ,errors: err
       })
     })
+  })
+
+  router.post("/create", function(req, res, next) {
+    var param = req.body,
+        name = param.name,
+        mobile = param.mobile,
+        reg_code = param.reg_code,
+        expire_date = param.expire_date,
+        unit_number = param.unit_number;
+
+    Units.findOne({
+      where: {
+        unit_number: unit_number
+      }
+    })
+    .then(function(unit) {
+      if (!unit) {
+        return res.json({
+          success: false,
+          errMsg: '找不到改户号!'
+        })
+      }
+
+      var unit_id = unit.id;
+      KerryUsers.findOne({
+        where: {
+          mobile: mobile,
+          reg_code: reg_code
+        }
+      })
+      .then(function(user) {
+
+        if (user) {
+          return res.json({
+            success: false,
+            errMsg: '已经创建过改用户!'
+          })
+        }
+
+        KerryUsers.create({
+          name: name,
+          mobile: mobile,
+          reg_code: reg_code,
+          is_master: true,
+          expire_date: expire_date
+        })
+        .then(function(user) {
+
+          KerryUserUnit.create({
+            unit_id: unit_id,
+            kerry_user_id: user.id
+          })
+          .then(function(userUnit) {
+            return res.json({
+              success: true,
+              data: userUnit
+            })
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.status(500).json({
+              success: false
+              ,errMsg: err.message
+              ,errors: err
+            })
+          })
+
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
   })
 
 
