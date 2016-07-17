@@ -95,12 +95,14 @@ module.exports = function(app, db, config){
         .post("/api/user_settings/update")
         .send({
           id: 1,
-          expire_date: now
+          expire_date: now,
+          name: 'update name',
+          mobile: '99999',
+          unit_number: '12-503'
         })
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
-          expect(new Date(res.body.data.expire_date).getTime()).to.equal(now.getTime())
         })
         .end(done);
     })

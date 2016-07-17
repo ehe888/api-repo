@@ -123,59 +123,134 @@ module.exports = function(app, db, options){
         name = param.name || '',
         reg_code = param.reg_code || '',
         mobile = param.mobile || '',
+        unit_id = param.unit_id,
+        unit_number = param.unit_number || '',
         id = param.id;
-    KerryUsers.findOne({
+    KerryUserUnit.findOne({
       where: {
         id: id
-      }
+      },
+      include: [{
+        model: sequelize.model("Units"),
+        as: 'unit',
+        include: [{
+          model: sequelize.model("SysUser"),
+          as: 'sys_user',
+          attributes: ['first_name', 'last_name', 'email']
+        },
+        {
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          attributes:['name']
+        }]
+      }, {
+        model: KerryUsers,
+        as: 'kerry_user'
+      }]
     })
-    .then(function(user){
-
-      if (!user) {
+    .then(function(userUnit) {
+      if (!userUnit) {
         return res.status(404).json({
           success: false,
-          errMsg: '用户不存在'
-        })
-      }else {
-        var updateOptioin = {};
-        if (expire_date && expire_date.length > 0) {
-          updateOptioin.expire_date = expire_date
-        }
-        if (name && name.length > 0) {
-          updateOptioin.name = name
-        }
-        if (reg_code && reg_code.length > 0) {
-          updateOptioin.reg_code = reg_code
-        }
-        if (mobile && mobile.length > 0) {
-          updateOptioin.mobile = mobile
-        }
-        user.update(updateOptioin)
-        .then(function(user) {
-          return res.json({
-            success: true,
-            data: user
-          })
-        })
-        .catch(function(err) {
-          console.error(err)
-          return res.status(500).json({
-            success: false
-            ,errMsg: err.message
-            ,errors: err
-          })
+          errMsg: '找不到绑定信息!'
         })
       }
 
-    })
-    .catch(function(err) {
-      console.error(err)
-      return res.status(500).json({
-        success: false
-        ,errMsg: err.message
-        ,errors: err
+      KerryUsers.findOne({
+        where: {
+          id: userUnit.kerry_user_id
+        }
       })
+      .then(function(user){
+
+        if (!user) {
+          return res.status(404).json({
+            success: false,
+            errMsg: '用户不存在'
+          })
+        }else {
+          var updateOptioin = {};
+          if (expire_date && expire_date.length > 0) {
+            updateOptioin.expire_date = expire_date
+          }
+          if (name && name.length > 0) {
+            updateOptioin.name = name
+          }
+          if (reg_code && reg_code.length > 0) {
+            updateOptioin.reg_code = reg_code
+          }
+          if (mobile && mobile.length > 0) {
+            updateOptioin.mobile = mobile
+          }
+
+          user.update(updateOptioin)
+          .then(function(user) {
+            if (unit_number && unit_number.length > 0) {
+
+              Units.findOne({
+                where: {
+                  unit_number: unit_number
+                }
+              })
+              .then(function(unit) {
+                if (unit) {
+                  userUnit.update({
+                    unit_id: unit.id
+                  })
+                  .then(function(userUnit) {
+                    return res.json({
+                      success: true,
+                      data: userUnit
+                    })
+                  })
+                  .catch(function(err) {
+                    console.error(err)
+                    return res.status(500).json({
+                      success: false
+                      ,errMsg: err.message
+                      ,errors: err
+                    })
+                  })
+                }else {
+                  return res.json({
+                    success: true,
+                    data: userUnit
+                  })
+                }
+
+              })
+
+            }
+            else {
+              return res.json({
+                success: true,
+                data: userUnit
+              })
+            }
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.status(500).json({
+              success: false
+              ,errMsg: err.message
+              ,errors: err
+            })
+          })
+        }
+
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+
     })
+
+
 
   })
 
