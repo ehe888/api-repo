@@ -107,6 +107,20 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("删除业主", function(done){
+      var now = new Date()
+      request(app)
+        .post("/api/user_settings/delete_bind")
+        .send({
+          id: 1
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
     it("创建业主", function(done) {
       var now = new Date();
       request(app)

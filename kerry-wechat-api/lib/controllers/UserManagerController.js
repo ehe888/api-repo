@@ -257,23 +257,56 @@ module.exports = function(app, db, options){
   router.post('/delete_bind', function(req, res, next) {
     var param = req.body,
         id = param.id;
-    KerryUsers.destroy({
+
+    KerryUserUnit.findOne({
       where: {
         id: id
       }
     })
-    .then(function() {
-      return res.json({
-        success: true
-      })
-    })
-    .catch(function(err) {
-      console.error(err)
-      return res.status(500).json({
-        success: false
-        ,errMsg: err.message
-        ,errors: err
-      })
+    .then(function(userUnit) {
+      if (userUnit) {
+        var user_id = userUnit.kerry_user_id;
+        KerryUserUnit.destroy({
+          where: {
+            id: id
+          }
+        })
+        .then(function() {
+          KerryUsers.destroy({
+            where: {
+              id: user_id
+            }
+          })
+          .then(function() {
+            return res.json({
+              success: true
+            })
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.status(500).json({
+              success: false
+              ,errMsg: err.message
+              ,errors: err
+            })
+          })
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+
+      }
+      else {
+        return res.status(404).json({
+          success: false,
+          errMsg: '未绑定!'
+        })
+      }
     })
   })
 
