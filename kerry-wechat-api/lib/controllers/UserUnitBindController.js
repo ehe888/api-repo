@@ -61,27 +61,46 @@ module.exports = function(app, db, options){
                     .then(function(user){
                       var is_master = kerryUser.name == username?true:false;
                       if(user){
-                        UserUnitBinding.create({  //创建微信与单元绑定关系
-                          username:username,
-                          mobile:mobile,
-                          wechat_user_id:wechat_user_id,
-                          unit_id:unit.id,
-                          master_username:kerryUser.name,
-                          expire_date:kerryUser.expire_date,
-                          is_master:is_master
+                        UserUnitBinding.findOne({ //查询该微信用户是否已经绑定该单元
+                          where: {
+                            wechat_user_id: wechat_user_id,
+                            unit_id: unit.id
+                          }
                         })
-                        .then(function(UserUnitBinding){
-                          return res.json({
-                            success:true
-                          })
+                        .then(function(bind) {
+                          if (bind) {
+                            return res.json({
+                              success: false,
+                              errMsg: '您已绑定该房屋'
+                            })
+                          }
+                          else {
+                            UserUnitBinding.create({  //创建微信与单元绑定关系
+                              username:username,
+                              mobile:mobile,
+                              wechat_user_id:wechat_user_id,
+                              unit_id:unit.id,
+                              master_username:kerryUser.name,
+                              expire_date:kerryUser.expire_date,
+                              is_master:is_master
+                            })
+                            .then(function(UserUnitBinding){
+                              return res.json({
+                                success:true
+                              })
+                            })
+                            .catch(function(err){
+                              return res.status(500).json({
+                                success: false
+                                ,errMsg: err.message
+                                ,errors: err
+                              })
+                            })
+                          }
+
                         })
-                        .catch(function(err){
-                          return res.status(500).json({
-                            success: false
-                            ,errMsg: err.message
-                            ,errors: err
-                          })
-                        })
+
+
                       }
                       else{
                         return res.json({
