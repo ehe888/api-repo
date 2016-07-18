@@ -299,7 +299,6 @@ module.exports = function(app, db, options){
             ,errors: err
           })
         })
-
       }
       else {
         return res.status(404).json({
