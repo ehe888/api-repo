@@ -31,28 +31,28 @@ module.exports = function(app, db, config){
     //     .end(done);
     // })
 
-    it("POST更新角色", function(done){
-      request(app)
-        .post("/api/roles/update")
-        .send({
-          id:23,
-          name:'ceshiyongli',
-          permissions:[{
-            name:'创建角色',
-            httpMethod:'POST',
-            httpPath:'/^/wxapi/roles.*/'
-          },{
-            name:'ALL',
-            httpMethod:'*',
-            httpPath:'/^/wxapi/roles.*/'
-          }]
-        })
-        .expect(200)
-        .expect(function(res){
-          expect(res.body.success).to.be.true;
-        })
-        .end(done);
-    })
+    // it("POST更新角色", function(done){
+    //   request(app)
+    //     .post("/api/roles/update")
+    //     .send({
+    //       id:23,
+    //       name:'ceshiyongli',
+    //       permissions:[{
+    //         name:'创建角色',
+    //         httpMethod:'POST',
+    //         httpPath:'/^/wxapi/roles.*/'
+    //       },{
+    //         name:'ALL',
+    //         httpMethod:'*',
+    //         httpPath:'/^/wxapi/roles.*/'
+    //       }]
+    //     })
+    //     .expect(200)
+    //     .expect(function(res){
+    //       expect(res.body.success).to.be.true;
+    //     })
+    //     .end(done);
+    // })
 
     // it("POST查询角色", function(done){
     //   request(app)

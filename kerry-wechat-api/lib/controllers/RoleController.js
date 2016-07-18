@@ -124,7 +124,7 @@ router.post("/update", function(req, res, next) {
           data.role_id = id;
         })
       }
-      
+
       SysRolePermission.bulkCreate(param.permissions)
       .then(function(){
         return res.json({

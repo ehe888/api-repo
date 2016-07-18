@@ -12,6 +12,7 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      SysUser =  sequelize.model("SysUser"),
+     SysRoleUser = sequelize.model("SysRoleUser"),
      models = options.db;
 
   var router = express.Router();
@@ -65,10 +66,11 @@ module.exports = function(app, db, options){
 
 
   /**
-  *查询系统用户
+  *创建系统用户
   */
   router.post("/create", function(req, res, next){
     var param = req.body;
+    var id;
 
     if(param.userType == 'CORP' ){
       param.userType = SysUser.userTypes.CORP;
@@ -89,9 +91,27 @@ module.exports = function(app, db, options){
       working_property_id: param.working_property_id
     })
     .then(function(sysUser){
-      return res.json({
-        success:true,
-        data:sysUser
+      id = sysUser.id;
+      if(param.SysRoleUsers){
+        param.SysRoleUsers.forEach(function(data){
+          data.username = sysUser.name;
+        })
+      }
+
+      SysRoleUser.bulkCreate(param.SysRoleUsers)
+      .then(function(){
+        return res.jons({
+          success:true,
+          data:sysUser
+        })
+      })
+      .catch(function(err){
+        console.error(err)
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
       })
     })
     .catch(function(err){
@@ -122,9 +142,48 @@ module.exports = function(app, db, options){
         lastName:param.lastName,
       })
       .then(function(sysUser){
-        return res.json({
-          success:true,
-          data:sysUser
+        SysRoleUser.findAll({
+          where:{
+            username:sysUser.username
+          }
+        })
+        .then(function(sysRoleUsers){
+          if(sysRoleUsers){
+            sysRoleUsers.forEach(function(data){
+                 _.remove(param.sysRoleUsers,function(paramData){
+                      console.log(data.role_id+'  '+ paramData.role_id);
+                return data.role_id == paramData.role_id
+              })
+            })
+          }
+
+          if(param.sysRoleUsers){
+            param.sysRoleUsers.forEach(function(data){
+              data.username = sysUser.username;
+            })
+          }
+
+          SysRoleUser.bulkCreate(param.sysRoleUsers)
+          .then(function(){
+            return res.json({
+              success:true,
+              data:sysUser
+            })
+          })
+          .catch(function(err){
+            return res.status(500).json({
+              success:true,
+              errMsg:err.message,
+              errors:err
+            })
+          })
+        })
+        .catch(function(err){
+          return res.status(500).json({
+            success:true,
+            errMsg:err.message,
+            errors:err
+          })
         })
       })
       .catch(function(err){
@@ -148,7 +207,9 @@ module.exports = function(app, db, options){
   //查询后台用户
   router.post("/querySysUsers", function(req, res, next) {
     var param = req.body;
-    var username = param.username || "";
+    var username = param.username || "",
+        offset = param.offset || 0,
+        limit = param.limit || 20;
 
     SysUser.findAll({
       where :{
@@ -156,21 +217,23 @@ module.exports = function(app, db, options){
           $like:"%"+username+"%"
         }
       },
-      include:[{
-        model: sequelize.model("KerryProperty"),
-        as: 'WorkingProperty',
-        where: {
-          appId: param.appId
-        }
-      }]
+      offset: offset,
+      limit: limit,
+      order: ' id desc'
     })
-    .then(function(sysUsers){
+    .then(function(results){
+      console.log(results);
+      var count = results.count;
       return res.json({
-        success:true,
-        data:sysUsers
-      });
+        success: true,
+        data: results.rows,
+        count: count,
+        offset: offset,
+        limit: limit
+      })
     })
     .catch(function(err){
+      console.log(err);
       return res.status(500).json({
         success:false,
         errMsg:err.message,
@@ -203,7 +266,6 @@ module.exports = function(app, db, options){
       })
     })
   })
-
 
   app.use("/sysusers", router);
 }
