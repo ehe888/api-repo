@@ -68,6 +68,24 @@ module.exports = function(app, db, options){
   /**
   *创建系统用户
   */
+
+
+
+  function updateUnits(list, index, callback) {
+    if (index >= list.length) {
+      return callback()
+    }
+
+    var data = list[index]
+    models.units.update(data)
+    .then(function() {
+      updateUnits(list, ++index, callback)
+    })
+    .catch(function() {
+      updateUnits(list, ++index, callback)
+    })
+  }
+
   router.post("/create", function(req, res, next){
     var param = req.body;
     var id;
@@ -94,15 +112,17 @@ module.exports = function(app, db, options){
       id = sysUser.id;
       if(param.SysRoleUsers){
         param.SysRoleUsers.forEach(function(data){
-          data.username = sysUser.name;
+          data.username = sysUser.username;
         })
       }
 
       SysRoleUser.bulkCreate(param.SysRoleUsers)
       .then(function(){
-        return res.jons({
-          success:true,
-          data:sysUser
+        updateUnits(param.unit, 0, function(){
+          return res.json({
+            success:true,
+            data:sysUser
+          })
         })
       })
       .catch(function(err){
@@ -165,9 +185,11 @@ module.exports = function(app, db, options){
 
           SysRoleUser.bulkCreate(param.sysRoleUsers)
           .then(function(){
-            return res.json({
-              success:true,
-              data:sysUser
+            updateUnits(param.unit, 0, function(){
+              return res.json({
+                success:true,
+                data:sysUser
+              })
             })
           })
           .catch(function(err){
@@ -217,6 +239,13 @@ module.exports = function(app, db, options){
           $like:"%"+username+"%"
         }
       },
+      include:[{
+        model: sequelize.model("KerryProperty"),
+        as: 'WorkingProperty',
+        where:{
+          appId:param.appId
+        }
+      }],
       offset: offset,
       limit: limit,
       order: ' id desc'
@@ -266,6 +295,7 @@ module.exports = function(app, db, options){
       })
     })
   })
+
 
   app.use("/sysusers", router);
 }
