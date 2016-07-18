@@ -233,7 +233,7 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20;
 
-    SysUser.findAll({
+    SysUser.findAndCountAll({
       where :{
         username:{
           $like:"%"+username+"%"
