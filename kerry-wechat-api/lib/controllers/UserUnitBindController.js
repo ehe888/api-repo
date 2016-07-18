@@ -42,8 +42,7 @@ module.exports = function(app, db, options){
           if(unit){
             KerryUsers.findOne({  //根据注册码查询业主数据
               where:{
-                reg_code:reg_code,
-                mobile: mobile
+                reg_code:reg_code
               }
             })
             .then(function(kerryUser){
