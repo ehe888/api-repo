@@ -271,6 +271,41 @@ module.exports = function(app, db, options){
     })
   })
 
+
+  //查询后台用户
+  router.post("/querySysRoleUsers", function(req, res, next) {
+    var param = req.body;
+    var username = param.username || "";
+
+    SysRoleUser.findAll({
+      where :{
+        username:{
+          $like:"%"+username+"%"
+        }
+      },
+      include:[{
+        model: sequelize.model("SysRole"),
+        as: 'role'
+      }]
+    })
+    .then(function(roles){
+      console.log(roles);
+      return res.json({
+        success:true,
+        data:roles
+      })
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+  })
+
+
   //删除角色
   router.get("/delete", function(req, res, next) {
     var param = req.query;
