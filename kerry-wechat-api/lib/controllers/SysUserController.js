@@ -114,17 +114,16 @@ module.exports = function(app, db, options){
       if(param.SysRoleUsers){
         param.SysRoleUsers.forEach(function(data){
           data.username = sysUser.username;
-          data.sys_user_id = sysUser.id
+          data.sys_user_id = sysUser.id;
+
         })
       }
 
       SysRoleUser.bulkCreate(param.SysRoleUsers)
       .then(function(){
-        updateUnits(param.unit, 0, function(){
-          return res.json({
-            success:true,
-            data:sysUser
-          })
+        return res.json({
+          success:true,
+          data:sysUser
         })
       })
       .catch(function(err){
@@ -562,49 +561,6 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
-
-    // SysRoleUser.findAndCountAll({
-    //   where: {
-    //     username: {
-    //       $like: "%"+username+"%"
-    //     }
-    //   },
-    //   include:[{
-    //     model: SysUser,
-    //     as: 'sysuser',
-    //     where: {
-    //       userType: userType
-    //     },
-    //     include:[{
-    //       model: sequelize.model("KerryProperty"),
-    //       as: 'WorkingProperty'
-    //     }]
-    //   },{
-    //     model: SysRole,
-    //     as: 'role'
-    //   }],
-    //   offset: offset,
-    //   limit: limit,
-    //   order: 'id desc'
-    // })
-    // .then(function(results) {
-    //   var count = results.count;
-    //   return res.json({
-    //     success: true,
-    //     data: results.rows,
-    //     count: count,
-    //     offset: offset,
-    //     limit: limit
-    //   })
-    // })
-    // .catch(function(err){
-    //   console.log(err);
-    //   return res.status(500).json({
-    //     success:false,
-    //     errMsg:err.message,
-    //     errors:err
-    //   })
-    // })
   })
 
   //删除角色
