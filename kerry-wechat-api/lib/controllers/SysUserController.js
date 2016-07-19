@@ -521,25 +521,24 @@ module.exports = function(app, db, options){
         userType = param.userType,
         offset = param.offset || 0,
         limit = param.limit || 20;
-    SysRoleUser.findAndCountAll({
+
+    SysUser.findAndCountAll({
       where: {
         username: {
           $like: "%"+username+"%"
-        }
-      },
-      include:[{
-        model: SysUser,
-        as: 'sysuser',
-        where: {
-          userType: userType
         },
-        include:[{
-          model: sequelize.model("KerryProperty"),
-          as: 'WorkingProperty'
+        userType: userType
+      },
+      include: [{
+        model: SysRoleUser,
+        as: 'sys_role_user',
+        include: [{
+          model: SysRole,
+          as: 'role'
         }]
-      },{
-        model: SysRole,
-        as: 'role'
+      }, {
+        model: sequelize.model("KerryProperty"),
+        as: 'WorkingProperty'
       }],
       offset: offset,
       limit: limit,
@@ -563,6 +562,49 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
+
+    // SysRoleUser.findAndCountAll({
+    //   where: {
+    //     username: {
+    //       $like: "%"+username+"%"
+    //     }
+    //   },
+    //   include:[{
+    //     model: SysUser,
+    //     as: 'sysuser',
+    //     where: {
+    //       userType: userType
+    //     },
+    //     include:[{
+    //       model: sequelize.model("KerryProperty"),
+    //       as: 'WorkingProperty'
+    //     }]
+    //   },{
+    //     model: SysRole,
+    //     as: 'role'
+    //   }],
+    //   offset: offset,
+    //   limit: limit,
+    //   order: 'id desc'
+    // })
+    // .then(function(results) {
+    //   var count = results.count;
+    //   return res.json({
+    //     success: true,
+    //     data: results.rows,
+    //     count: count,
+    //     offset: offset,
+    //     limit: limit
+    //   })
+    // })
+    // .catch(function(err){
+    //   console.log(err);
+    //   return res.status(500).json({
+    //     success:false,
+    //     errMsg:err.message,
+    //     errors:err
+    //   })
+    // })
   })
 
   //删除角色
