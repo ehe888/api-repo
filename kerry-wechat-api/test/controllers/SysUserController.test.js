@@ -18,6 +18,7 @@ module.exports = function(app, db, config){
         .post("/api/sysusers/query")
         .send({
           username: '',
+          userType: "CORP",
           appId: 'wxa0c45fc6d9e269ed'
         })
         .expect(200)

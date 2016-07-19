@@ -518,6 +518,7 @@ module.exports = function(app, db, options){
   router.post("/query", function(req, res, next) {
     var param = req.body;
     var username = param.username || "",
+        userType = param.userType,
         offset = param.offset || 0,
         limit = param.limit || 20;
     SysRoleUser.findAndCountAll({
@@ -529,6 +530,9 @@ module.exports = function(app, db, options){
       include:[{
         model: SysUser,
         as: 'sysuser',
+        where: {
+          userType: userType
+        },
         include:[{
           model: sequelize.model("KerryProperty"),
           as: 'WorkingProperty'
