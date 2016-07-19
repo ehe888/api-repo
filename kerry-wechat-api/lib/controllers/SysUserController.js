@@ -12,6 +12,7 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      SysUser =  sequelize.model("SysUser"),
+     SysRole = sequelize.model("SysRole"),
      SysRoleUser = sequelize.model("SysRoleUser"),
      models = options.db;
 
@@ -113,6 +114,7 @@ module.exports = function(app, db, options){
       if(param.SysRoleUsers){
         param.SysRoleUsers.forEach(function(data){
           data.username = sysUser.username;
+          data.sys_user_id = sysUser.id
         })
       }
 
@@ -145,6 +147,88 @@ module.exports = function(app, db, options){
   });
 
   //更新后台用户
+  // router.post("/update", function(req, res, next) {
+  //   var param = req.body;
+  //
+  //   SysUser.findOne({
+  //     where:{
+  //       id: param.id
+  //     }
+  //   })
+  //   .then(function(sysUser){
+  //     sysUser.update({
+  //       email:param.email,
+  //       mobile:param.mobile,
+  //       headimage:param.headimage,
+  //       firstName:param.firstName,
+  //       lastName:param.lastName,
+  //     })
+  //     .then(function(sysUser){
+  //       SysRoleUser.findAll({
+  //         where:{
+  //           username:sysUser.username
+  //         }
+  //       })
+  //       .then(function(sysRoleUsers){
+  //         if(sysRoleUsers){
+  //           sysRoleUsers.forEach(function(data){
+  //                _.remove(param.sysRoleUsers,function(paramData){
+  //                     console.log(data.role_id+'  '+ paramData.role_id);
+  //               return data.role_id == paramData.role_id
+  //             })
+  //           })
+  //         }
+  //
+  //         if(param.sysRoleUsers){
+  //           param.sysRoleUsers.forEach(function(data){
+  //             data.username = sysUser.username;
+  //           })
+  //         }
+  //
+  //         SysRoleUser.bulkCreate(param.sysRoleUsers)
+  //         .then(function(){
+  //           updateUnits(param.unit, 0, function(){
+  //             return res.json({
+  //               success:true,
+  //               data:sysUser
+  //             })
+  //           })
+  //         })
+  //         .catch(function(err){
+  //           return res.status(500).json({
+  //             success:true,
+  //             errMsg:err.message,
+  //             errors:err
+  //           })
+  //         })
+  //       })
+  //       .catch(function(err){
+  //         return res.status(500).json({
+  //           success:true,
+  //           errMsg:err.message,
+  //           errors:err
+  //         })
+  //       })
+  //     })
+  //     .catch(function(err){
+  //       return res.status(500).json({
+  //         success:true,
+  //         errMsg:err.message,
+  //         errors:err
+  //       })
+  //     })
+  //   })
+  //   .catch(function(err){
+  //     return res.status(500).json({
+  //       success:false,
+  //       errMsg:err.message,
+  //       errors:err
+  //     })
+  //   })
+  // })
+
+
+  //更新用户基本信息
   router.post("/update", function(req, res, next) {
     var param = req.body;
 
@@ -154,61 +238,33 @@ module.exports = function(app, db, options){
       }
     })
     .then(function(sysUser){
-      sysUser.update({
-        email:param.email,
-        mobile:param.mobile,
-        headimage:param.headimage,
-        firstName:param.firstName,
-        lastName:param.lastName,
-      })
+      var updateOption = {};
+      if (param.email) {
+        updateOption.email = param.email
+      }
+      if (param.mobile) {
+        updateOption.mobile = param.mobile
+      }
+      if (param.headimage) {
+        updateOption.headimage = param.headimage
+      }
+      if (param.firstName) {
+        updateOption.firstName = param.firstName
+      }
+      if (param.lastName) {
+        updateOption.lastName = param.lastName
+      }
+      sysUser.update(updateOption)
       .then(function(sysUser){
-        SysRoleUser.findAll({
-          where:{
-            username:sysUser.username
-          }
-        })
-        .then(function(sysRoleUsers){
-          if(sysRoleUsers){
-            sysRoleUsers.forEach(function(data){
-                 _.remove(param.sysRoleUsers,function(paramData){
-                      console.log(data.role_id+'  '+ paramData.role_id);
-                return data.role_id == paramData.role_id
-              })
-            })
-          }
 
-          if(param.sysRoleUsers){
-            param.sysRoleUsers.forEach(function(data){
-              data.username = sysUser.username;
-            })
-          }
+        return res.json({
+          success: true,
+          data: sysUser
+        })
 
-          SysRoleUser.bulkCreate(param.sysRoleUsers)
-          .then(function(){
-            updateUnits(param.unit, 0, function(){
-              return res.json({
-                success:true,
-                data:sysUser
-              })
-            })
-          })
-          .catch(function(err){
-            return res.status(500).json({
-              success:true,
-              errMsg:err.message,
-              errors:err
-            })
-          })
-        })
-        .catch(function(err){
-          return res.status(500).json({
-            success:true,
-            errMsg:err.message,
-            errors:err
-          })
-        })
       })
       .catch(function(err){
+        console.error(err)
         return res.status(500).json({
           success:true,
           errMsg:err.message,
@@ -217,6 +273,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err){
+      console.error(err)
       return res.status(500).json({
         success:false,
         errMsg:err.message,
@@ -225,6 +282,196 @@ module.exports = function(app, db, options){
     })
   })
 
+
+  //更新用户单元
+  router.post("/updateUnits", function(req, res, next) {
+    var param = req.body,
+        unit_id = param.unit_id,
+        sys_user_id = param.sys_user_id;
+    SysUser.findOne({
+      where: {
+        id: sys_user_id
+      }
+    })
+    .then(function(sysUser) {
+      if (!sysUser) {
+        return res.json({
+          success: false,
+          errMsg: '找不到用户!'
+        })
+      }
+      else {
+        sequelize.model("Units").findOne({
+          where: {
+            id: unit_id
+          }
+        })
+        .then(function(unit) {
+          if (!unit) {
+            return res.json({
+              success: false,
+              errMsg: '找不到该单元'
+            })
+          }
+          else {
+            unit.update({
+              sys_user_id: sys_user_id
+            })
+            .then(function(unit) {
+
+              return res.json({
+                success: true,
+                data: unit
+              })
+
+            })
+            .catch(function(err){
+              console.log(err);
+              return res.status(500).json({
+                success:false,
+                errMsg:err.message,
+                errors:err
+              })
+            })
+          }
+        })
+        .catch(function(err){
+          console.log(err);
+          return res.status(500).json({
+            success:false,
+            errMsg:err.message,
+            errors:err
+          })
+        })
+      }
+
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+
+  })
+
+  //更新用户角色
+  router.post("/updateRoles", function(req, res, next) {
+    var param = req.body,
+        sys_user_id = param.sys_user_id,
+        role_id = param.role_id;
+
+    SysUser.findOne({
+      where: {
+        id: sys_user_id
+      }
+    })
+    .then(function(sysUser) {
+
+      SysRoleUser.findOne({
+        sys_user_id: sys_user_id,
+        role_id: role_id
+      })
+      .then(function(roleUser) {
+        if (roleUser) {
+          return res.json({
+            success: true,
+            data: roleUser
+          })
+        }
+        else {
+          SysRoleUser.create({
+            username: sysUser.username,
+            sys_user_id: sys_user_id,
+            role_id: role_id
+          })
+          .then(function(roleUser) {
+            return res.json({
+              success: true,
+              data: roleUser
+            })
+          })
+          .catch(function(err){
+            console.log(err);
+            return res.status(500).json({
+              success:false,
+              errMsg:err.message,
+              errors:err
+            })
+          })
+        }
+
+      })
+      .catch(function(err){
+        console.log(err);
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+
+  })
+
+  //删除用户角色
+  router.post("/deleteRoles", function(req, res, next) {
+    var param = req.body,
+        sys_user_id = param.sys_user_id,
+        role_id = param.role_id;
+    SysRoleUser.findOne({
+      where: {
+        sys_user_id: sys_user_id,
+        role_id: role_id
+      }
+    })
+    .then(function(roleUser) {
+      if (!roleUser) {
+        return res.json({
+          success: false,
+          errMsg: '找不到角色!'
+        })
+      }
+      else {
+        sequelize.query("DELETE FROM sys_role_users WHERE id = ?", {replacements: [roleUser.id]})
+        .then(function() {
+          return res.json({
+            success: true
+          })
+        })
+        .catch(function(err){
+          console.log(err);
+          return res.status(500).json({
+            success:false,
+            errMsg:err.message,
+            errors:err
+          })
+        })
+      }
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+  })
 
   //查询后台用户
   router.post("/querySysUsers", function(req, res, next) {
@@ -241,14 +488,11 @@ module.exports = function(app, db, options){
       },
       include:[{
         model: sequelize.model("KerryProperty"),
-        as: 'WorkingProperty',
-        where:{
-          appId:param.appId
-        }
+        as: 'WorkingProperty'
       }],
       offset: offset,
       limit: limit,
-      order: ' id desc'
+      order: 'id desc'
     })
     .then(function(results){
       console.log(results);
@@ -269,6 +513,53 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
+  })
+
+  router.post("/query", function(req, res, next) {
+    var param = req.body;
+    var username = param.username || "",
+        offset = param.offset || 0,
+        limit = param.limit || 20;
+    SysRoleUser.findAndCountAll({
+      where: {
+        username: {
+          $like: "%"+username+"%"
+        }
+      },
+      include:[{
+        model: SysUser,
+        as: 'sysuser',
+        include:[{
+          model: sequelize.model("KerryProperty"),
+          as: 'WorkingProperty'
+        }]
+      },{
+        model: SysRole,
+        as: 'role'
+      }],
+      offset: offset,
+      limit: limit,
+      order: 'id desc'
+    })
+    .then(function(results) {
+      var count = results.count;
+      return res.json({
+        success: true,
+        data: results.rows,
+        count: count,
+        offset: offset,
+        limit: limit
+      })
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
   })
 
   //删除角色
