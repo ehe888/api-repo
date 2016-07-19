@@ -253,6 +253,9 @@ module.exports = function(app, db, options){
       if (param.lastName) {
         updateOption.lastName = param.lastName
       }
+      if (param.working_property_id) {
+        updateOption.working_property_id = param.working_property_id
+      }
       sysUser.update(updateOption)
       .then(function(sysUser){
 
