@@ -374,8 +374,10 @@ module.exports = function(app, db, options){
     .then(function(sysUser) {
 
       SysRoleUser.findOne({
-        sys_user_id: sys_user_id,
-        role_id: role_id
+        where: {
+          sys_user_id: sys_user_id,
+          role_id: role_id
+        }
       })
       .then(function(roleUser) {
         if (roleUser) {
