@@ -111,15 +111,15 @@ module.exports = function(app, db, options){
     })
     .then(function(sysUser){
       id = sysUser.id;
-      if(param.SysRoleUsers){
-        param.SysRoleUsers.forEach(function(data){
+      if(param.sys_role_user){
+        param.sys_role_user.forEach(function(data){
           data.username = sysUser.username;
           data.sys_user_id = sysUser.id;
 
         })
       }
 
-      SysRoleUser.bulkCreate(param.SysRoleUsers)
+      SysRoleUser.bulkCreate(param.sys_role_user)
       .then(function(){
         return res.json({
           success:true,
