@@ -559,7 +559,6 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
-
   })
 
   //删除角色
