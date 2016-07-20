@@ -145,87 +145,6 @@ module.exports = function(app, db, options){
     })
   });
 
-  //更新后台用户
-  // router.post("/update", function(req, res, next) {
-  //   var param = req.body;
-  //
-  //   SysUser.findOne({
-  //     where:{
-  //       id: param.id
-  //     }
-  //   })
-  //   .then(function(sysUser){
-  //     sysUser.update({
-  //       email:param.email,
-  //       mobile:param.mobile,
-  //       headimage:param.headimage,
-  //       firstName:param.firstName,
-  //       lastName:param.lastName,
-  //     })
-  //     .then(function(sysUser){
-  //       SysRoleUser.findAll({
-  //         where:{
-  //           username:sysUser.username
-  //         }
-  //       })
-  //       .then(function(sysRoleUsers){
-  //         if(sysRoleUsers){
-  //           sysRoleUsers.forEach(function(data){
-  //                _.remove(param.sysRoleUsers,function(paramData){
-  //                     console.log(data.role_id+'  '+ paramData.role_id);
-  //               return data.role_id == paramData.role_id
-  //             })
-  //           })
-  //         }
-  //
-  //         if(param.sysRoleUsers){
-  //           param.sysRoleUsers.forEach(function(data){
-  //             data.username = sysUser.username;
-  //           })
-  //         }
-  //
-  //         SysRoleUser.bulkCreate(param.sysRoleUsers)
-  //         .then(function(){
-  //           updateUnits(param.unit, 0, function(){
-  //             return res.json({
-  //               success:true,
-  //               data:sysUser
-  //             })
-  //           })
-  //         })
-  //         .catch(function(err){
-  //           return res.status(500).json({
-  //             success:true,
-  //             errMsg:err.message,
-  //             errors:err
-  //           })
-  //         })
-  //       })
-  //       .catch(function(err){
-  //         return res.status(500).json({
-  //           success:true,
-  //           errMsg:err.message,
-  //           errors:err
-  //         })
-  //       })
-  //     })
-  //     .catch(function(err){
-  //       return res.status(500).json({
-  //         success:true,
-  //         errMsg:err.message,
-  //         errors:err
-  //       })
-  //     })
-  //   })
-  //   .catch(function(err){
-  //     return res.status(500).json({
-  //       success:false,
-  //       errMsg:err.message,
-  //       errors:err
-  //     })
-  //   })
-  // })
-
 
   //更新用户基本信息
   router.post("/update", function(req, res, next) {
@@ -481,6 +400,54 @@ module.exports = function(app, db, options){
       })
     })
 
+  })
+
+  //删除用户绑定单元
+  router.post("/deleteUnit", function(req, res, next) {
+    var param = req.body,
+        sys_user_id = param.sys_user_id,
+        unit_id = param.unit_id;
+    Units.findOne({
+      where: {
+        id: unit_id,
+        sys_user_id: sys_user_id
+      }
+    })
+    .then(function(unit) {
+      if (!unit) {
+        return res.json({
+          success: false,
+          errMsg: '用户未与该单元绑定'
+        })
+      }
+
+      unit.update({
+        sys_user_id: null
+      })
+      .then(function(unit) {
+        return res.json({
+          success: true,
+          data: unit
+        })
+      })
+      .catch(function(err){
+        console.log(err);
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
   })
 
   //查询后台用户
