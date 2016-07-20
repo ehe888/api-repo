@@ -187,7 +187,7 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20;
 
-    PropertyBill.findAndCountAll({
+    PropertyBill.findAll({
       where: {
         bill_number: {
           $like: '%'+bill_number+'%'
@@ -205,13 +205,19 @@ module.exports = function(app, db, options){
       order: ' id desc'
     })
     .then(function(results) {
-      var count = results.count;
-      return res.json({
-        success: true,
-        data: results.rows,
-        count: count,
-        offset: offset,
-        limit: limit
+      PropertyBill.count({
+        where:{
+          bill_number: {
+            $like: '%'+bill_number+'%'
+          }
+      }).then(function(count) {
+        return res.json({
+          success: true,
+          data: results,
+          count: count,
+          offset: offset,
+          limit: limit
+        })
       })
     })
     .catch(function(err) {
