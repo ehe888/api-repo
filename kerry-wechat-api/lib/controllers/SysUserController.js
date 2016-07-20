@@ -236,7 +236,8 @@ module.exports = function(app, db, options){
             })
           }
           else {
-            if (unit.sys_user_id != null || unit.sys_user_id != '') {
+            console.log(unit.sys_user_id)
+            if (unit.sys_user_id != null && unit.sys_user_id != '') {
               return res.json({
                 success: false,
                 errMsg: '该户号已经被绑定了!'
