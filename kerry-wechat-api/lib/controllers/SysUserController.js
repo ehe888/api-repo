@@ -569,22 +569,40 @@ module.exports = function(app, db, options){
   })
 
   //删除角色
-  router.get("/delete", function(req, res, next) {
-    var param = req.query;
+  router.post("/delete", function(req, res, next) {
+    var param = req.body;
     var id = param.id;
 
-    SysUser.destroy({
-      where:{
-        id:id
+    SysRoleUser.destroy({
+      where: {
+        sys_user_id: id
       }
     })
-    .then(function(rows){
-      return res.json({
-        success:true,
-        rows:rows
-      });
+    .then(function() {
+
+      SysUser.destroy({
+        where:{
+          id:id
+        }
+      })
+      .then(function(rows){
+        return res.json({
+          success:true,
+          rows:rows
+        });
+      })
+      .catch(function(err){
+        console.error(err)
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+
     })
     .catch(function(err){
+      console.error(err);
       return res.status(500).json({
         success:false,
         errMsg:err.message,
