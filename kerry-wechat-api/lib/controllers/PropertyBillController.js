@@ -185,7 +185,8 @@ module.exports = function(app, db, options){
     var param = req.body,
         bill_number = param.bill_number || '',
         offset = param.offset || 0,
-        limit = param.limit || 20;
+        limit = param.limit || 20,
+        appId = param.appId;
 
     PropertyBill.findAll({
       where: {
@@ -195,7 +196,14 @@ module.exports = function(app, db, options){
       },
       include:[{
         model: sequelize.model("Units"),
-        as: 'unit'
+        as: 'unit',
+        include: [{
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          where: {
+            appId: appId
+          }
+        }]
       },{
         model: sequelize.model("PropertyBillLine"),
         as: 'property_bill_lines'
@@ -210,7 +218,18 @@ module.exports = function(app, db, options){
           bill_number: {
             $like: '%'+bill_number+'%'
           }
-        }
+        },
+        include: [{
+          model: sequelize.model("Units"),
+          as: 'unit',
+          include: [{
+            model: sequelize.model("KerryProperty"),
+            as: 'property',
+            where: {
+              appId: appId
+            }
+          }]
+        }]
       }).then(function(count) {
         return res.json({
           success: true,
