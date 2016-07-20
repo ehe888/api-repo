@@ -14,6 +14,7 @@ module.exports = function(app, db, options){
      SysUser =  sequelize.model("SysUser"),
      SysRole = sequelize.model("SysRole"),
      SysRoleUser = sequelize.model("SysRoleUser"),
+     Units = sequelize.model("Units"),
      models = options.db;
 
   var router = express.Router();
