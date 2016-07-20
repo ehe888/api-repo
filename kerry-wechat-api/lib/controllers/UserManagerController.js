@@ -326,7 +326,7 @@ module.exports = function(app, db, options){
       if (!unit) {
         return res.json({
           success: false,
-          errMsg: '找不到改户号!'
+          errMsg: '找不到该户号!'
         })
       }
 
@@ -342,7 +342,7 @@ module.exports = function(app, db, options){
         if (user) {
           return res.json({
             success: false,
-            errMsg: '已经创建过改用户!'
+            errMsg: '已经创建过该用户!'
           })
         }
 
