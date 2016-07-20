@@ -399,7 +399,6 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
-
   })
 
   //删除用户绑定单元
