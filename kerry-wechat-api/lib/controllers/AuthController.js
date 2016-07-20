@@ -97,6 +97,13 @@ module.exports = function(app, db, options){
       },{
         model: sequelize.model("Units"),
         as: 'unit'
+      }, {
+        model: sequelize.model("SysRoleUser"),
+        as: 'sys_role_user',
+        include: [{
+          model: sequelize.model("SysRole"),
+          as: 'role'
+        }]
       }]
     })
     .then(function(sysuser) {

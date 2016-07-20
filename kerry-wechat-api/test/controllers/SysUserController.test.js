@@ -90,6 +90,20 @@ module.exports = function(app, db, config){
         .end(done)
     })
 
+    it("删除用户", function(done) {
+      request(app)
+        .post("/api/sysusers/delete")
+        .send({
+          id: 2
+        })
+        .expect(200)
+        .expect(function(res) {
+          console.log(res.body);
+          expect(res.body.success).to.be.true;
+        })
+        .end(done)
+    })
+
 
   });
 }
