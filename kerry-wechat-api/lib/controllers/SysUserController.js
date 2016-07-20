@@ -205,7 +205,7 @@ module.exports = function(app, db, options){
   })
 
 
-  //更新用户单元
+  //更新用户户号
   router.post("/updateUnits", function(req, res, next) {
     var param = req.body,
         unit_id = param.unit_id,
@@ -232,14 +232,14 @@ module.exports = function(app, db, options){
           if (!unit) {
             return res.json({
               success: false,
-              errMsg: '找不到该单元'
+              errMsg: '找不到该户号'
             })
           }
           else {
             if (unit.sys_user_id != null || unit.sys_user_id != '') {
               return res.json({
                 success: false,
-                errMsg: '该单元已经被绑定了!'
+                errMsg: '该户号已经被绑定了!'
               })
             }
             unit.update({
@@ -402,7 +402,7 @@ module.exports = function(app, db, options){
     })
   })
 
-  //删除用户绑定单元
+  //删除用户绑定户号
   router.post("/deleteUnit", function(req, res, next) {
     var param = req.body,
         sys_user_id = param.sys_user_id,
@@ -417,7 +417,7 @@ module.exports = function(app, db, options){
       if (!unit) {
         return res.json({
           success: false,
-          errMsg: '用户未与该单元绑定'
+          errMsg: '用户未与该户号绑定'
         })
       }
 

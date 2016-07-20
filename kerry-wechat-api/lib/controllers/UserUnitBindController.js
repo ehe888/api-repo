@@ -32,7 +32,7 @@ module.exports = function(app, db, options){
     })
     .then(function(property){
       if(property){
-        Units.findOne({   //根据单元号查询单元对象
+        Units.findOne({   //根据户号查询单元对象
           where:{
             unit_number:unit_number,
             property_id: property.id
@@ -153,7 +153,7 @@ module.exports = function(app, db, options){
           else{
             return res.json({
               success:false,
-              errMsg:'该单元号不存在！'
+              errMsg:'该户号不存在！'
             })
           }
         })

@@ -152,7 +152,7 @@ module.exports = function(app, db, options){
       if (!unit) {
         return res.json({
           success: false,
-          errMsg: '找不到单元'
+          errMsg: '找不到户号'
         })
       }else {
         unit.update({

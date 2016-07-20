@@ -249,7 +249,7 @@ module.exports = function(app, db, options){
       if (!userUnitBindings) {
         return res.json({
           success: false,
-          errMsg: '请先绑定单元!'
+          errMsg: '请先绑定户号!'
         })
       }
 
@@ -302,7 +302,7 @@ module.exports = function(app, db, options){
   //field3: 账单结束日期,
   //field4: 本期金额,
   //field5: 建筑物,
-  //field6: 单元,
+  //field6: 户号,
   //field7: 租户地址号,
   //field8: 租户名称,
   //field9: 合同号
@@ -339,7 +339,7 @@ module.exports = function(app, db, options){
       })
     }
 
-    //通过CSV中的建筑编号+单元号, 查询系统里对应的单元id;
+    //通过CSV中的建筑编号+户号, 查询系统里对应的户号id;
     searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
 
       var billLines = [];
@@ -349,7 +349,7 @@ module.exports = function(app, db, options){
         billLines = _.concat(lines, billLines);
       }
       console.log(billLines)
-      //查询系统是否有相应的账单和账单行, 根据description, 单元号, 日期查询, 如果有的话update, 没有的话create
+      //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
       searchAndUpdateBillLines(billLines, 0, function() {
         return res.json({
           success: true
@@ -359,7 +359,7 @@ module.exports = function(app, db, options){
 
   })
 
-  //查询billLines中的单元号, 找出unit_id, 添加到billLines中对应该unit_number的对象中
+  //查询billLines中的户号, 找出unit_id, 添加到billLines中对应该unit_number的对象中
   function searchUnitIdByUnitNumbers(billLines, index, callback) {
 
     var unitNumbers = Object.keys(billLines);
@@ -397,7 +397,7 @@ module.exports = function(app, db, options){
 
   //先根据Unit_id, year, month查询是否有bill,
   //如果有的话,
-  //  查询是否有相同订单号, 根据description, 单元号
+  //  查询是否有相同订单号, 根据description, 户号
   //    如果有, 那么update
   //    如果没有, create
   //如果没有, 新建账单记录, 再create账单行
