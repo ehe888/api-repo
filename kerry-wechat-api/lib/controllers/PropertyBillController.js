@@ -210,6 +210,7 @@ module.exports = function(app, db, options){
           bill_number: {
             $like: '%'+bill_number+'%'
           }
+        }
       }).then(function(count) {
         return res.json({
           success: true,
