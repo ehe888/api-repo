@@ -282,5 +282,21 @@ module.exports = function(app, db, config){
           .end(done);
     })
 
+    it("根据id查询Bill", function(done) {
+
+        request(app)
+          .post("/api/propertyBills/pushMessage")
+          .send({
+            bill_id: 2
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
   });
 }

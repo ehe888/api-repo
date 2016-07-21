@@ -315,6 +315,54 @@ module.exports = function(app, db, options){
 
   })
 
+  //根据bill_id 发送Bill 模板消息
+  router.post("/pushMessage", function(req, res, next) {
+    var param = req.body,
+        bill_id = param.bill_id;
+
+    PropertyBill.findOne({
+      where: {
+        id: bill_id
+      },
+      include:[{
+        model: sequelize.model("Units"),
+        as: 'unit',
+        attributes: ['id', 'unit_number'],
+        include: [{
+          model: sequelize.model("UserUnitBinding"),
+          as: 'user_unit_binding',
+          attributes:['is_master', 'wechat_user_id'],
+          include: [{
+            model: sequelize.model("User"),
+            as: 'wechat_user',
+            attributes: ['wechat_id']
+          }]
+        }]
+      },{
+        model: sequelize.model("PropertyBillLine"),
+        as: 'property_bill_lines'
+      }]
+
+    })
+    .then(function(bill) {
+      return res.json({
+        success: true,
+        data: bill
+      })
+    })
+    .catch(function(err){
+      console.error(err)
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+
+  })
+
+
   //上传CSV账单
   //field1: 费用类型,
   //field2: 账单开始日期,
