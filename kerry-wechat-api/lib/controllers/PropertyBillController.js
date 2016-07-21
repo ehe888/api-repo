@@ -345,6 +345,10 @@ module.exports = function(app, db, options){
             as: 'wechat_user',
             attributes: ['wechatId']
           }]
+        }, {
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          attributes: ['city', 'street', 'name']
         }]
       },{
         model: sequelize.model("PropertyBillLine"),
@@ -361,7 +365,11 @@ module.exports = function(app, db, options){
           var billLine = billLines[i];
           amount += parseFloat(billLine.gross_amount);
         }
-
+        var address = "";
+        if (bill.unit && bill.unit.property) {
+          var property = bill.unit.property;
+          address = property.city+property.street+bill.unit.unit_number;
+        }
         sequelize.model("Template").findOne({
           where: {
             template_type: 'bill'
@@ -386,8 +394,13 @@ module.exports = function(app, db, options){
               value: date,
               color: '#173177'
             },
+            keyword2: {
+              value: address,
+              color: '#173177'
+            },
             remark:{
-              value: '当期总计费用: '+amount+". 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！"
+              value: '当期总计费用: '+amount+". 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！",
+              color: '#173177'
             }
           }
 
@@ -418,15 +431,12 @@ module.exports = function(app, db, options){
             sequelize.model("PushMessageLog").bulkCreate(logs)
             .then(function(results) {
               // console.log(results)
-
-              var bearer = req.headers['authorization'];
-              var access_token = bearer.substring("Bearer".length).trim();
-
               // return res.json({
               //   success: true,
               //   data: logs
               // })
-
+              var bearer = req.headers['authorization'];
+              var access_token = bearer.substring("Bearer".length).trim();
               SendTemplateMessage(openids, contentStr, template.template_id, url, topcolor, access_token, app_id, host,function() {
                 return res.json({
                   success: true,
