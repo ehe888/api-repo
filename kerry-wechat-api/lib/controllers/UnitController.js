@@ -41,7 +41,13 @@ module.exports = function(app, db, options){
     var param = req.body,
         unit_number = param.unit_number || '',
         offset = param.offset || 0,
-        limit = param.limit || 20;
+        limit = param.limit || 20,
+        appId = param.appId;
+
+    var propertyOption = {};
+    if (appId && appId.length > 0) {
+      propertyOption.appId = appId;
+    }
 
     Units.findAndCountAll({
       where: {
@@ -55,9 +61,7 @@ module.exports = function(app, db, options){
       }, {
         model: sequelize.model("KerryProperty"),
         as: 'property',
-        where: {
-          appId: param.appId
-        }
+        where: propertyOption
       }],
       order: 'id desc',
       offset: offset,

@@ -16,7 +16,13 @@ module.exports = function(app, db, options){
     var param = req.body,
         name = param.name || '',
         offset = param.offset || 0,
-        limit = param.limit || 20;
+        limit = param.limit || 20,
+        appId = param.appId
+
+    var propertyOption = {};
+    if (appId && appId.length > 0) {
+      propertyOption.appId = appId;
+    }
 
     KerryUserUnit.findAndCountAll({
       offset: offset,
@@ -33,9 +39,7 @@ module.exports = function(app, db, options){
           model: sequelize.model("KerryProperty"),
           as: 'property',
           attributes:['name'],
-          where: {
-            appId: param.appId
-          }
+          where: propertyOption
         }]
       }, {
         model: KerryUsers,

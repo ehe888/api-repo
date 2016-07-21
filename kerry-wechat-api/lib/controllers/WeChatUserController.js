@@ -19,7 +19,13 @@ router.post("/queryWechatUsers", function(req, res, next) {
  var param = req.body;
  var username = param.username || "",
      offset = param.offset || 0,
-     limit = param.limit || 20;
+     limit = param.limit || 20,
+     appId = param.appId;
+
+ var propertyOption = {};
+ if (appId && appId.length > 0) {
+   propertyOption.appId = appId;
+ }
 
  UserUnitBinding.findAndCountAll({
    where :{
@@ -39,9 +45,7 @@ router.post("/queryWechatUsers", function(req, res, next) {
      }, {
        model: sequelize.model("KerryProperty"),
        as: 'property',
-       where: {
-         appId: param.appId
-       }
+       where: propertyOption
      }]
    }],
    offset: offset,
