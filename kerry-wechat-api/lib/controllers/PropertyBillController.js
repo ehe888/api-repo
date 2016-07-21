@@ -408,7 +408,7 @@ module.exports = function(app, db, options){
             }
           }
           if (openids.length > 0) {
-            PushMessageLog.bulkCreate(logs)
+            sequelize.model("PushMessageLog").bulkCreate(logs)
             .then(function(results) {
               console.log(results)
 
