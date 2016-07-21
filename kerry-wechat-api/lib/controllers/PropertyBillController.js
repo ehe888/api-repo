@@ -322,7 +322,7 @@ module.exports = function(app, db, options){
     var param = req.body,
         bill_id = param.bill_id,
         topcolor = param.topcolor
-        appId = param.appId;
+        app_id = param.appId;
 
 
     var host = req.protocol+"://"+req.hostname
@@ -343,7 +343,7 @@ module.exports = function(app, db, options){
           include: [{
             model: sequelize.model("User"),
             as: 'wechat_user',
-            attributes: ['wechat_id']
+            attributes: ['wechatId']
           }]
         }]
       },{
@@ -375,18 +375,23 @@ module.exports = function(app, db, options){
             })
           }
 
-          var content = template.data;
-          content.keyword1 = {
-            value: "每月的01-10号",
-            color: '#173177'
-          };
-          content.keyword2 = {
-            value: date,
-            color: '#173177'
+          var templateData = JSON.parse(template.data);
+          var content = {
+            first: templateData.first,
+            keyword1: {
+              value: "每月的01-10号",
+              color: '#173177'
+            },
+            keyword2: {
+              value: date,
+              color: '#173177'
+            },
+            remark:{
+              value: '当期总计费用: '+amount+". 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！"
+            }
           }
-          content.remark = {
-            value: '当期总计费用: '+amount+". 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！"
-          }
+
+          console.log(content)
 
           var url = config.wechatHost+"/wechat/bind";
 
@@ -396,24 +401,32 @@ module.exports = function(app, db, options){
             for (var i = 0; i < bill.unit.user_unit_binding.length; i++) {
               var bind = bill.unit.user_unit_binding[i];
               if (bind.wechat_user) {
-                openids.push(bind.wechat_user.wechat_id)
+                // console.log(bind.wechat_user.wechatId)
+                openids.push(bind.wechat_user.wechatId)
                 logs.push({
-                  openid: bind.wechat_user.wechat_id,
+                  openid: bind.wechat_user.wechatId,
                   template_id: template.id,
-                  content: content,
+                  content: JSON.stringify(content),
                   template_type: 'bill',
                   unit_id: bill.unit.id
                 })
               }
             }
           }
+          // console.log(logs)
           if (openids.length > 0) {
             sequelize.model("PushMessageLog").bulkCreate(logs)
             .then(function(results) {
-              console.log(results)
+              // console.log(results)
 
               var bearer = req.headers['authorization'];
               var access_token = bearer.substring("Bearer".length).trim();
+
+              // return res.json({
+              //   success: true,
+              //   data: logs
+              // })
+
               SendTemplateMessage(openids, content, template.template_id, url, topcolor, access_token, app_id, host,function() {
                 return res.json({
                   success: true,
