@@ -394,12 +394,12 @@ module.exports = function(app, db, options){
               value: date,
               color: '#173177'
             },
-            keyword2: {
+            keyword3: {
               value: address,
               color: '#173177'
             },
             remark:{
-              value: '当期总计费用: '+amount+". 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！",
+              value: '当期总计费用: '+amount+"元, 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！",
               color: '#173177'
             }
           }
