@@ -375,7 +375,7 @@ module.exports = function(app, db, options){
             })
           }
 
-          var content = template.content;
+          var content = template.data;
           content.keyword1 = {
             value: "每月的01-10号",
             color: '#173177'
