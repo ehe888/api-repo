@@ -391,7 +391,7 @@ module.exports = function(app, db, options){
             }
           }
 
-          console.log(content)
+          var contentStr = JSON.stringify(content)
 
           var url = config.wechatHost+"/wechat/bind";
 
@@ -406,7 +406,7 @@ module.exports = function(app, db, options){
                 logs.push({
                   openid: bind.wechat_user.wechatId,
                   template_id: template.id,
-                  content: JSON.stringify(content),
+                  content: contentStr,
                   template_type: 'bill',
                   unit_id: bill.unit.id
                 })
@@ -427,7 +427,7 @@ module.exports = function(app, db, options){
               //   data: logs
               // })
 
-              SendTemplateMessage(openids, content, template.template_id, url, topcolor, access_token, app_id, host,function() {
+              SendTemplateMessage(openids, contentStr, template.template_id, url, topcolor, access_token, app_id, host,function() {
                 return res.json({
                   success: true,
                   data: logs
