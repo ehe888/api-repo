@@ -16,6 +16,8 @@ module.exports = function(app, db, options){
 
   var router = express.Router();
 
+  var SendTemplateMessage = require('../Utils/SendTemplateMessage')
+
 
   //创建账单
   router.post("/create", function(req, res, next) {
@@ -318,7 +320,13 @@ module.exports = function(app, db, options){
   //根据bill_id 发送Bill 模板消息
   router.post("/pushMessage", function(req, res, next) {
     var param = req.body,
-        bill_id = param.bill_id;
+        bill_id = param.bill_id,
+        topcolor = param.topcolor
+        appId = param.appId;
+
+
+    var host = req.protocol+"://"+req.hostname
+    var config = req.x_app_config;
 
     PropertyBill.findOne({
       where: {
@@ -345,10 +353,108 @@ module.exports = function(app, db, options){
 
     })
     .then(function(bill) {
-      return res.json({
-        success: true,
-        data: bill
-      })
+      if (bill) {
+        var amount = 0;
+        var date = bill.year + "年" + bill.month + "月";
+        var billLines = bill.property_bill_lines;
+        for (var i = 0; i < billLines.length; i++) {
+          var billLine = billLines[i];
+          amount += parseFloat(billLine.gross_amount);
+        }
+
+        sequelize.model("Template").findOne({
+          where: {
+            template_type: 'bill'
+          }
+        })
+        .then(function(template) {
+          if (!template) {
+            return res.status(500).json({
+              success: false,
+              errMsg: '没有找到相应模板'
+            })
+          }
+
+          var content = template.content;
+          content.keyword1 = {
+            value: "每月的01-10号",
+            color: '#173177'
+          };
+          content.keyword2 = {
+            value: date,
+            color: '#173177'
+          }
+          content.remark = {
+            value: '当期总计费用: '+amount+". 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！"
+          }
+
+          var url = config.wechatHost+"/wechat/bind";
+
+          var openids = [];
+          var logs = [];
+          if (bill.unit && bill.unit.user_unit_binding && bill.unit.user_unit_binding.length > 0) {
+            for (var i = 0; i < bill.unit.user_unit_binding.length; i++) {
+              var bind = bill.unit.user_unit_binding[i];
+              if (bind.wechat_user) {
+                openids.push(bind.wechat_user.wechat_id)
+                logs.push({
+                  openid: bind.wechat_user.wechat_id,
+                  template_id: template.id,
+                  content: content,
+                  template_type: 'bill',
+                  unit_id: bill.unit.id
+                })
+              }
+            }
+          }
+          if (openids.length > 0) {
+            PushMessageLog.bulkCreate(logs)
+            .then(function(results) {
+              console.log(results)
+
+              var bearer = req.headers['authorization'];
+              var access_token = bearer.substring("Bearer".length).trim();
+              SendTemplateMessage(openids, content, template.template_id, url, topcolor, access_token, app_id, host,function() {
+                return res.json({
+                  success: true,
+                  data: logs
+                })
+              })
+            })
+            .catch(function(err) {
+              console.error(err)
+              return res.status(500).json({
+                success: false
+                ,errMsg: err.message
+                ,errors: err
+              })
+            })
+
+          }
+          else {
+            return res.json({
+              success: false,
+              errMsg: '现在没有微信用户与该户号绑定'
+            })
+          }
+
+
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success:false,
+            errMsg:err.message,
+            errors:err
+          })
+        })
+      }
+      else {
+        return res.json({
+          success: false,
+          errMsg: '找不到该账单'
+        })
+      }
     })
     .catch(function(err){
       console.error(err)

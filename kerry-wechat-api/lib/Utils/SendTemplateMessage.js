@@ -1,6 +1,6 @@
 var rp = require('request-promise')
 
-var SendTemplateMessage = function(openids, content, template_id, url, topcolor, access_token, app_id, callback) {
+var SendTemplateMessage = function(openids, content, template_id, url, topcolor, access_token, app_id, host,callback) {
 
   var index = 0;
 
@@ -24,7 +24,7 @@ var SendTemplateMessage = function(openids, content, template_id, url, topcolor,
 
     var option = {
       method: 'POST',
-      uri: 'http://identity.aivics.net/wxapi/template/send?app_id='+app_id,
+      uri: host+'/wxapi/template/send?app_id='+app_id,
       body: data,
       headers: {
         authorization: 'Bearer '+access_token
