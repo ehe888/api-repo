@@ -14,7 +14,7 @@ module.exports = function(app, db, config){
 
     it("推送bill", function(done) {
       var requestData = {
-        bill_id: 26,
+        bill_id: 31,
         appId: 'wxa0c45fc6d9e269ed'
       }
 
