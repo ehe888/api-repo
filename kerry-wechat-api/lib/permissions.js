@@ -40,6 +40,11 @@ module.exports = [
       name: "微信菜单与消息操作",
       httpMethod: "POST",
       httpPath: "^(\/api\/wechatAssets.*|\/wxapi.*)"
+    },
+    {
+      name: "个人中心",
+      httpMethod: "POST",
+      httpPath: "^\/api\/auth.*"
     }
 
 ]
