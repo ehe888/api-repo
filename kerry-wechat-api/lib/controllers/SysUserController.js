@@ -500,7 +500,7 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20;
 
-    SysUser.findAndCountAll({
+    SysUser.findAll({
       where: {
         username: {
           $like: "%"+username+"%"
@@ -523,14 +523,26 @@ module.exports = function(app, db, options){
       order: 'id desc'
     })
     .then(function(results) {
-      var count = results.count;
-      return res.json({
-        success: true,
-        data: results.rows,
-        count: count,
-        offset: offset,
-        limit: limit
+      SysUser.count({
+        where: {
+          username: {
+            $like: "%"+username+"%"
+          },
+          userType: userType
+        }
       })
+      .then(function(count) {
+
+        return res.json({
+          success: true,
+          data: results,
+          count: count,
+          offset: offset,
+          limit: limit
+        })
+
+      })
+
     })
     .catch(function(err){
       console.log(err);
