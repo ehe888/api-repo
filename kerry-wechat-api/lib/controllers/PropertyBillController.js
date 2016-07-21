@@ -438,9 +438,21 @@ module.exports = function(app, db, options){
               var bearer = req.headers['authorization'];
               var access_token = bearer.substring("Bearer".length).trim();
               SendTemplateMessage(openids, contentStr, template.template_id, url, topcolor, access_token, app_id, host,function() {
-                return res.json({
-                  success: true,
-                  data: logs
+                bill.update({
+                  is_push: true
+                })
+                .then(function() {
+                  return res.json({
+                    success: true
+                  })
+                })
+                .catch(function(err) {
+                  console.error(err)
+                  return res.status(500).json({
+                    success: false
+                    ,errMsg: err.message
+                    ,errors: err
+                  })
                 })
               })
             })
