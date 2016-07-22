@@ -30,18 +30,10 @@ router.post("/queryWechatUsers", function(req, res, next) {
  UserUnitBinding.findAndCountAll({
    where :
    {
-     $or: [
-       {
-         username: {
-           $like: "%"+username+"%"
-         }
-       },
-       {
-         unit.unit_number: {
-           $like: "%"+username+"%"
-         }
+
+       username: {
+         $like: "%"+username+"%"
        }
-     ]
    },
    include:[{
      model: sequelize.model("User"),
@@ -80,6 +72,68 @@ router.post("/queryWechatUsers", function(req, res, next) {
    })
  })
 })
+
+
+
+//查询角色
+router.post("/queryWechatUsersByView", function(req, res, next) {
+ var param = req.body;
+ var username = param.username || "",
+     offset = param.offset || 0,
+     limit = param.limit || 20,
+     appId = param.appId;
+
+console.log("11111");
+     sequelize.query('select * from vw_userunitbind where (wechat_nickname like :username or username like :username or unit_number like :username) and appid=:appid order by id desc  limit :limit offset :offset',
+       { replacements: {limit:limit,offset:offset,username:"%"+username+"%",appid:appId}, type: sequelize.QueryTypes.SELECT }
+     ).then(function(results){
+
+
+
+        sequelize.query('select count(*)  from vw_userunitbind where (wechat_nickname like :username or username like :username or unit_number like :username) and appid=:appid',
+          { replacements: {username:"%"+username+"%",appid:appId} ,type: sequelize.QueryTypes.SELECT }
+        ).then(function(countresults){
+          console.log(countresults);
+
+
+          var count = countresults.count;
+          // return res.status(200).json({
+          //   success:true
+          // })
+
+          return res.json({
+            success: true,
+            data: results,
+            count: count,
+            offset: offset,
+            limit: limit
+          })
+
+        })
+        .catch(function(err){
+          console.error(err);
+          return res.status(500).json({
+            success:false,
+            errMsg:err.message,
+            errors:err
+          })
+        })
+
+
+      })
+      .catch(function(err){
+          console.error(err);
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+
+
+
+})
+
 
 //删除角色
 router.get("/delete", function(req, res, next) {
