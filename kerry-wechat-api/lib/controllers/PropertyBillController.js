@@ -365,10 +365,13 @@ module.exports = function(app, db, options){
           var billLine = billLines[i];
           amount += parseFloat(billLine.gross_amount);
         }
+        var url = config.wechatHost+"/wechat/my_bind";
         var address = "";
         if (bill.unit && bill.unit.property) {
           var property = bill.unit.property;
           address = property.city+property.street+bill.unit.unit_number;
+          url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
+                + "&unit_id="+bill.unit.id
         }
         sequelize.model("Template").findOne({
           where: {
@@ -406,7 +409,7 @@ module.exports = function(app, db, options){
 
           var contentStr = JSON.stringify(content)
 
-          var url = config.wechatHost+"/wechat/bind";
+
 
           var openids = [];
           var logs = [];
