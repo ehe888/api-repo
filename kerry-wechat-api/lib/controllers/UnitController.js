@@ -120,14 +120,40 @@ module.exports = function(app, db, options){
   router.post("/delete", function(req, res, next) {
     var param = req.body,
         id = param.id;
-    Units.destroy({
+
+    Units.findOne({
       where: {
         id: id
       }
     })
-    .then(function() {
-      return res.json({
-        success: true
+    .then(function(unit) {
+      var now = new Date();
+      var unit_number = unit.unit_number+"__"+now.getTime();
+      unit.update({
+        unit_number: unit_number
+      })
+      .then(function() {
+        unit.destroy().then(function() {
+          return res.json({
+            success: true
+          })
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
       })
     })
     .catch(function(err) {
