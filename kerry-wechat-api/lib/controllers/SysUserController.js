@@ -597,6 +597,38 @@ module.exports = function(app, db, options){
     })
   })
 
+  //查询该物业下所有系统用户
+  router.post("/querySysUsersByProperty", function(req, res, next) {
+    var param = req.body;
+    var appId = param.appId;
+
+    SysUser.findAll({
+      include:[{
+        model: sequelize.model("KerryProperty"),
+        as: 'WorkingProperty',
+        where: {
+          appId: appId
+        }
+      }],
+      order: 'id desc'
+    })
+    .then(function(results){
+      console.log(results);
+      return res.json({
+        success: true,
+        data: results
+      })
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+  })
+
 
   app.use("/sysusers", router);
 }
