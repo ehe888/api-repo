@@ -92,5 +92,19 @@ module.exports = function(app, db, config){
     //     })
     //     .end(done);
     // })
+    //
+    it("PGET删除角色权限", function(done){
+      request(app)
+        .post("/api/roles/deleteRoles")
+        .send({
+          role_id: 1,
+          name: "创建角色"
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
   });
 }

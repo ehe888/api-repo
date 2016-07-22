@@ -156,6 +156,33 @@ router.post("/update", function(req, res, next) {
   })
 })
 
+router.post("/deleteRoles", function(req, res, next) {
+  var param = req.body,
+      role_id = param.role_id,
+      name = param.name;
+
+  SysRolePermission.destroy({
+    where:{
+      role_id:role_id,
+      name: name
+    }
+  })
+  .then(function(rows){
+    return res.json({
+      success:true,
+      data:rows
+    })
+  })
+  .catch(function(err){
+    return res.status(500).json({
+      success:false,
+      errMsg:err.message,
+      errors:err
+    })
+  })
+
+})
+
 //查询角色
 router.post("/queryRoles", function(req, res, next) {
  var param = req.body;
