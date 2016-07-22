@@ -32,13 +32,13 @@ app.use(function(req, res, next){
 
 var kerryApp = require("../lib/")(app, "/api", db, {})
 
-//require("./Sequelize.test")(db, config.sequelize )
+require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/SysController.test")(app, db, config);
 // require("./controllers/AuthController.test")(app, db, config);
-//require("./controllers/RoleController.test")(app, db, config);
+// require("./controllers/RoleController.test")(app, db, config);
 // require("./controllers/KerryPropertyController.test")(app, db, config);
 // require("./controllers/UserManagerController.test")(app, db, config);
-// require("./controllers/UnitController.test")(app, db, config);
+require("./controllers/UnitController.test")(app, db, config);
 // require("./controllers/SysUserController.test")(app, db, config);
 
 // require("./controllers/UserUnitBindController.test")(app, db, config);
@@ -50,4 +50,3 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)
- require("./controllers/QueryUser.test")(app, db, config)

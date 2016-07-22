@@ -27,7 +27,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/units/create")
         .send({
-          unit_number: "A0001103E",
+          unit_number: "A00015",
           property_id: 1
         })
         .expect(200)
@@ -87,6 +87,40 @@ module.exports = function(app, db, config){
 
         })
         .end(done);
+    })
+
+    it("新建单元2", function(done) {
+      request(app)
+        .post("/api/units/create")
+        .send({
+          unit_number: "A00010",
+          property_id: 1
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+
+        })
+        .end(done);
+    })
+
+    it("删除单元", function(done) {
+
+      request(app)
+        .post("/api/units/delete")
+        .send({
+          id: '1'
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+
+
+        })
+        .end(done);
+
+
     })
 
   })
