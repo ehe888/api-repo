@@ -83,13 +83,13 @@ router.post("/queryWechatUsersByView", function(req, res, next) {
      appId = param.appId;
 
 console.log("11111");
-     sequelize.query('select * from vw_userunitbind where (wechat_nickname like :username or username like :username or unitnumber like :username) and appid=:appid order by id desc  limit :limit offset :offset',
+     sequelize.query('select * from vw_user_unit_bind where (wechat_nickname like :username or username like :username or unit_number like :username) and appid=:appid order by id desc  limit :limit offset :offset',
        { replacements: {limit:limit,offset:offset,username:"%"+username+"%",appid:appId}, type: sequelize.QueryTypes.SELECT }
      ).then(function(results){
 
 
 
-        sequelize.query('select count(*)  from vw_userunitbind where (wechat_nickname like :username or username like :username or unitnumber like :username) and appid=:appid',
+        sequelize.query('select count(*)  from vw_user_unit_bind where (wechat_nickname like :username or username like :username or unit_number like :username) and appid=:appid',
           { replacements: {username:"%"+username+"%",appid:appId} ,type: sequelize.QueryTypes.SELECT }
         ).then(function(countresults){
           console.log(countresults);
