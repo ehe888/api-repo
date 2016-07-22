@@ -27,6 +27,7 @@ module.exports = function(app, db, options){
     KerryUserUnit.findAndCountAll({
       offset: offset,
       limit: limit,
+      order: 'id DESC',
       include: [{
         model: sequelize.model("Units"),
         as: 'unit',

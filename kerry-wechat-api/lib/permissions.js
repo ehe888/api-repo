@@ -9,7 +9,7 @@ module.exports = [
     {
       name: "创建户号",
       httpMethod: "POST",
-      httpPath: "^\/api\/units(\/create|\/update)"
+      httpPath: "^\/api\/units.*"
     },
     {
       name: "查询户号",
@@ -50,6 +50,11 @@ module.exports = [
       name: "个人中心",
       httpMethod: "POST",
       httpPath: "^\/api(\/auth.*|\/sysusers\/deleteUnit|\/sysusers\/updateUnits)"
+    },
+    {
+      name: "查询物业管家",
+      httpMethod: "POST",
+      httpPath: "^\/api\/sysuser"
     }
 
 ]

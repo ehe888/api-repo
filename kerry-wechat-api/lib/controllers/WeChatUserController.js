@@ -30,7 +30,6 @@ router.post("/queryWechatUsers", function(req, res, next) {
  UserUnitBinding.findAndCountAll({
    where :
    {
-
        username: {
          $like: "%"+username+"%"
        }
