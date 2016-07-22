@@ -73,7 +73,7 @@ module.exports = function(app, db, options){
         url = param.url,
         app_id = req.query.app_id
 
-
+    var host = req.protocol+"://"+req.hostname
     Units.findOne({
       where: {
         unit_number: unit_number
@@ -137,7 +137,7 @@ module.exports = function(app, db, options){
             var bearer = req.headers['authorization'];
             var access_token = bearer.substring("Bearer".length).trim();
             console.log(access_token)
-            SendTemplateMessage(openids, content, template.template_id, url, topcolor, access_token, app_id, function() {
+            SendTemplateMessage(openids, content, template.template_id, url, topcolor, access_token, app_id, host, function() {
               return res.json({
                 success: true,
                 data: logs

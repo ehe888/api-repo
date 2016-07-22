@@ -27,7 +27,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/WeChatAssetController")(subapp, db, options)
   require("./controllers/PropertyBillController")(subapp, db, options)
   require("./controllers/PropertyBillLineController")(subapp, db, options)
-  
+
   app.use( path || "/api", subapp);
 
   return subapp
