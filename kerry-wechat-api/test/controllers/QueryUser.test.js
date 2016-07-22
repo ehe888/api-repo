@@ -14,9 +14,9 @@ module.exports = function(app, db, config){
 
     it("POST查询后台用户", function(done){
       request(app)
-        .post("/api/wechatUsers/queryWechatUsers")
+        .post("/api/wechatUsers/queryWechatUsersByView")
         .send({
-          username: 't',
+          username: '1',
           offset: 0,
           limit: 20,
           appId: 'wxa0c45fc6d9e269ed'
