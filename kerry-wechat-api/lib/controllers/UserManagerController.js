@@ -24,6 +24,15 @@ module.exports = function(app, db, options){
       propertyOption.appId = appId;
     }
 
+    var unitOption = {};
+    if (req.units) {
+      unitOption = {
+        id: {
+          $in: req.units
+        }
+      }
+    }
+
     KerryUserUnit.findAndCountAll({
       offset: offset,
       limit: limit,
@@ -31,11 +40,7 @@ module.exports = function(app, db, options){
       include: [{
         model: sequelize.model("Units"),
         as: 'unit',
-        where: {
-          id: {
-            $in: req.units
-          }
-        },
+        where: unitOption,
         include: [{
           model: sequelize.model("SysUser"),
           as: 'sys_user',

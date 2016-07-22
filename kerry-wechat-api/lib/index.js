@@ -10,6 +10,7 @@
 module.exports = function(app, path, db, options){
   var express = require("express");
   var subapp = express();
+  var _ = require("lodash")
 
   var sequelize = db.sequelize,  //The sequelize instance
       Sequelize = db.Sequelize;
@@ -32,7 +33,15 @@ module.exports = function(app, path, db, options){
   require("./controllers/PropertyBillLineController")(subapp, db, options)
 
   app.use("/", function(req, res, next) {
-    var sys_user_name = req.identity.sub;
+    var sys_user_name = req.identity.sub,
+        ut = req.identity.ut,
+        roles = req.identity.roles;
+    if (ut == 'CORP') {
+      return next();
+    }
+    if (_.indexOf(roles, '小区管理员') > 0) {
+      return next();
+    }
     sequelize.model("SysUser").findOne({
       where: {
         username: sys_user_name

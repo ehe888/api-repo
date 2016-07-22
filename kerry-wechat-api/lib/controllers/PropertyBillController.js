@@ -189,7 +189,14 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20,
         appId = param.appId;
-
+    var unitOption = {};
+    if (req.units) {
+      unitOption = {
+        id: {
+          $in: req.units
+        }
+      }
+    }
     PropertyBill.findAll({
       where: {
         bill_number: {
@@ -199,11 +206,7 @@ module.exports = function(app, db, options){
       include:[{
         model: sequelize.model("Units"),
         as: 'unit',
-        where: {
-          id: {
-            $in: req.units
-          }
-        },
+        where: unitOption,
         include: [{
           model: sequelize.model("KerryProperty"),
           as: 'property',

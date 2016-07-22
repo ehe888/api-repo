@@ -24,7 +24,16 @@ module.exports = function(app, db, options){
     var param = req.body,
         offset = param.offset,
         limit = param.limit
-    
+
+    var unitOption = {};
+    if (req.units) {
+      unitOption = {
+        id: {
+          $in: req.units
+        }
+      }
+    }
+
     PushMessageLog.findAndCountAll({
       where: {
         template_type: 'delivery'
@@ -32,11 +41,7 @@ module.exports = function(app, db, options){
       include: [{
         model: sequelize.model("Units"),
         as: 'unit',
-        where: {
-          id: {
-            $in: req.units
-          }
-        },
+        where: unitOption,
         include: [{
           model: sequelize.model("KerryProperty"),
           as: 'property',
