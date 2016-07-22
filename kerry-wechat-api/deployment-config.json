@@ -1,0 +1,9 @@
+{
+    "type": "sftp",
+    "host": "121.43.186.24",
+    "username": "root",
+    "password": "Hedingwen0615",
+    "port": 22,
+    "remotePath": "/srv/kerry-api/api-repo/kerry-wechat-api",
+    "uploadOnSave": true
+}

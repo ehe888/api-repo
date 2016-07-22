@@ -5,7 +5,7 @@ module.exports = function(models, config){
 
   describe("Sequelize Models", function(){
     it("成功Sync数据库", function(done){
-      models.sequelize.sync({ force: config.sync.force })
+      models.sequelize.sync({ force: false })
         .then(function(){
           console.log("Success to sync!!!")
           done();

@@ -28,10 +28,20 @@ router.post("/queryWechatUsers", function(req, res, next) {
  }
 
  UserUnitBinding.findAndCountAll({
-   where :{
-     username:{
-       $like:"%"+username+"%"
-     },
+   where :
+   {
+     $or: [
+       {
+         username: {
+           $like: "%"+username+"%"
+         }
+       },
+       {
+         unit.unit_number: {
+           $like: "%"+username+"%"
+         }
+       }
+     ]
    },
    include:[{
      model: sequelize.model("User"),

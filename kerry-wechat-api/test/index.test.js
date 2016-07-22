@@ -48,4 +48,5 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/WechatAssetController.test")(app, db, config)
 // require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
-require("./controllers/permissions.test")(app, db, config)
+// require("./controllers/permissions.test")(app, db, config)
+require("./controllers/QueryUser.test")(app, db,config)
