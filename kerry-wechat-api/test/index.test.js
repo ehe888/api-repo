@@ -27,6 +27,11 @@ app.locals.config = config;
 */
 app.use(function(req, res, next){
    req.x_app_config = app.locals.config;
+   req.identity = { sub: 'property',
+                    roles: [ 'SUPER_USER' ],
+                    ut: 'PROPERTY',
+                    iat: 1469182996,
+                    exp: 1469254996 };
    return next();
   })
 
@@ -38,15 +43,15 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/RoleController.test")(app, db, config);
 // require("./controllers/KerryPropertyController.test")(app, db, config);
 // require("./controllers/UserManagerController.test")(app, db, config);
-require("./controllers/UnitController.test")(app, db, config);
+// require("./controllers/UnitController.test")(app, db, config);
 // require("./controllers/SysUserController.test")(app, db, config);
 
 // require("./controllers/UserUnitBindController.test")(app, db, config);
 // require("./controllers/SysPermissionController.test")(app, db, config);
-// require("./controllers/DeliveryController.test")(app, db, config);
+require("./controllers/DeliveryController.test")(app, db, config);
 // require("./controllers/WechatUserController.test")(app, db, config);
 // require("./controllers/WechatAssetController.test")(app, db, config)
-// require("./controllers/PropertyBillController.test")(app, db, config);
+require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)

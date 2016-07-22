@@ -43,8 +43,9 @@ module.exports = function(app, db, config){
         })
         .expect(200)
         .expect(function(res) {
+          console.log(res.body)
           expect(res.body.success).to.be.true;
-          expect(res.body.data.sub).to.equal("su");
+          expect(res.body.data).to.be.exist;
         })
         .end(done);
     })

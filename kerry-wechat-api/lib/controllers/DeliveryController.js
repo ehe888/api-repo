@@ -24,7 +24,7 @@ module.exports = function(app, db, options){
     var param = req.body,
         offset = param.offset,
         limit = param.limit
-
+    
     PushMessageLog.findAndCountAll({
       where: {
         template_type: 'delivery'
@@ -32,6 +32,11 @@ module.exports = function(app, db, options){
       include: [{
         model: sequelize.model("Units"),
         as: 'unit',
+        where: {
+          id: {
+            $in: req.units
+          }
+        },
         include: [{
           model: sequelize.model("KerryProperty"),
           as: 'property',
@@ -62,7 +67,6 @@ module.exports = function(app, db, options){
         ,errors: err
       })
     })
-
   })
 
   router.post("/create", function(req, res, next) {

@@ -11,6 +11,9 @@ module.exports = function(app, path, db, options){
   var express = require("express");
   var subapp = express();
 
+  var sequelize = db.sequelize,  //The sequelize instance
+      Sequelize = db.Sequelize;
+
   require("../models")(db); //Merge localDB with global DB
 
   require("./controllers/SysController")(subapp, db, options);
@@ -27,6 +30,51 @@ module.exports = function(app, path, db, options){
   require("./controllers/WeChatAssetController")(subapp, db, options)
   require("./controllers/PropertyBillController")(subapp, db, options)
   require("./controllers/PropertyBillLineController")(subapp, db, options)
+
+  app.use("/", function(req, res, next) {
+    var sys_user_name = req.identity.sub;
+    sequelize.model("SysUser").findOne({
+      where: {
+        username: sys_user_name
+      },
+      include: [{
+        model: sequelize.model("Units"),
+        as: 'unit'
+      }]
+    })
+    .then(function(sysUser) {
+      if (!sysUser) {
+        return res.status(403).json({
+          success: false,
+          errMsg: 'forbidden'
+        })
+      }
+
+      if (sysUser.userType == 'CORP') {
+        return next();
+      }
+      var units = []
+      if (sysUser.unit && sysUser.unit.length > 0) {
+        for (var i = 0; i < sysUser.unit.length; i++) {
+          var unit = sysUser.unit[i];
+          units.push(unit.id)
+        }
+      }
+      req.units = units;
+      console.log(units)
+      return next();
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
 
   app.use( path || "/api", subapp);
 

@@ -53,6 +53,9 @@ module.exports = function(app, db, options){
       where: {
         unit_number: {
           $like: '%'+unit_number+'%'
+        },
+        id: {
+          $in: req.units
         }
       },
       include: [{
