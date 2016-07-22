@@ -161,12 +161,8 @@ router.post("/deleteRoles", function(req, res, next) {
       role_id = param.role_id,
       name = param.name;
 
-  SysRolePermission.destroy({
-    where:{
-      role_id:role_id,
-      name: name
-    }
-  })
+  sequelize.query("DELETE FROM sys_role_permissions WHERE role_id = ? AND name = ?",
+            {replacements: [role_id, name]})
   .then(function(rows){
     return res.json({
       success:true,
