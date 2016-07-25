@@ -46,52 +46,53 @@ module.exports = function(app, path, db, options){
       if (ut != 'PROPERTY') {
         return next();
       }
-      
-      if (_.indexOf(roles, '小区物业') >= 0) {
+
+      if (_.indexOf(roles, '物业管家') >= 0) {
+        sequelize.model("SysUser").findOne({
+          where: {
+            username: sys_user_name
+          },
+          include: [{
+            model: sequelize.model("Units"),
+            as: 'unit'
+          }]
+        })
+        .then(function(sysUser) {
+          if (!sysUser) {
+            return res.status(403).json({
+              success: false,
+              errMsg: 'forbidden'
+            })
+          }
+
+          if (sysUser.userType == 'CORP') {
+            return next();
+          }
+          var units = []
+          if (sysUser.unit && sysUser.unit.length > 0) {
+            for (var i = 0; i < sysUser.unit.length; i++) {
+              var unit = sysUser.unit[i];
+              units.push(unit.id)
+            }
+          }
+          req.units = units;
+          return next();
+
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+
+      }
+      else {
         return next();
       }
 
-
-
-      sequelize.model("SysUser").findOne({
-        where: {
-          username: sys_user_name
-        },
-        include: [{
-          model: sequelize.model("Units"),
-          as: 'unit'
-        }]
-      })
-      .then(function(sysUser) {
-        if (!sysUser) {
-          return res.status(403).json({
-            success: false,
-            errMsg: 'forbidden'
-          })
-        }
-
-        if (sysUser.userType == 'CORP') {
-          return next();
-        }
-        var units = []
-        if (sysUser.unit && sysUser.unit.length > 0) {
-          for (var i = 0; i < sysUser.unit.length; i++) {
-            var unit = sysUser.unit[i];
-            units.push(unit.id)
-          }
-        }
-        req.units = units;
-        return next();
-
-      })
-      .catch(function(err) {
-        console.error(err)
-        return res.status(500).json({
-          success: false
-          ,errMsg: err.message
-          ,errors: err
-        })
-      })
 
 
     } catch (e) {
