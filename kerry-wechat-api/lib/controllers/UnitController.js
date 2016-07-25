@@ -54,11 +54,11 @@ module.exports = function(app, db, options){
         $like: '%'+unit_number+'%'
       }
     };
-    // if (req.units) {
-    //   unitOption.id = {
-    //     $in: req.units
-    //   }
-    // }
+    if (req.units) {
+      unitOption.id = {
+        $in: req.units
+      }
+    }
     console.log(unitOption)
 
     Units.findAndCountAll({

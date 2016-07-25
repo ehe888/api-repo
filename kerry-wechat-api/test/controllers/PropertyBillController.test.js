@@ -94,7 +94,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/propertyBills/queryPropertyBills")
         .send({
-          bill_number:'B'
+          bill_number:''
         })
         .expect(200)
         .expect(function(res){

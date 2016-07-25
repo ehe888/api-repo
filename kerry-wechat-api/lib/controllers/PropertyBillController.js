@@ -190,13 +190,13 @@ module.exports = function(app, db, options){
         limit = param.limit || 20,
         appId = param.appId;
     var unitOption = {};
-    // if (req.units) {
-    //   unitOption = {
-    //     id: {
-    //       $in: req.units
-    //     }
-    //   }
-    // }
+    if (req.units) {
+      unitOption = {
+        id: {
+          $in: req.units
+        }
+      }
+    }
     PropertyBill.findAll({
       where: {
         bill_number: {
