@@ -55,4 +55,6 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)
-require("./controllers/Debug.test")(app, db, config);
+//require("./controllers/Debug.test")(app, db, config);
+
+ require("./controllers/KerrySuggestionController.test")(app, db, config)

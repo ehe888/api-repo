@@ -31,6 +31,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/WeChatAssetController")(subapp, db, options)
   require("./controllers/PropertyBillController")(subapp, db, options)
   require("./controllers/PropertyBillLineController")(subapp, db, options)
+  require("./controllers/KerrySuggestionController")(subapp, db, options)
 
   app.use("/", function(req, res, next) {
 
@@ -46,7 +47,7 @@ module.exports = function(app, path, db, options){
       if (ut != 'PROPERTY') {
         return next();
       }
-      
+
       if (_.indexOf(roles, '小区物业') >= 0) {
         return next();
       }
