@@ -27,6 +27,15 @@ router.post("/queryWechatUsers", function(req, res, next) {
    propertyOption.appId = appId;
  }
 
+ var unitOption = {};
+ if (req.units) {
+   unitOption = {
+     id: {
+       $in: req.units
+     }
+   }
+ }
+
  UserUnitBinding.findAndCountAll({
    where :
    {
@@ -40,6 +49,7 @@ router.post("/queryWechatUsers", function(req, res, next) {
    },{
      model:sequelize.model("Units"),
      as: 'unit',
+     where: unitOption,
      include: [{
        model: sequelize.model("SysUser"),
        as: 'sys_user'
@@ -82,7 +92,6 @@ router.post("/queryWechatUsersByView", function(req, res, next) {
      limit = param.limit || 20,
      appId = param.appId;
 
-console.log("11111");
      sequelize.query('select * from vw_user_unit_bind where (wechat_nickname like :username or username like :username or unit_number like :username) and appid=:appid order by id desc  limit :limit offset :offset',
        { replacements: {limit:limit,offset:offset,username:"%"+username+"%",appid:appId}, type: sequelize.QueryTypes.SELECT }
      ).then(function(results){

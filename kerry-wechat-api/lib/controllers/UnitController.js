@@ -49,14 +49,21 @@ module.exports = function(app, db, options){
       propertyOption.appId = appId;
     }
 
+    var unitOption = {};
+    if (req.units) {
+      unitOption = {
+        id: {
+          $in: req.units
+        }
+      }
+    }
+
     Units.findAndCountAll({
       where: {
         unit_number: {
           $like: '%'+unit_number+'%'
         },
-        id: {
-          $in: req.units
-        }
+        unitOption
       },
       include: [{
         model: sequelize.model("SysUser"),
