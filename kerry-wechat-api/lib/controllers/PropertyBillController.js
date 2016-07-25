@@ -374,6 +374,7 @@ module.exports = function(app, db, options){
           var billLine = billLines[i];
           amount += parseFloat(billLine.gross_amount);
         }
+        amount = amount.toFixed(2);
         var url = config.wechatHost+"/wechat/my_bind";
         var address = "";
         if (bill.unit && bill.unit.property) {

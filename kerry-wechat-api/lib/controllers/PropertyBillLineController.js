@@ -86,6 +86,54 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/updatePay", function(req, res, next) {
+    var param = req.body,
+        id = param.id;
+
+    PropertyBillLine.findOne({
+      where: {
+        id: param.id
+      }
+    })
+    .then(function(line) {
+      if (!line) {
+        return res.json({
+          success: false,
+          errMsg: '找不到该账单行'
+        })
+      }
+
+      line.update({
+        is_pay: true
+      })
+      .then(function(line) {
+        return res.json({
+          success: true,
+          data: line
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+
+  })
+
   //删除账单
   router.get("/delete", function(req, res, next) {
    var param = req.query;

@@ -9,7 +9,6 @@ let _   = require("lodash"),
 
 module.exports = function(app, db, config){
 
-
   describe("API平台系统创建物业", function(){
 
     it("POST提交物业", function(done){
@@ -142,19 +141,19 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
-    // it("删除存在的物业", function(done){
-    //   request(app)
-    //     .post("/api/properties/delete")
-    //     .send({
-    //       id: '1'
-    //     })
-    //     .expect(200)
-    //     .expect(function(res) {
-    //       expect(res.body.success).to.be.true;
-    //       expect(res.body.affectedRows).to.equal(1);
-    //     })
-    //     .end(done);
-    // })
+    it("删除存在的物业", function(done){
+      request(app)
+        .post("/api/properties/delete")
+        .send({
+          id: '1'
+        })
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.success).to.be.true;
+          expect(res.body.affectedRows).to.equal(1);
+        })
+        .end(done);
+    })
 
     it("提交物业", function(done){
       request(app)
