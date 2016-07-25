@@ -62,9 +62,7 @@ module.exports = function(app, db, options){
     console.log(unitOption)
 
     Units.findAndCountAll({
-      where: {
-        unitOption
-      },
+      where: unitOption,
       include: [{
         model: sequelize.model("SysUser"),
         as: 'sys_user',
