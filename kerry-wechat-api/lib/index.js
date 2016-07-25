@@ -37,7 +37,7 @@ module.exports = function(app, path, db, options){
         ut = req.identity.ut,
         roles = req.identity.roles;
     try {
-
+      console.log(ut)
       if (ut == 'CORP') {
         return next();
       }
@@ -46,7 +46,11 @@ module.exports = function(app, path, db, options){
       }
 
     } catch (e) {
-      console.error(e)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
     } finally {
 
     }

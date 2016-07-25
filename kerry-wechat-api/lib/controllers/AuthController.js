@@ -31,7 +31,7 @@ module.exports = function(app, db, options){
 
     SysUser.getAuthenticated(username, password, function(err, user){
       if(err){
-        console.error(err);
+        console.error("auth error: ", err);
         return res.status(403).json({
                                      success: false
                                      ,errMsg: err.message
