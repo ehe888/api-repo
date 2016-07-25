@@ -43,7 +43,7 @@ module.exports = function(app, db, options){
         var err = new Error("invalid_username_and_password")
         return res.status(403).json({
                                      success: false
-                                     ,errMsg: err.message
+                                     ,errMsg: '请输入正确的用户名和密码'
                                      ,errors: err
                                     });
       }
