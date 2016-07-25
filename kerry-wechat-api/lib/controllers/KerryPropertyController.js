@@ -127,16 +127,60 @@ module.exports = function(app, db, options){
 
   router.post('/delete', function(req, res, next) {
     var id = req.body.id;
-    KerryProperty.destroy({
+
+    KerryProperty.findOne({
       where: {
         id: id
       }
     })
-    .then(function(affectedRows) {
-      return res.json({
-        success: true,
-        affectedRows: affectedRows
+    .then(function(property) {
+      if (!property) {
+        return res.json({
+          success: false,
+          errMsg: '找不到物业'
+        })
+      }
+      var now = new Date(),
+          nowTime = now.getTime();
+      var name = property.name+"__"+nowTime;
+      var appId = property.appId + "__"+nowTime;
+      var telephone = property.telephone + "__"+nowTime;
+
+      property.update({
+        name: name,
+        appId: appId,
+        telephone: telephone
       })
+      .then(function(property) {
+        KerryProperty.destroy({
+          where: {
+            id: id
+          }
+        })
+        .then(function(affectedRows) {
+          return res.json({
+            success: true,
+            affectedRows: affectedRows
+          })
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+
     })
     .catch(function(err) {
       console.error(err)
