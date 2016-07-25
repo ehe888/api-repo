@@ -49,21 +49,20 @@ module.exports = function(app, db, options){
       propertyOption.appId = appId;
     }
 
-    var unitOption = {};
+    var unitOption = {
+      unit_number: {
+        $like: '%'+unit_number+'%'
+      }
+    };
     if (req.units) {
-      unitOption = {
-        id: {
-          $in: req.units
-        }
+      unitOption.id = {
+        $in: req.units
       }
     }
     console.log(unitOption)
 
     Units.findAndCountAll({
       where: {
-        unit_number: {
-          $like: '%'+unit_number+'%'
-        },
         unitOption
       },
       include: [{

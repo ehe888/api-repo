@@ -232,6 +232,7 @@ module.exports = function(app, db, options){
         include: [{
           model: sequelize.model("Units"),
           as: 'unit',
+          where: unitOption,
           include: [{
             model: sequelize.model("KerryProperty"),
             as: 'property',
