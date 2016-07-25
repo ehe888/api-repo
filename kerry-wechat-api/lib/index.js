@@ -36,11 +36,19 @@ module.exports = function(app, path, db, options){
     var sys_user_name = req.identity.sub,
         ut = req.identity.ut,
         roles = req.identity.roles;
-    if (ut == 'CORP') {
-      return next();
-    }
-    if (_.indexOf(roles, '小区物业') > 0) {
-      return next();
+    try {
+
+      if (ut == 'CORP') {
+        return next();
+      }
+      if (_.indexOf(roles, '小区物业') > 0) {
+        return next();
+      }
+
+    } catch (e) {
+      console.error(e)
+    } finally {
+
     }
     sequelize.model("SysUser").findOne({
       where: {
