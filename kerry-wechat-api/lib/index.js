@@ -90,6 +90,7 @@ module.exports = function(app, path, db, options){
 
 
     } catch (e) {
+      console.error(e)
       return res.status(500).json({
         success: false
         ,errMsg: err.message
