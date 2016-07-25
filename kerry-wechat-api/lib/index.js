@@ -39,7 +39,7 @@ module.exports = function(app, path, db, options){
     if (ut == 'CORP') {
       return next();
     }
-    if (_.indexOf(roles, '小区管理员') > 0) {
+    if (_.indexOf(roles, '小区物业') > 0) {
       return next();
     }
     sequelize.model("SysUser").findOne({
