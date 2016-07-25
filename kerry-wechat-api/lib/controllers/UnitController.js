@@ -57,6 +57,7 @@ module.exports = function(app, db, options){
         }
       }
     }
+    console.log(unitOption)
 
     Units.findAndCountAll({
       where: {

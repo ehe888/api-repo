@@ -79,7 +79,6 @@ module.exports = function(app, path, db, options){
           }
         }
         req.units = units;
-        console.log(units)
         return next();
 
       })

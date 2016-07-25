@@ -28,7 +28,7 @@ app.locals.config = config;
 app.use(function(req, res, next){
    req.x_app_config = app.locals.config;
    req.identity = { sub: 'property',
-                    roles: [ 'SUPER_USER' ],
+                    roles: [ '小区物业' ],
                     ut: 'PROPERTY',
                     iat: 1469182996,
                     exp: 1469254996 };
