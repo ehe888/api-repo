@@ -39,6 +39,7 @@ module.exports = function(app, path, db, options){
       if (!req.identity) {
         return next();
       }
+      console.log(req.identity)
 
       var sys_user_name = req.identity.sub,
           ut = req.identity.ut,
