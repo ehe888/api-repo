@@ -20,7 +20,7 @@ router.post("/", function(req, res, next) {
 
   var bearer = req.headers['authorization'];
   var port = req.app.settings.port
-  var host = req.protocol+"://"+req.hostname + + ( port == 80 || port == 443 ? '' : ':'+port );
+  var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
   WechatAssets.findOne({
     where: {
       media_id: media_id,

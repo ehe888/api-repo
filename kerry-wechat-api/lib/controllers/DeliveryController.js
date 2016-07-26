@@ -83,7 +83,7 @@ module.exports = function(app, db, options){
         app_id = req.query.app_id
 
     var port = req.app.settings.port
-    var host = req.protocol+"://"+req.hostname + + ( port == 80 || port == 443 ? '' : ':'+port );
+    var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
     Units.findOne({
       where: {
         unit_number: unit_number
