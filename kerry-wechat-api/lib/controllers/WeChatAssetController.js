@@ -85,7 +85,7 @@ router.post("/", function(req, res, next) {
     else {
       return res.json({
         success: true,
-        data: host+asset.url
+        data: asset.url
       })
     }
 
