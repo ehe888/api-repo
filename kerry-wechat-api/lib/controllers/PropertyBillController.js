@@ -386,7 +386,8 @@ module.exports = function(app, db, options){
         }
         sequelize.model("Template").findOne({
           where: {
-            template_type: 'bill'
+            template_type: 'bill',
+            app_id: app_id
           }
         })
         .then(function(template) {

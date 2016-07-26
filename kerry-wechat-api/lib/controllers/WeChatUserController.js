@@ -167,6 +167,99 @@ router.get("/delete", function(req, res, next) {
  })
 })
 
+//判断业主是否已经过期
+//如果过期, 解除业主/户号绑定, 同时解除所有微信用户绑定
+router.post("/checkExpire", function(req, res, next) {
+  var param = req.body,
+      wechat_user_id = param.wechat_user_id;
+
+  UserUnitBinding.findAll({
+    where: {
+      wechat_user_id: wechat_user_id
+    }
+  })
+  .then(function(results) {
+    var now = new Date().getTime();
+    var expiredBind = [];
+    for (var i = 0; i < results.length; i++) {
+      var userUnit = results[i];
+      var expire_date = userUnit.expire_date;
+      if (expire_date) {
+        var expire = new Date(expire_date);
+        if (expire) {
+          var expire_time = expire.getTime();
+          if (expire_time < now) {
+            expiredBind.push(userUnit)
+          }
+        }
+      }
+    }
+    //有过期的绑定
+    if (expiredBind.length > 0) {
+      deleteUserUnit(expiredBind, 0, function() {
+        return res.json({
+          success: true
+        })
+      })
+    }
+    else {
+      return res.json({
+        success: true
+      })
+    }
+
+  })
+  .catch(function(err){
+    console.error(err)
+    return res.status(500).json({
+      success:false,
+      errMsg:err.message,
+      errors:err
+    })
+  })
+
+})
+
+function deleteUserUnit(array, index, callback) {
+  if (index >= array.length) {
+    return callback();
+  }
+
+  var userUnit = array[index];
+  var unit_id = userUnit.unit_id,
+      wechat_user_id = userUnit.wechat_user_id;
+  //解除单元业主绑定
+  sequelize.model("KerryUserUnit").destroy({
+    where: {
+      unit_id: unit_id
+    }
+  })
+  .then(function() {
+
+    //解除微信/单元绑定
+    sequelize.model("UserUnitBinding").destroy({
+      where: {
+        wechat_user_id: wechat_user_id,
+        unit_id: unit_id
+      }
+    })
+    .then(function() {
+      return deleteUserUnit(array, ++index, callback);
+    })
+    .catch(function(err){
+      console.error(err)
+      return deleteUserUnit(array, ++index, callback);
+    })
+
+  })
+  .catch(function(err){
+    console.error(err)
+    return deleteUserUnit(array, ++index, callback);
+  })
+
+}
+
+
 
 app.use("/wechatUsers", router);
 

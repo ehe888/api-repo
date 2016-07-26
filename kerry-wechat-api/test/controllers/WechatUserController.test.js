@@ -73,5 +73,19 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("微信用户判断是否解除绑定", function(done){
+      request(app)
+        .post("/api/wechatUsers/checkExpire")
+        .send({
+          wechat_user_id: 'wechat_ossPrw-q064upNxReGsPDqqLsOFQ'
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+
+        })
+        .end(done);
+    })
+
   });
 }

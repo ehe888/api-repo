@@ -109,7 +109,8 @@ module.exports = function(app, db, options){
 
         Template.findOne({
           where: {
-            template_type: 'delivery'
+            template_type: 'delivery',
+            app_id: app_id
           }
         })
         .then(function(template) {
