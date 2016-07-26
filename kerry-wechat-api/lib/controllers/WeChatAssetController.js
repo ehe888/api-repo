@@ -56,7 +56,7 @@ router.post("/", function(req, res, next) {
             .then(function(asset) {
               return res.json({
                 success: true,
-                data: host+asset.url
+                data: asset.url
               })
             })
             .catch(function(err) {
