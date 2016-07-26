@@ -77,7 +77,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/wechatUsers/checkExpire")
         .send({
-          wechat_user_id: 'wechat_ossPrw-q064upNxReGsPDqqLsOFQ'
+          wechat_user_id: "wechat_ossPrw6Uu6gK69mwwyv151LbPgJE"
         })
         .expect(200)
         .expect(function(res){

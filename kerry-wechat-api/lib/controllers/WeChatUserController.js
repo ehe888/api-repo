@@ -180,25 +180,48 @@ router.post("/checkExpire", function(req, res, next) {
   })
   .then(function(results) {
     var now = new Date().getTime();
-    var expiredBind = [];
+    var units = [];
     for (var i = 0; i < results.length; i++) {
       var userUnit = results[i];
-      var expire_date = userUnit.expire_date;
-      if (expire_date) {
-        var expire = new Date(expire_date);
-        if (expire) {
-          var expire_time = expire.getTime();
-          if (expire_time < now) {
-            expiredBind.push(userUnit)
-          }
-        }
+      if (userUnit.unit_id) {
+        units.push(userUnit.unit_id);
       }
     }
-    //有过期的绑定
-    if (expiredBind.length > 0) {
-      deleteUserUnit(expiredBind, 0, function() {
-        return res.json({
-          success: true
+
+    if (units.length > 0) {
+      sequelize.model("KerryUserUnit").findAll({
+        where: {
+          unit_id: {
+            $in: units
+          }
+        },
+        include: [{
+          model: sequelize.model("KerryUsers"),
+          as: 'kerry_user'
+        }]
+      })
+      .then(function(results) {
+
+        if (results.length > 0) {
+          checkAndDeleteUserUnit(results, 0, function() {
+            return res.json({
+              success: true
+            })
+          })
+        }
+        else {
+          return res.json({
+            success: true
+          })
+        }
+
+      })
+      .catch(function(err){
+        console.error(err)
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
         })
       })
     }
@@ -220,42 +243,74 @@ router.post("/checkExpire", function(req, res, next) {
 
 })
 
-function deleteUserUnit(array, index, callback) {
+function checkAndDeleteUserUnit(array, index, callback) {
   if (index >= array.length) {
     return callback();
   }
-
+  var now = new Date().getTime();
   var userUnit = array[index];
   var unit_id = userUnit.unit_id,
-      wechat_user_id = userUnit.wechat_user_id;
-  //解除单元业主绑定
-  sequelize.model("KerryUserUnit").destroy({
-    where: {
-      unit_id: unit_id
-    }
-  })
-  .then(function() {
+      kerry_user = userUnit.kerry_user;
 
-    //解除微信/单元绑定
-    sequelize.model("UserUnitBinding").destroy({
+  if (kerry_user) {
+    sequelize.model("KerryUsers").findOne({
       where: {
-        wechat_user_id: wechat_user_id,
-        unit_id: unit_id
+        id: kerry_user.id
       }
     })
-    .then(function() {
-      return deleteUserUnit(array, ++index, callback);
-    })
-    .catch(function(err){
-      console.error(err)
-      return deleteUserUnit(array, ++index, callback);
-    })
+    .then(function(user) {
+      if (user) {
+        var expire_date = user.expire_date;
+        console.log("user id is ", user.id)
+        if (expire_date) {
+          var expire_time = expire_date.getTime();
+          if (now > expire_time) {
+            //解除绑定
+            sequelize.model("KerryUserUnit").destroy({
+              where: {
+                unit_id: unit_id,
+                kerry_user_id: kerry_user.id
+              }
+            })
+            .then(function() {
 
-  })
-  .catch(function(err){
-    console.error(err)
-    return deleteUserUnit(array, ++index, callback);
-  })
+              sequelize.model("UserUnitBinding").destroy({
+                where: {
+                  unit_id: unit_id
+                }
+              })
+              .then(function() {
+                return checkAndDeleteUserUnit(array, ++index, callback);
+              })
+              .catch(function(error) {
+                console.error("unbind UserUnitBinding error: ", error)
+                return checkAndDeleteUserUnit(array, ++index, callback);
+              })
+
+            })
+            .catch(function(error) {
+              console.error("unbind UserUnitBinding error: ", error)
+              return checkAndDeleteUserUnit(array, ++index, callback);
+            })
+
+          }
+          else {
+            return checkAndDeleteUserUnit(array, ++index, callback);
+          }
+
+        }else {
+          return checkAndDeleteUserUnit(array, ++index, callback);
+        }
+      }
+      else {
+        return checkAndDeleteUserUnit(array, ++index, callback);
+      }
+    })
+  }
+  else {
+    return checkAndDeleteUserUnit(array, ++index, callback);
+  }
+
 
 }
 
