@@ -19,7 +19,8 @@ router.post("/", function(req, res, next) {
       appId = param.appId
 
   var bearer = req.headers['authorization'];
-  var host = req.protocol+"://"+req.hostname
+  var port = req.app.settings.port
+  var host = req.protocol+"://"+req.hostname + + ( port == 80 || port == 443 ? '' : ':'+port );
   WechatAssets.findOne({
     where: {
       media_id: media_id,
