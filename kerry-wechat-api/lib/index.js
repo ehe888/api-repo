@@ -32,6 +32,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/PropertyBillController")(subapp, db, options)
   require("./controllers/PropertyBillLineController")(subapp, db, options)
 
+  require("./controllers/KerrySuggestionController")(subapp, db, options)
   app.use("/", function(req, res, next) {
 
     try {
