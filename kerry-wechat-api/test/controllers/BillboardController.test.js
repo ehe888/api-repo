@@ -88,6 +88,25 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("修改发布公告", function(done){
+      request(app)
+        .post("/api/billboards/update")
+        .send({
+          id: 1,
+          title: 'test1111',
+          description: 'test billboards',
+          img_url: '',
+          url: "http",
+          content: 'test billboards',
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+        })
+        .end(done);
+    })
+
     it("后端查询公告", function(done){
       request(app)
         .post("/api/billboards/query")

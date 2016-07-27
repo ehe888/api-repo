@@ -75,7 +75,6 @@ module.exports = function(app, db, options){
 
   })
 
-
   //更新公告状态
   router.post("/updateStatus", function(req, res, next) {
     var param = req.body;
@@ -126,6 +125,65 @@ module.exports = function(app, db, options){
 
   })
 
+  //更新公告
+  router.post("/update", function(req, res, next) {
+    var param = req.body;
+    var id = param.id,
+        title = param.title,
+        description = param.description || null,
+        img_url = param.img_url || null,
+        url = param.url,
+        content = param.content;
+
+    KerryBillboard.findOne({
+      where: {
+        id: id
+      }
+    })
+    .then(function(billboard) {
+      if (!billboard) {
+        return res.json({
+          success: false,
+          errMsg: '找不到该公告!'
+        })
+      }
+
+      billboard.update({
+        title: title,
+        description: description,
+        img_url: img_url,
+        url: url,
+        content: content
+      })
+      .then(function(billboard) {
+        return res.json({
+          success: true,
+          data: billboard
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+
+  })
+
+
   //删除公告
   router.post('/delete', function(req, res, next) {
     var id = req.body.id;
@@ -171,7 +229,8 @@ module.exports = function(app, db, options){
         }
       }],
       offset: offset,
-      limit: limit
+      limit: limit,
+      order: 'id desc'
     })
     .then(function(results) {
       return res.json({
@@ -227,7 +286,8 @@ module.exports = function(app, db, options){
           }
         }],
         offset: offset,
-        limit: limit
+        limit: limit,
+        order: 'id desc'
       })
       .then(function(results) {
         return res.json({
