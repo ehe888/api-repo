@@ -49,10 +49,11 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/UserUnitBindController.test")(app, db, config);
 // require("./controllers/SysPermissionController.test")(app, db, config);
 // require("./controllers/DeliveryController.test")(app, db, config);
-require("./controllers/WechatUserController.test")(app, db, config);
+// require("./controllers/WechatUserController.test")(app, db, config);
 // require("./controllers/WechatAssetController.test")(app, db, config)
 // require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)
 // require("./controllers/Debug.test")(app, db, config);
+require("./controllers/BillboardController.test")(app, db, config);
