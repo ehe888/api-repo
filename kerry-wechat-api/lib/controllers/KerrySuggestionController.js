@@ -19,12 +19,14 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body;
     var content = param.content,
-        wechat_user_id = param.wechat_user_id
+        wechat_user_id = param.wechat_user_id,
+        property_id = param.property_id;
 
 
     KerrySuggestion.create({
       content: content,
-      wechat_user_id: wechat_user_id
+      wechat_user_id: wechat_user_id,
+      property_id: property_id
     })
     .then(function(Suggestion) {
       return res.json({
@@ -42,7 +44,6 @@ module.exports = function(app, db, options){
     })
   })
 
-  //修改物业
   router.post("/update", function(req, res, next) {
     var param = req.body;
     var id = param.id,
@@ -118,18 +119,37 @@ module.exports = function(app, db, options){
 
   router.post('/query', function(req, res, next) {
     var content = req.body.content || '';
+    var offset = req.body.offse || 0;
+    var limit = req.body.limit || 0;
+    var appId = req.body.appId;
     KerrySuggestion
-    .findAll({
+    .findAndCountAll({
       where: {
         content: {
           $like: '%'+content+'%'
         }
-      }
+      },
+      include: [{
+        model: sequelize.model("User"),
+        as: "wechat_user"
+      }, {
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: appId
+        }
+      }],
+      offset: offset,
+      limit: limit,
+      order: 'id desc'
     })
-    .then(function(suggestions) {
+    .then(function(results) {
       return res.json({
         success: true,
-        data: suggestions
+        offset: offset,
+        limit: limit,
+        count: results.count,
+        data: results.rows
       })
     })
     .catch(function(err) {
