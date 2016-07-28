@@ -47,6 +47,7 @@ module.exports = function(app, db, options){
         url: url,
         content: content,
         type: type,
+        status: 5,
         property_id: property.id
       })
       .then(function(billboard) {
