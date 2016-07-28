@@ -12,11 +12,17 @@ module.exports = function(app, db, config){
 
   describe("API平台意见反馈", function(){
 
+    before(function(done) {
+      db.sequelize.model("KerrySuggestion").sync({force: true}).then(function() {
+        done();
+      })
+    })
+
     it("POST提交意见", function(done){
       request(app)
         .post("/api/suggestions/create")
         .send({
-          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
+          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf',
           content: 'test3'
         })
         .expect(200)
@@ -33,13 +39,14 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/suggestions/query")
         .send({
-          content: ''
+          content: '',
+          appId:'shanghai'
         })
         .expect(200)
         .expect(function(res) {
           console.log(res.body)
           expect(res.body.success).to.be.true;
-          expect(res.body.data.length).to.be.above(0);
+          expect(res.body.data.length).to.equal(1);
         })
         .end(done);
     })
