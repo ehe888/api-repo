@@ -265,8 +265,7 @@ module.exports = function(app, db, options){
 
     sequelize.model("User").findOne({
       where: {
-        username: wechat_user_id,
-        type: type
+        username: wechat_user_id
       }
     })
     .then(function(user) {
@@ -282,7 +281,8 @@ module.exports = function(app, db, options){
       KerryBillboard.findAndCountAll({
         attributes: ['title', 'description', 'img_url', 'url', 'type','created_at', 'updated_at'],
         where: {
-          status: KerryBillboard.Status.PUBLISHED
+          status: KerryBillboard.Status.PUBLISHED,
+          type: type
         },
         include:[{
           model: KerryProperty,
