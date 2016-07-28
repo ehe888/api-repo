@@ -27,6 +27,11 @@ module.exports = [
       httpPath: "^\/api\/pushMessage.*"
     },
     {
+      name: "公告操作",
+      httpMethod: "POST",
+      httpPath: "^\/api\/billboards.*"
+    },
+    {
       name: "账单查询",
       httpMethod: "POST",
       httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills)"
