@@ -47,6 +47,11 @@ module.exports = [
       httpPath: "^\/api\/user_settings.*"
     },
     {
+      name: "查询意见",
+      httpMethod: "POST",
+      httpPath: "^\/api\/suggestions.*"
+    },
+    {
       name: "微信用户操作",
       httpMethod: "POST",
       httpPath: "^\/api\/wechatUsers.*"
