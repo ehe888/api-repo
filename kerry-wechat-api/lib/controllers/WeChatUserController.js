@@ -190,6 +190,7 @@ router.post("/checkExpire", function(req, res, next) {
     }
 
     if (units.length > 0) {
+      console.log("has binded")
       sequelize.model("KerryUserUnit").findAll({
         where: {
           unit_id: {
@@ -229,6 +230,7 @@ router.post("/checkExpire", function(req, res, next) {
       })
     }
     else {
+      console.log("not binded")
       return res.json({
         success: true,
         hasBinded: false
