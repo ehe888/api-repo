@@ -192,6 +192,41 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/queryByWechatUser", function(req, res, next) {
+    var offset = req.body.offse || 0;
+    var limit = req.body.limit || 10;
+    var wechat_user_id = req.body.wechat_user_id;
+    KerrySuggestion
+    .findAndCountAll({
+      where: {
+        wechat_user_id: wechat_user_id
+      },
+      include: [{
+        model: sequelize.model("User"),
+        as: "wechat_user"
+      }],
+      offset: offset,
+      limit: limit,
+      order: 'id desc'
+    })
+    .then(function(results) {
+      return res.json({
+        success: true,
+        offset: offset,
+        limit: limit,
+        count: results.count,
+        data: results.rows
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
 
 
   app.use("/suggestions", router);

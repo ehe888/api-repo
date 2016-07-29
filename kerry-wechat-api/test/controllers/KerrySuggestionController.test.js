@@ -51,5 +51,21 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("微信用户查询意见", function(done) {
+      request(app)
+        .post("/api/suggestions/queryByWechatUser")
+        .send({
+          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf'
+        })
+        .expect(200)
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+          expect(res.body.data.length).to.equal(1);
+        })
+        .end(done);
+    })
+
+
   });
 }
