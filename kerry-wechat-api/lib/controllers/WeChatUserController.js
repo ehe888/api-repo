@@ -167,8 +167,9 @@ router.get("/delete", function(req, res, next) {
  })
 })
 
-//判断业主是否已经过期
+//判断业主是否已经过期, 以及是否绑定
 //如果过期, 解除业主/户号绑定, 同时解除所有微信用户绑定
+//return hasBinded bool
 router.post("/checkExpire", function(req, res, next) {
   var param = req.body,
       wechat_user_id = param.wechat_user_id;
@@ -205,13 +206,15 @@ router.post("/checkExpire", function(req, res, next) {
         if (results.length > 0) {
           checkAndDeleteUserUnit(results, 0, function() {
             return res.json({
-              success: true
+              success: true,
+              hasBinded: true
             })
           })
         }
         else {
           return res.json({
-            success: true
+            success: true,
+            hasBinded: true
           })
         }
 
@@ -227,7 +230,8 @@ router.post("/checkExpire", function(req, res, next) {
     }
     else {
       return res.json({
-        success: true
+        success: true,
+        hasBinded: false
       })
     }
 
