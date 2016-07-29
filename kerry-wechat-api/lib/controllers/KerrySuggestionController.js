@@ -22,27 +22,58 @@ module.exports = function(app, db, options){
         wechat_user_id = param.wechat_user_id
 
 
-    KerrySuggestion.create({
-      content: content,
-      wechat_user_id: wechat_user_id
+    sequelize.model("User").findOne({
+      where: {
+        username: wechat_user_id
+      }
     })
-    .then(function(Suggestion) {
-      return res.json({
-        success: true,
-        data: Suggestion
-      });
-    })
-    .catch(function(err) {
-      console.log(err)
-      return res.status(500).json({
-        success: false
-        ,errMsg: err.message
-        ,errors: err
+    .then(function(user) {
+      if (!user) {
+        return res.json({
+          success: false,
+          errMsg: '找不到用户!'
+        })
+      }
+
+      var app_id = user.app_id;
+      sequelize.model("KerryProperty").findOne({
+        where: {
+          app_id: app_id
+        }
       })
+      .then(function(property) {
+        if (!property) {
+          return res.json({
+            success: false,
+            errMsg: '找不到物业!'
+          })
+        }
+        var property_id = property.id;
+        KerrySuggestion.create({
+          content: content,
+          wechat_user_id: wechat_user_id,
+          property_id: property_id
+        })
+        .then(function(Suggestion) {
+          return res.json({
+            success: true,
+            data: Suggestion
+          });
+        })
+        .catch(function(err) {
+          console.log(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+      })
+
     })
+
   })
 
-  //修改物业
   router.post("/update", function(req, res, next) {
     var param = req.body;
     var id = param.id,
@@ -118,18 +149,37 @@ module.exports = function(app, db, options){
 
   router.post('/query', function(req, res, next) {
     var content = req.body.content || '';
+    var offset = req.body.offse || 0;
+    var limit = req.body.limit || 20;
+    var appId = req.body.appId;
     KerrySuggestion
-    .findAll({
+    .findAndCountAll({
       where: {
         content: {
           $like: '%'+content+'%'
         }
-      }
+      },
+      include: [{
+        model: sequelize.model("User"),
+        as: "wechat_user"
+      }, {
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: appId
+        }
+      }],
+      offset: offset,
+      limit: limit,
+      order: 'id desc'
     })
-    .then(function(suggestions) {
+    .then(function(results) {
       return res.json({
         success: true,
-        data: suggestions
+        offset: offset,
+        limit: limit,
+        count: results.count,
+        data: results.rows
       })
     })
     .catch(function(err) {
@@ -142,6 +192,41 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/queryByWechatUser", function(req, res, next) {
+    var offset = req.body.offse || 0;
+    var limit = req.body.limit || 10;
+    var wechat_user_id = req.body.wechat_user_id;
+    KerrySuggestion
+    .findAndCountAll({
+      where: {
+        wechat_user_id: wechat_user_id
+      },
+      include: [{
+        model: sequelize.model("User"),
+        as: "wechat_user"
+      }],
+      offset: offset,
+      limit: limit,
+      order: 'id desc'
+    })
+    .then(function(results) {
+      return res.json({
+        success: true,
+        offset: offset,
+        limit: limit,
+        count: results.count,
+        data: results.rows
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
 
 
   app.use("/suggestions", router);

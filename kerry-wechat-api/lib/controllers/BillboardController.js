@@ -24,6 +24,7 @@ module.exports = function(app, db, options){
         img_url = param.img_url || null,
         url = param.url,
         content = param.content,
+        type = param.type,
         appId = param.appId
 
     KerryProperty.findOne({
@@ -45,6 +46,8 @@ module.exports = function(app, db, options){
         img_url: img_url,
         url: url,
         content: content,
+        type: type,
+        status: 5,
         property_id: property.id
       })
       .then(function(billboard) {
@@ -133,6 +136,7 @@ module.exports = function(app, db, options){
         description = param.description || null,
         img_url = param.img_url || null,
         url = param.url,
+        type = param.type,
         content = param.content;
 
     KerryBillboard.findOne({
@@ -153,7 +157,8 @@ module.exports = function(app, db, options){
         description: description,
         img_url: img_url,
         url: url,
-        content: content
+        content: content,
+        type: type
       })
       .then(function(billboard) {
         return res.json({
@@ -256,6 +261,7 @@ module.exports = function(app, db, options){
     var param = req.body,
         offset = param.offset || 0,
         limit = param.limit || 10,
+        type = param.type,
         wechat_user_id = param.wechat_user_id;
 
     sequelize.model("User").findOne({
@@ -274,9 +280,10 @@ module.exports = function(app, db, options){
 
       var appId = user.app_id;
       KerryBillboard.findAndCountAll({
-        attributes: ['title', 'description', 'img_url', 'url', 'created_at', 'updated_at'],
+        attributes: ['title', 'description', 'img_url', 'url', 'type','created_at', 'updated_at'],
         where: {
-          status: KerryBillboard.Status.PUBLISHED
+          status: KerryBillboard.Status.PUBLISHED,
+          type: type
         },
         include:[{
           model: KerryProperty,
