@@ -1,6 +1,6 @@
 {
   "name": "kerry-wechat-api",
-  "version": "0.0.165",
+  "version": "0.0.167",
   "description": "Kerry Wechat WebAPI ",
   "main": "lib/index.js",
   "scripts": {
@@ -16,7 +16,10 @@
     "pg": "^5.1.0",
     "request-promise": "^3.0.0",
     "sequelize": "^3.23.3",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "sha1": "^1.1.1",
+    "underscore": "^1.8.3",
+    "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "body-parser": "^1.15.1",

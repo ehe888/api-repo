@@ -58,4 +58,5 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/Debug.test")(app, db, config);
 // require("./controllers/BillboardController.test")(app, db, config);
 // require("./controllers/PushMessageController.test")(app, db, config)
-require("./controllers/KerrySuggestionController.test")(app, db, config)
+//require("./controllers/KerrySuggestionController.test")(app, db, config)
+require("./controllers/WechatPayController.test")(app, db, config)
