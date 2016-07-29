@@ -12,7 +12,7 @@ module.exports = function(app, db, options){
      KerryProperty =  sequelize.model("KerryProperty"),
      KerryBillboard = sequelize.model("KerryBillboard"),
      models = options.db;
-
+     
   var router = express.Router();
 
 
