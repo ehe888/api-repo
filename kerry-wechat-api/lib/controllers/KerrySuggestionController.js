@@ -193,7 +193,7 @@ module.exports = function(app, db, options){
   })
 
   router.post("/queryByWechatUser", function(req, res, next) {
-    var offset = req.body.offse || 0;
+    var offset = req.body.offset || 0;
     var limit = req.body.limit || 10;
     var wechat_user_id = req.body.wechat_user_id;
     KerrySuggestion
