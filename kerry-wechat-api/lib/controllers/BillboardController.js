@@ -12,7 +12,7 @@ module.exports = function(app, db, options){
      KerryProperty =  sequelize.model("KerryProperty"),
      KerryBillboard = sequelize.model("KerryBillboard"),
      models = options.db;
-     
+
   var router = express.Router();
 
 
@@ -219,12 +219,14 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20,
         title = param.title || "",
+        type = param.type,
         appId = param.appId;
     KerryBillboard.findAndCountAll({
       where: {
         title: {
           $like: '%'+title+'%'
-        }
+        },
+        type: type
       },
       include:[{
         model: KerryProperty,
