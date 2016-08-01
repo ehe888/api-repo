@@ -45,6 +45,7 @@ module.exports = function(app, db, config){
           img_url: '',
           content: 'test billboards',
           url: 'http://',
+          type: 'test',
           appId: 'shanghai'
         })
         .expect(200)
@@ -96,6 +97,7 @@ module.exports = function(app, db, config){
           title: 'test1111',
           description: 'test billboards',
           img_url: '',
+          type: 'test',
           url: "http",
           content: 'test billboards',
         })
@@ -111,7 +113,8 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/billboards/query")
         .send({
-          appId: 'shanghai'
+          appId: 'shanghai',
+          type: 'test'
         })
         .expect(200)
         .expect(function(res){
@@ -126,7 +129,8 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/billboards/queryByWechat")
         .send({
-          wechat_user_id: "wechat_ossPrw6Uu6gK69mwwyv151LbPgJE"
+          wechat_user_id: "wechat_ossPrw6Uu6gK69mwwyv151LbPgJE",
+          type: 'test'
         })
         .expect(200)
         .expect(function(res){
