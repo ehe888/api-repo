@@ -33,7 +33,7 @@ router.post("/WechatPay", function(req, res, next) {
       //attach = param.attach,
       out_trade_no = param.out_trade_no,
       total_fee = param.total_fee,
-      wechat_user_id = param.wechat_user_id;
+      wechat_user_id = param.wechat_user_id.replace('wechat_', '');
 
   var order = {
   body: product_name,
