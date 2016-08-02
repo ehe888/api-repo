@@ -28,6 +28,20 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("POST准备发起预付单", function(done){
+      request(app)
+        .post("/api/wechatPays/billLinePay")
+        .send({
+          billLines: "1,4,6"
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body);
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
 
     it("POST查询微信用户", function(done){
       request(app)
