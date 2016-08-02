@@ -18,10 +18,10 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/wechatPays/WechatPay")
         .send({
-          username: '',
-          offset:0,
-          limit:20,
-          appId: 'wxa0c45fc6d9e269ed'
+          product_name: '鸡腿饭',
+          out_trade_no:'20160802120900001',
+          total_fee:1,
+          wechat_user_id: 'oc4kVwVHYTTQhWq7hrc_rgMBSpjI'
         })
         .expect(200)
         .expect(function(res){
@@ -31,7 +31,7 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
-    
+
 
   });
 }

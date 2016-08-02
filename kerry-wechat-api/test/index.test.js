@@ -56,7 +56,7 @@ require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)
 // require("./controllers/Debug.test")(app, db, config);
-require("./controllers/BillboardController.test")(app, db, config);
+//require("./controllers/BillboardController.test")(app, db, config);
 // require("./controllers/PushMessageController.test")(app, db, config)
 //require("./controllers/KerrySuggestionController.test")(app, db, config)
-// require("./controllers/WechatPayController.test")(app, db, config)
+ require("./controllers/WechatPayController.test")(app, db, config)

@@ -27,22 +27,30 @@ var _ = require("lodash"),
 
 //查询角色
 router.post("/WechatPay", function(req, res, next) {
+
+  var param = req.body,
+      product_name = param.product_name,
+      //attach = param.attach,
+      out_trade_no = param.out_trade_no,
+      total_fee = param.total_fee,
+      wechat_user_id = param.wechat_user_id;
+
   var order = {
-  body: '吮指原味鸡 * 1',
-  attach: '{"部位":"三角"}',     //附加数据
-  out_trade_no: '20160628080001',   //订单号
-  total_fee: 10 * 100,     //总金额
-  spbill_create_ip: "10.0.0.35",  //下单IP
-  openid: 'oc4kVwVHYTTQhWq7hrc_rgMBSpjI',
+  body: product_name,
+  //attach: '{"部位":"三角"}',     //附加数据
+  out_trade_no: out_trade_no,   //订单号
+  total_fee: total_fee,     //总金额
+  spbill_create_ip: "10.0.0.35",  //下单IP"10.0.0.35"
+  openid: "oc4kVwVHYTTQhWq7hrc_rgMBSpjI", // "oc4kVwVHYTTQhWq7hrc_rgMBSpjI"
   trade_type: 'JSAPI'
 };
-console.log("IP  "+ req.ip);
 
 payment.getBrandWCPayRequestParams(order, function(err, payargs){
 console.log(err);
   console.log(payargs);
   return res.json({
-    success: true
+    success: true,
+    data:payargs
   })
 });
 
