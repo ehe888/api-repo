@@ -158,5 +158,56 @@ module.exports = function(app, db, options){
    })
   })
 
+  //微信用户查询某年未付款账单
+  router.post("/queryWechatUnpaid", function(req, res, next) {
+    var param = req.body,
+        wechat_user_id = param.wechat_user_id,
+        unit_id = param.unit_id,
+        year = param.year;
+    sequelize.model("UserUnitBinding").findOne({
+      where: {
+        wechat_user_id: wechat_user_id,
+        unit_id: unit_id
+      }
+    })
+    .then(function(userUnit) {
+      if (!userUnit) {
+        return res.json({
+          success: false,
+          errMsg: '用户没有和该户号绑定!'
+        })
+      }
+      return PropertyBill.findAll({
+        where: {
+          year: year,
+          unit_id: unit_id
+        },
+        include: [{
+          model: PropertyBillLine,
+          as: 'property_bill_lines',
+          where: {
+            is_pay: false
+          }
+        }]
+      })
+    })
+    .then(function(bills) {
+      return res.json({
+        success: true,
+        data: bills,
+        year: year
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
   app.use("/propertyBillLines", router);
 }

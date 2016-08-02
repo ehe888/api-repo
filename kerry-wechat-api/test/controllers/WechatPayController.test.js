@@ -12,6 +12,21 @@ module.exports = function(app, db, config){
 
   describe("API平台系统微信用户", function(){
 
+    it("POST查询微信用户未付款账单", function(done){
+      request(app)
+        .post("/api/propertyBillLines/queryWechatUnpaid")
+        .send({
+          year: 2016,
+          unit_id: 12,
+          wechat_user_id: 'wechat_ossPrw-q064upNxReGsPDqqLsOFQ'
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body);
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
 
 
     it("POST查询微信用户", function(done){
