@@ -50,6 +50,7 @@ module.exports = function(app, db, options){
       })
       .then(function(asset) {
         img_url = host+asset.url;
+        console.log(img_url);
         KerryBillboard.create({
           title: title,
           description: description,
