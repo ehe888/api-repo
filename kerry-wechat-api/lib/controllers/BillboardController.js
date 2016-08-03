@@ -27,8 +27,8 @@ module.exports = function(app, db, options){
         type = param.type,
         appId = param.appId
 
-    var port = req.app.settings.port
-    var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
+    var config = req.x_app_config,
+        host = config.apiHost;
 
     KerryProperty.findOne({
       where: {
