@@ -8,6 +8,7 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      fs = require('fs'),
+     env = process.env.NODE_ENV,
      Payment = require('../wechatPay/payment').Payment,
      Paymentmiddleware = require('../wechatPay/middleware');
 
@@ -17,7 +18,7 @@ module.exports = function(app, db, options){
    mchId: "1352525102",
    notifyUrl: "http://www.weixin.qq.com/wxpay/pay.php"//,
    //pfx: fs.readFileSync("../../cert/apiclient_cert.p12")
-     };
+  };
   var payment = new Payment(initConfig);
 
   models = options.db;
@@ -27,12 +28,24 @@ module.exports = function(app, db, options){
   //准备付款
   router.post("/billLinePay", function(req, res, next) {
     var param = req.body,
-        billLines = param.billLines;
+        billLines = param.billLines,
+        wechat_user_id = param.wechat_user_id;
+
+    var config = req.x_app_config;
 
     var billLineIds = [];
     if (billLines) {
       billLineIds = billLines.split(",");
     }
+
+    var initalParam = {
+      trade_type: 'JSAPI',
+      spbill_create_ip: config.apiIp
+    },
+    initalConfig = {
+      notifyUrl: config.apiHost+"/api/wechatPays/callback"
+    };
+
     sequelize.model("PropertyBillLine").findAll({
       where: {
         id: {
@@ -41,6 +54,13 @@ module.exports = function(app, db, options){
       }
     })
     .then(function(billLines) {
+      //查询并计算提交账单行的金额
+      if (!billLines || billLines.length == 0) {
+        return res.json({
+          success: false,
+          errMsg: '没有需要付款的账单'
+        })
+      }
       var totalAmount = parseInt(0);
       for (var i = 0; i < billLines.length; i++) {
         var billLine = billLines[i];
@@ -48,14 +68,110 @@ module.exports = function(app, db, options){
           totalAmount += parseFloat(billLine.gross_amount)
         }
       }
+      if (totalAmount <= 0) {
+        return res.json({
+          success: false,
+          errMsg: '没有需要付款的账单'
+        })
+      }
+      initalParam.total_fee = totalAmount;
+      return sequelize.model("User")
+            .findOne({
+              attributes: ['wechatId', 'app_id'],
+              where: {
+                username: wechat_user_id
+              }
+            })
+    })
+    .then(function(user) {
+      //根据wechat_user_id查询微信用户, 获取openid和appId
+      if (!user) {
+        return res.json({
+          success: false,
+          errMsg: '找不到用户!'
+        })
+      }
+      var app_id = user.app_id,
+          openid = user.wechatId;
+      initalParam.openid = openid;
+      return sequelize.model("KerryProperty")
+            .findOne({
+              where: {
+                app_id: app_id
+              }
+            })
+    })
+    .then(function(property) {
+      //根据appId查询物业, 获取物业商户相关参数
+      if (!property) {
+        return res.json({
+          success: false,
+          errMsg: '没有对应物业'
+        })
+      }
+      initalParam.body = property.name + "账单"
+      initalConfig.partnerKey = property.partnerKey
+      initalConfig.appId = property.appId
+      initalConfig.mchId = property.mchId;
+      return sequelize.model("WechatPay").count()
+    })
+    .then(function(payCount) {
+      //提交微信统一下单接口
+      var now = new Date();
+      var year = now.getFullYear(),
+          month = (now.getMonth()+1)+"",
+          day = (now.getDate())+"";
+      month = pad(month, 2);
+      day = pad(day, 2);
+      payCount = pad(payCount+"", 7);
+      var trade_no = year+month+day+payCount;
+      initalParam.out_trade_no = trade_no;
 
-      //TODO: call Wechat Pay
-      return res.json({
-        success: true,
-        data: totalAmount
-      })
+      var wechatPay = new Payment(initalConfig);
+      if (env=='development') {
+        return res.json({
+          success: true,
+          config: initalConfig,
+          param: initalParam
+        })
+      }
+      else {
+        wechatPay.getBrandWCPayRequestParams(initalParam, function(err, payargs) {
+          if (err) {
+            console.error(err);
+            return res.json({
+              success: false,
+              errMsg: err
+            })
+          }
+          //统一下单成功后, 创建WechatPay记录
+          sequelize.model("WechatPay").create({
+            trade_no: initalParam.out_trade_no,
+            prepay_id: payargs.package,
+            description: initalParam.product_name,
+            bill_lines: billLines,
+            request_content: JSON.stringify(payargs),
+            wechat_user_id: wechat_user_id
+          })
+          .then(function(pay) {
+            return res.json({
+              success: true,
+              data: JSON.parse(pay.request_content)
+            })
+          })
+        })
+      }
 
     })
+    .catch(function(err) {
+      console.error(err)
+      return res.json({
+        success: false,
+        errMsg: err.message,
+        error: err
+      })
+    })
+
 
   })
 
@@ -79,7 +195,7 @@ module.exports = function(app, db, options){
     };
 
     payment.getBrandWCPayRequestParams(order, function(err, payargs){
-    console.log(err);
+      console.log(err);
       console.log(payargs);
       return res.json({
         success: true,
@@ -89,7 +205,13 @@ module.exports = function(app, db, options){
 
   })
 
-
+  function pad(n, length) {
+    if (n.length < length) {
+      return pad("0"+n, length)
+    }else {
+      return n;
+    }
+  }
 
   app.use("/wechatPays", router);
 

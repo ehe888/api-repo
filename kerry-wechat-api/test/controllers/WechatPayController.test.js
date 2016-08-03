@@ -32,7 +32,8 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/wechatPays/billLinePay")
         .send({
-          billLines: "1,4,6"
+          billLines: "1,4,6",
+          wechat_user_id: "wechat_ossPrw6Uu6gK69mwwyv151LbPgJE"
         })
         .expect(200)
         .expect(function(res){
@@ -41,25 +42,6 @@ module.exports = function(app, db, config){
         })
         .end(done);
     })
-
-
-    it("POST查询微信用户", function(done){
-      request(app)
-        .post("/api/wechatPays/WechatPay")
-        .send({
-          product_name: '鸡腿饭',
-          out_trade_no:'20160802120900001',
-          total_fee:1,
-          wechat_user_id: 'oc4kVwVHYTTQhWq7hrc_rgMBSpjI'
-        })
-        .expect(200)
-        .expect(function(res){
-          console.log(res.body);
-          expect(res.body.success).to.be.true;
-        })
-        .end(done);
-    })
-
 
 
   });

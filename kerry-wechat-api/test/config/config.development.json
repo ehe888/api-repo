@@ -20,5 +20,8 @@
       "underscored": true,
       "underscoredAll": true
     }
-  }
+  },
+  "wechatHost": "http://kerry.aivics.net"
+  ,"apiIp": "121.43.186.24"
+  ,"apiHost": "http://kerry.aivics.net"
 }
