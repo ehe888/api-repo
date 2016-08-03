@@ -27,6 +27,9 @@ module.exports = function(app, db, options){
         type = param.type,
         appId = param.appId
 
+    var port = req.app.settings.port
+    var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
+
     KerryProperty.findOne({
       where: {
         app_id: appId
@@ -40,30 +43,40 @@ module.exports = function(app, db, options){
         })
       }
 
-      KerryBillboard.create({
-        title: title,
-        description: description,
-        img_url: img_url,
-        url: url,
-        content: content,
-        type: type,
-        status: 5,
-        property_id: property.id
+      sequelize.model("WechatAssets").findOne({
+        where: {
+          media_id: img_url
+        }
       })
-      .then(function(billboard) {
-        return res.json({
-          success: true,
-          data: billboard
+      .then(function(asset) {
+        img_url = host+asset.url;
+        KerryBillboard.create({
+          title: title,
+          description: description,
+          img_url: img_url,
+          url: url,
+          content: content,
+          type: type,
+          status: 5,
+          property_id: property.id
         })
-      })
-      .catch(function(err) {
-        console.error(err)
-        return res.status(500).json({
-          success: false
-          ,errMsg: err.message
-          ,errors: err
+        .then(function(billboard) {
+          return res.json({
+            success: true,
+            data: billboard
+          })
         })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false
+            ,errMsg: err.message
+            ,errors: err
+          })
+        })
+
       })
+
 
     })
     .catch(function(err) {
