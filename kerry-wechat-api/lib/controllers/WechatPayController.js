@@ -9,6 +9,7 @@ module.exports = function(app, db, options){
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      fs = require('fs'),
      env = process.env.NODE_ENV,
+     xml2js = require('xml2js'),
      Payment = require('../wechatPay/payment').Payment,
      Paymentmiddleware = require('../wechatPay/middleware');
 
@@ -129,10 +130,22 @@ module.exports = function(app, db, options){
 
       var wechatPay = new Payment(initalConfig);
       if (env=='development') {
-        return res.json({
-          success: true,
-          config: initalConfig,
-          param: initalParam
+
+        //统一下单成功后, 创建WechatPay记录
+        sequelize.model("WechatPay").create({
+          trade_no: initalParam.out_trade_no,
+          prepay_id: (new Date()).getTime(),
+          description: initalParam.product_name,
+          bill_lines: billLines,
+          request_content: "",
+          wechat_user_id: wechat_user_id
+        })
+        .then(function(pay) {
+          return res.json({
+            success: true,
+            config: initalConfig,
+            param: initalParam
+          })
         })
       }
       else {
@@ -159,6 +172,7 @@ module.exports = function(app, db, options){
               data: JSON.parse(pay.request_content)
             })
           })
+
         })
       }
 
@@ -172,6 +186,39 @@ module.exports = function(app, db, options){
       })
     })
 
+
+  })
+
+  router.post("/callback", function(req, res, next) {
+    res.set('Content-Type', 'text/xml');
+    var parseString = xml2js.parseString;
+    var result = req.body.root;
+    if (result.return_code == 'SUCCESS') {
+      //支付回调成功,
+      if (result.result_code == 'SUCCESS') {
+        //支付成功
+        console.log('WECHAT PAY SUCCESS');
+      }
+      else {
+        if (result.err_code) {
+          console.error("Wechat Pay Error")
+          console.error("err_code is ", result.err_code);
+        }
+      }
+    }
+    else {
+      console.error("Wechat Pay Return Error")
+      if (result.return_msg) {
+        console.error("return_msg is ", result.return_msg);
+      }
+    }
+
+    var data = {
+      return_code: 'SUCCESS'
+    }
+    var builder = new xml2js.Builder();
+    var xml = builder.buildObject(data);
+    return res.send(xml);
 
   })
 

@@ -3,6 +3,7 @@
 let _   = require("lodash"),
     bodyParser = require("body-parser"),
   	cookieParser = require('cookie-parser'),
+    xmlparser = require('express-xml-bodyparser'),
   	expect = require('chai').expect,
   	express = require('express'),
     request = require('supertest'),
@@ -20,6 +21,7 @@ require("kerry-wechat-model")(db);
 var app = express();
 app.use(cookieParser());
 app.use(bodyParser());
+app.use(xmlparser({ explicitArray: false }));
 app.locals.config = config;
 
 /**
