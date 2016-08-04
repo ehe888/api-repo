@@ -34,7 +34,7 @@ module.exports = [
     {
       name: "图文消息",
       httpMethod: "POST",
-      httpPath: "^\/api\/news.*"
+      httpPath: "^\/api\/wechatNews.*"
     },
     {
       name: "账单查询",
