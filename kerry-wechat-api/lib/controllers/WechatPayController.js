@@ -75,6 +75,7 @@ module.exports = function(app, db, options){
           errMsg: '没有需要付款的账单'
         })
       }
+      totalAmount *= 100;
       initalParam.total_fee = totalAmount;
       return sequelize.model("User")
             .findOne({
