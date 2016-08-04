@@ -208,7 +208,7 @@ module.exports = function(app, db, options){
         if (result.result_code == 'SUCCESS') {
           //支付成功
 
-          WechatPay.findOne({
+          sequelize.model("WechatPay").findOne({
             where: {
               trade_no: out_trade_no
             }
