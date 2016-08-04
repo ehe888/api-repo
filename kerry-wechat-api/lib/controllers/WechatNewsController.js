@@ -137,6 +137,8 @@ router.post("/singleNews", function(req, res, next) {
     }
   })
   .catch(function(error) {
+    console.error(error)
+    console.error(JSON.stringify(error))
     return res.json({
       success: false,
       errMsg: error.message,
