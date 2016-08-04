@@ -51,7 +51,8 @@ router.post("/combineNews", function(req, res, next) {
       sequelize.model("KerryNews")
       .create({
         media_id: media_id,
-        content: content
+        content: content,
+        app_id: appId
       })
       .then(function(news) {
         return res.json({
@@ -114,7 +115,8 @@ router.post("/singleNews", function(req, res, next) {
       sequelize.model("KerryNews")
       .create({
         media_id: media_id,
-        content: content
+        content: content,
+        app_id: appId
       })
       .then(function(news) {
         return res.json({
@@ -136,6 +138,41 @@ router.post("/singleNews", function(req, res, next) {
       success: false,
       errMsg: error.message,
       error: error
+    })
+  })
+
+})
+
+router.post('/query', function(req, res, next) {
+  var param = req.body,
+      offset = param.offset || 0,
+      limit = param.limit || 10,
+      appId = param.appId;
+
+  sequelize.model("KerryNews")
+  .findAndCountAll({
+    where: {
+      app_id: appId
+    },
+    offset: offset,
+    limit: limit
+  })
+  .then(function(results) {
+    var count = results.count;
+    var data =results.rows;
+    return res.json({
+      success: true,
+      data: data,
+      offset: offset,
+      limit:limit,
+      count: count
+    })
+  })
+  .catch(function(err) {
+    return res.status(500).json({
+      success: false,
+      errMsg: err.message,
+      error: err
     })
   })
 

@@ -64,5 +64,19 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("查询多图文消息", function(done) {
+      request(app)
+        .post("/api/wechatNews/query")
+        .send({
+          appId: "wxa0c45fc6d9e269ed"
+        })
+        .expect(200)
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
   });
 }
