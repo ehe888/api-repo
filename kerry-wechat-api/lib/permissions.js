@@ -32,6 +32,11 @@ module.exports = [
       httpPath: "^\/api\/billboards.*"
     },
     {
+      name: "图文消息",
+      httpMethod: "POST",
+      httpPath: "^\/api\/news.*"
+    },
+    {
       name: "账单查询",
       httpMethod: "POST",
       httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills)"
