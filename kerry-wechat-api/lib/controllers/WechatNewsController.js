@@ -183,6 +183,29 @@ router.post('/query', function(req, res, next) {
 
 })
 
+router.post("/queryThisMonth", function(req, res, next) {
+  var now = new Date();
+  var date = now.getFullYear() + "/"+(now.getMonth()+1)+"/1 08:00:00";
+  var thisMonth = new Date(date);
+
+  sequelize.model("KerryNews").findAndCountAll({
+    where: {
+      created_at: {
+        $gt: thisMonth
+      }
+    }
+  })
+  .then(function(results) {
+    return res.json({
+      success: true,
+      data: results.rows,
+      count: results.count
+    })
+  })
+
+
+})
+
 
 app.use("/wechatNews", router);
 
