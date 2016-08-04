@@ -98,6 +98,7 @@ router.post("/singleNews", function(req, res, next) {
   }
   rp(option)
   .then(function(response) {
+    console.log(response)
     if (response.success) {
       var media_id = response.media_id,
           data = response.data
@@ -105,6 +106,7 @@ router.post("/singleNews", function(req, res, next) {
       try {
         content = JSON.stringify(data)
       } catch (e) {
+        console.error(e)
         return res.json({
           success: false,
           errMsg: e.message,
@@ -126,6 +128,7 @@ router.post("/singleNews", function(req, res, next) {
       })
     }
     else {
+
       return res.json({
         success: false,
         errMsg: response.errMsg,
