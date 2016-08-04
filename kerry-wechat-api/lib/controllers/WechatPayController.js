@@ -210,7 +210,7 @@ module.exports = function(app, db, options){
 
           sequelize.model("WechatPay").findOne({
             where: {
-              trade_no: out_trade_no
+              trade_no: result.out_trade_no
             }
           })
           .then(function(wechatpay) {
