@@ -201,55 +201,63 @@ module.exports = function(app, db, options){
     var xml = builder.buildObject(data);
     var result = req.body.xml;
             console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
-    if (result.return_code == 'SUCCESS') {
-      //支付回调成功,
-      if (result.result_code == 'SUCCESS') {
-        //支付成功
 
-        WechatPay.findOne({
-          where: {
-            trade_no: out_trade_no
-          }
-        })
-        .then(function(wechatpay) {
-          wechatpay.update({
-            status: "PAID",
-            wechat_response_content: JSON.stringify(req.body)
+    try {
+      if (result.return_code == 'SUCCESS') {
+        //支付回调成功,
+        if (result.result_code == 'SUCCESS') {
+          //支付成功
+
+          WechatPay.findOne({
+            where: {
+              trade_no: out_trade_no
+            }
           })
-          .then(function(instance) {
-            UpdateWechatPayBill(wechatpay.bill_lines, sequelize, function(err) {
-              if (err) {
-                console.error("update bill line error: ", err);
-              }
+          .then(function(wechatpay) {
+            wechatpay.update({
+              status: "PAID",
+              wechat_response_content: JSON.stringify(req.body)
+            })
+            .then(function(instance) {
+              UpdateWechatPayBill(wechatpay.bill_lines, sequelize, function(err) {
+                if (err) {
+                  console.error("update bill line error: ", err);
+                }
+                return res.send(xml);
+              })
+
+            })
+            .catch(function(err) {
+              console.error(err)
               return res.send(xml);
             })
-
           })
           .catch(function(err) {
             console.error(err)
             return res.send(xml);
           })
-        })
-        .catch(function(err) {
-          console.error(err)
-          return res.send(xml);
-        })
 
-        console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
-      }
-      else {
-        if (result.err_code) {
-          console.error("Wechat Pay Error")
-          console.error("err_code is ", result.err_code);
-          return res.send(xml);
+          console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
+        }
+        else {
+          if (result.err_code) {
+            console.error("Wechat Pay Error")
+            console.error("err_code is ", result.err_code);
+            return res.send(xml);
+          }
         }
       }
-    }
-    else {
-      console.error("Wechat Pay Return Error")
-      if (result.return_msg) {
-        console.error("return_msg is ", result.return_msg);
+      else {
+        console.error("Wechat Pay Return Error")
+        if (result.return_msg) {
+          console.error("return_msg is ", result.return_msg);
+        }
+        return res.send(xml);
       }
+
+    }
+    catch(e) {
+      console.error(e);
       return res.send(xml);
     }
 
