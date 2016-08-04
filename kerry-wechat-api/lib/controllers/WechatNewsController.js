@@ -17,7 +17,7 @@ router.post("/combineNews", function(req, res, next) {
   var param = req.body,
       news_item = param.news_item,
       appId = param.appId
-
+  debug(param)
   var bearer = req.headers['authorization'];
   var config = req.x_app_config;
 
