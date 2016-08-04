@@ -149,6 +149,7 @@ module.exports = function(app, db, options){
         })
       }
       else {
+        console.log(initalParam);
         wechatPay.getBrandWCPayRequestParams(initalParam, function(err, payargs) {
           if (err) {
             console.error(err);
