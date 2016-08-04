@@ -11,16 +11,17 @@ module.exports = function(app, db, options){
      env = process.env.NODE_ENV,
      xml2js = require('xml2js'),
      Payment = require('../wechatPay/payment').Payment,
-     Paymentmiddleware = require('../wechatPay/middleware');
+     Paymentmiddleware = require('../wechatPay/middleware'),
+     UpdateWechatPayBill = require('../Utils/UpdateWechatPayBill');
 
-  var initConfig = {
-   partnerKey: "w4go19um14n73r2v2v3wvderavvscgz0",  //w4go19um14n73r2v2v3wvderavvscgz0  API密钥，嘉里不夜城
-   appId: "wx59b13639314be7c8",
-   mchId: "1352525102",
-   notifyUrl: "http://www.weixin.qq.com/wxpay/pay.php"//,
-   //pfx: fs.readFileSync("../../cert/apiclient_cert.p12")
-  };
-  var payment = new Payment(initConfig);
+  // var initConfig = {
+  //  partnerKey: "w4go19um14n73r2v2v3wvderavvscgz0",  //w4go19um14n73r2v2v3wvderavvscgz0  API密钥，嘉里不夜城
+  //  appId: "wx59b13639314be7c8",
+  //  mchId: "1352525102",
+  //  notifyUrl: "http://www.weixin.qq.com/wxpay/pay.php"//,
+  //  //pfx: fs.readFileSync("../../cert/apiclient_cert.p12")
+  // };
+  // var payment = new Payment(initConfig);
 
   models = options.db;
 
@@ -75,6 +76,7 @@ module.exports = function(app, db, options){
           errMsg: '没有需要付款的账单'
         })
       }
+      totalAmount *= 100;
       initalParam.total_fee = totalAmount;
       return sequelize.model("User")
             .findOne({
@@ -149,6 +151,7 @@ module.exports = function(app, db, options){
         })
       }
       else {
+        console.log(initalParam);
         wechatPay.getBrandWCPayRequestParams(initalParam, function(err, payargs) {
           if (err) {
             console.error(err);
@@ -169,7 +172,7 @@ module.exports = function(app, db, options){
           .then(function(pay) {
             return res.json({
               success: true,
-              data: JSON.parse(pay.request_content)
+              data: payargs
             })
           })
 
@@ -191,34 +194,72 @@ module.exports = function(app, db, options){
 
   router.post("/callback", function(req, res, next) {
     res.set('Content-Type', 'text/xml');
-    var parseString = xml2js.parseString;
-    var result = req.body.root;
-    if (result.return_code == 'SUCCESS') {
-      //支付回调成功,
-      if (result.result_code == 'SUCCESS') {
-        //支付成功
-        console.log('WECHAT PAY SUCCESS');
-      }
-      else {
-        if (result.err_code) {
-          console.error("Wechat Pay Error")
-          console.error("err_code is ", result.err_code);
-        }
-      }
-    }
-    else {
-      console.error("Wechat Pay Return Error")
-      if (result.return_msg) {
-        console.error("return_msg is ", result.return_msg);
-      }
-    }
-
     var data = {
       return_code: 'SUCCESS'
     }
     var builder = new xml2js.Builder();
     var xml = builder.buildObject(data);
-    return res.send(xml);
+    var result = req.body.xml;
+            console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
+
+    try {
+      if (result.return_code == 'SUCCESS') {
+        //支付回调成功,
+        if (result.result_code == 'SUCCESS') {
+          //支付成功
+
+          sequelize.model("WechatPay").findOne({
+            where: {
+              trade_no: result.out_trade_no
+            }
+          })
+          .then(function(wechatpay) {
+            wechatpay.update({
+              status: "PAID",
+              wechat_response_content: JSON.stringify(req.body)
+            })
+            .then(function(instance) {
+              UpdateWechatPayBill(wechatpay.bill_lines, sequelize, function(err) {
+                if (err) {
+                  console.error("update bill line error: ", err);
+                }
+                return res.send(xml);
+              })
+
+            })
+            .catch(function(err) {
+              console.error(err)
+              return res.send(xml);
+            })
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.send(xml);
+          })
+
+          console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
+        }
+        else {
+          if (result.err_code) {
+            console.error("Wechat Pay Error")
+            console.error("err_code is ", result.err_code);
+            return res.send(xml);
+          }
+        }
+      }
+      else {
+        console.error("Wechat Pay Return Error")
+        if (result.return_msg) {
+          console.error("return_msg is ", result.return_msg);
+        }
+        return res.send(xml);
+      }
+
+    }
+    catch(e) {
+      console.error(e);
+      return res.send(xml);
+    }
 
   })
 
