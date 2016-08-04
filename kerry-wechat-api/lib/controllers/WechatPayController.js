@@ -169,7 +169,7 @@ module.exports = function(app, db, options){
           .then(function(pay) {
             return res.json({
               success: true,
-              data: JSON.parse(pay.request_content)
+              data: payargs
             })
           })
 
@@ -193,11 +193,32 @@ module.exports = function(app, db, options){
     res.set('Content-Type', 'text/xml');
     var parseString = xml2js.parseString;
     var result = req.body.root;
+            console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
     if (result.return_code == 'SUCCESS') {
       //支付回调成功,
       if (result.result_code == 'SUCCESS') {
         //支付成功
-        console.log('WECHAT PAY SUCCESS');
+
+        // WechatPay.findOne({
+        //   where: {
+        //     trade_no: id
+        //   }
+        // })
+        // .then(function(unit) {
+        //   var now = new Date();
+        //   var unit_number = unit.unit_number+"__"+now.getTime();
+        //
+        // })
+        // .catch(function(err) {
+        //   console.error(err)
+        //   return res.status(500).json({
+        //     success: false
+        //     ,errMsg: err.message
+        //     ,errors: err
+        //   })
+        // })
+
+        console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
       }
       else {
         if (result.err_code) {
