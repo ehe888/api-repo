@@ -192,6 +192,82 @@ module.exports = function(app, db, options){
     })
   })
 
+  //通过视图查询
+  router.post("/queryByView", function(req, res, next) {
+    var offset = req.body.offse || 0;
+    var limit = req.body.limit || 20;
+    var appId = req.body.appId;
+
+    var returnData = {
+      success: true,
+      offset: offset,
+      limit: limit
+    }
+    sequelize.query('SELECT * FROM vw_suggestion WHERE app_id = ? ORDER BY id DESC OFFSET ? LIMIT ?',
+                    {
+                      replacements: [appId, offset, limit],
+                       type: sequelize.QueryTypes.SELECT
+                    })
+    .then(function(results) {
+
+      var data = [];
+      for (var i = 0; i < results.length; i++) {
+        var row = results[i];
+        var sameIdData = _.find(data, function(o) {
+          return o.id = row.id
+        });
+        if (sameIdData) {
+          sameIdData.units.push({
+            unit_id: row.unit_id,
+            unit_number: row.unit_number
+          })
+          sameIdData.users.push({
+            username: row.username,
+            mobile: row.mobile
+          })
+        }
+        else {
+          data.push({
+            id: row.id,
+            content: row.content,
+            created_at: row.created_at,
+            wechat_id: row.wechat_id,
+            wechat_nickname: row.wechat_nickname,
+            property_name: row.property_name,
+            units: [{
+              unit_id: row.unit_id,
+              unit_number: row.unit_number
+            }],
+            users: [{
+              username: row.username,
+              mobile: row.mobile
+            }]
+          })
+        }
+      }
+      returnData.data = data;
+      return sequelize.query('SELECT count(1) FROM vw_suggestion WHERE app_id = ?',
+                       {
+                         replacements: [appId],
+                         type: sequelize.QueryTypes.SELECT
+                       })
+
+    })
+    .then(function(count) {
+      returnData.count = parseInt(count.length>0?count[0].count:0);
+      return res.json(returnData)
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
   router.post("/queryByWechatUser", function(req, res, next) {
     var offset = req.body.offset || 0;
     var limit = req.body.limit || 10;

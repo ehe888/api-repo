@@ -12,11 +12,11 @@ module.exports = function(app, db, config){
 
   describe("API平台意见反馈", function(){
 
-    before(function(done) {
-      db.sequelize.model("KerrySuggestion").sync({force: true}).then(function() {
-        done();
-      })
-    })
+    // before(function(done) {
+    //   db.sequelize.model("KerrySuggestion").sync({force: true}).then(function() {
+    //     done();
+    //   })
+    // })
 
     it("POST提交意见", function(done){
       request(app)
@@ -46,7 +46,6 @@ module.exports = function(app, db, config){
         .expect(function(res) {
           console.log(res.body)
           expect(res.body.success).to.be.true;
-          expect(res.body.data.length).to.equal(1);
         })
         .end(done);
     })
@@ -61,7 +60,21 @@ module.exports = function(app, db, config){
         .expect(function(res) {
           console.log(res.body)
           expect(res.body.success).to.be.true;
-          expect(res.body.data.length).to.equal(1);
+        })
+        .end(done);
+    })
+
+    it("视图查询意见", function(done) {
+      request(app)
+        .post("/api/suggestions/queryByView")
+        .send({
+          appId:'shanghai'
+        })
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.success).to.be.true;
+          console.log(res.body.data[0].units.length)
+          console.log(res.body.count)
         })
         .end(done);
     })
