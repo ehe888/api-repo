@@ -95,7 +95,7 @@ module.exports = function(app, db, config){
         .post("/api/units/create")
         .send({
           unit_number: "A00010",
-          property_id: 1
+          property_id: 5
         })
         .expect(200)
         .expect(function(res){
@@ -126,7 +126,8 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/units/queryUserBindByUnit")
         .send({
-          id: 2
+          unit_number: 'A00010',
+          appId: 'shanghai'
         })
         .expect(200)
         .expect(function(res){

@@ -234,10 +234,11 @@ module.exports = function(app, db, options){
 
   router.post("/queryUserBindByUnit", function(req, res, next) {
     var param = req.body,
-        id = param.id
+        unit_number = param.unit_number,
+        appId = param.appId;
     Units.findOne({
       where: {
-        id: id
+        unit_number: unit_number
       },
       include: [{
         model: sequelize.model("UserUnitBinding"),
@@ -253,6 +254,12 @@ module.exports = function(app, db, options){
           model: sequelize.model("KerryUsers"),
           as: 'kerry_user'
         }]
+      }, {
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: appId
+        }
       }]
     })
     .then(function(unit) {
