@@ -524,11 +524,12 @@ module.exports = function(app, db, options){
   //field2: 账单开始日期,
   //field3: 账单结束日期,
   //field4: 本期金额,
-  //field5: 建筑物,
-  //field6: 户号,
-  //field7: 租户地址号,
-  //field8: 租户名称,
-  //field9: 合同号
+  //field5: BU
+  //field6: 建筑物,
+  //field7: 户号,
+  //field8: 租户地址号,
+  //field9: 租户名称,
+  //field10: 合同号
   router.post('/upload', function(req, res, next) {
     var param = req.body,
         rows = param.data;
@@ -548,7 +549,7 @@ module.exports = function(app, db, options){
           start_date = new Date(start_time),
           end_date = new Date(end_time),
           gross_amount = (row.field4+'').replace(',', ''),
-          unit_number = row.field5 + row.field6;
+          unit_number = row.field5 + row.field7;
       if (!bill_lines[unit_number]) {
         bill_lines[unit_number] = [];
       }
@@ -562,23 +563,47 @@ module.exports = function(app, db, options){
       })
     }
 
-    //通过CSV中的建筑编号+户号, 查询系统里对应的户号id;
-    searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
+    if (bill_lines.length > 0) {
+      PropertyBillLine.destroy({
+        where: {
+          is_pay: false
+        }
+      })
+      .then(function() {
 
-      var billLines = [];
-      var unitKeys = Object.keys(bill_lines)
-      for (var i = 0; i < unitKeys.length; i++) {
-        var lines = bill_lines[unitKeys[i]];
-        billLines = _.concat(lines, billLines);
-      }
-      console.log(billLines)
-      //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
-      searchAndUpdateBillLines(billLines, 0, function() {
-        return res.json({
-          success: true
+        //通过CSV中的建筑编号+户号, 查询系统里对应的户号id;
+        searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
+
+          var billLines = [];
+          var unitKeys = Object.keys(bill_lines)
+          for (var i = 0; i < unitKeys.length; i++) {
+            var lines = bill_lines[unitKeys[i]];
+            billLines = _.concat(lines, billLines);
+          }
+          console.log(billLines)
+          //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
+          searchAndUpdateBillLines(billLines, 0, function() {
+            return res.json({
+              success: true
+            })
+          })
+        })
+
+      })
+      .catch(function(err){
+        console.error(err)
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
         })
       })
-    })
+    }else {
+      return res.json({
+        success: false,
+        errMsg: '没有有效的账单'
+      })
+    }
 
   })
 
