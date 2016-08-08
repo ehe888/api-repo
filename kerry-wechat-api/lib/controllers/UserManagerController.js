@@ -329,13 +329,21 @@ module.exports = function(app, db, options){
         name = param.name,
         mobile = param.mobile,
         reg_code = param.reg_code,
+        appId = param.appId,
         expire_date = param.expire_date,
         unit_number = param.unit_number;
 
     Units.findOne({
       where: {
         unit_number: unit_number
-      }
+      },
+      include: [{
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: param.appId
+        }
+      }]
     })
     .then(function(unit) {
       if (!unit) {
