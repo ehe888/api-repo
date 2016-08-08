@@ -563,7 +563,7 @@ module.exports = function(app, db, options){
       })
     }
 
-    if (bill_lines.length > 0) {
+    if (rows.length > 0) {
       PropertyBillLine.destroy({
         where: {
           is_pay: false
