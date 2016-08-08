@@ -214,8 +214,8 @@ module.exports = function(app, db, options){
       for (var i = 0; i < results.length; i++) {
         var row = results[i];
         var sameIdData = _.find(data, function(o) {
-          return o.id = row.id
-        });
+          return o.id == row.id
+        })
         if (sameIdData) {
           sameIdData.units.push({
             unit_id: row.unit_id,

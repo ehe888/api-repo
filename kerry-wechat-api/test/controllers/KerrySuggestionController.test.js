@@ -73,8 +73,7 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res) {
           expect(res.body.success).to.be.true;
-          console.log(res.body.data[0].units.length)
-          console.log(res.body.count)
+          console.log(res.body.data)
         })
         .end(done);
     })
