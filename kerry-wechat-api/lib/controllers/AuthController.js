@@ -102,7 +102,11 @@ module.exports = function(app, db, options){
         as: 'sys_role_user',
         include: [{
           model: sequelize.model("SysRole"),
-          as: 'role'
+          as: 'role',
+          include: [{
+            model: sequelize.model("SysRoleMenu"),
+            as: 'sys_role_menu'
+          }]
         }]
       }]
     })

@@ -34,7 +34,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/KerrySuggestionController")(subapp, db, options)
   require("./controllers/BillboardController")(subapp, db, options)
   require("./controllers/PushMessageController")(subapp, db, options)
-
+  require("./controllers/SysRoleMenuController")(subapp, db, options)
   require("./controllers/WechatPayController")(subapp, db, options)
   require("./controllers/WechatNewsController")(subapp, db, options)
 

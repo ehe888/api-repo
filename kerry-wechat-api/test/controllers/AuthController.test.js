@@ -44,6 +44,8 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res) {
           console.log(res.body)
+          console.log(JSON.stringify(res.body.data.sys_role_user))
+
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.be.exist;
         })
