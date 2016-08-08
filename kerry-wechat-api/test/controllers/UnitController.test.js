@@ -76,9 +76,10 @@ module.exports = function(app, db, config){
 
     it("查询所有单元", function(done) {
       request(app)
-        .post("/api/units/query")
+        .post("/api/units/query_all")
         .send({
-          unit_number: '11'
+          unit_number: '11',
+          appId: 'wxa0c45fc6d9e269ed'
         })
         .expect(200)
         .expect(function(res){

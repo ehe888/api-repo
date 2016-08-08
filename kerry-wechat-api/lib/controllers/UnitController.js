@@ -105,7 +105,14 @@ module.exports = function(app, db, options){
         unit_number: {
           $like: '%'+unit_number+'%'
         }
-      }
+      },
+      include: [{
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: param.appId
+        }
+      }]
     })
     .then(function(units) {
       return res.json({
