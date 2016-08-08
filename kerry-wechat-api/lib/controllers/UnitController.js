@@ -232,6 +232,46 @@ module.exports = function(app, db, options){
 
   })
 
+  router.post("/queryUserBindByUnit", function(req, res, next) {
+    var param = req.body,
+        id = param.id
+    Units.findOne({
+      where: {
+        id: id
+      },
+      include: [{
+        model: sequelize.model("UserUnitBinding"),
+        as: 'user_unit_binding',
+        include: [{
+          model: sequelize.model("User"),
+          as: 'wechat_user'
+        }]
+      },{
+        model: sequelize.model("KerryUserUnit"),
+        as: 'user_unit',
+        include: [{
+          model: sequelize.model("KerryUsers"),
+          as: 'kerry_user'
+        }]
+      }]
+    })
+    .then(function(unit) {
+      return res.json({
+        success: true,
+        unit: unit
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
 
   app.use("/units", router);
 }

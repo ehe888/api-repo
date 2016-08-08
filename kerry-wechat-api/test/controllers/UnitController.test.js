@@ -116,12 +116,24 @@ module.exports = function(app, db, config){
         .expect(200)
         .expect(function(res){
           expect(res.body.success).to.be.true;
-
-
         })
         .end(done);
+    })
 
 
+    it("根据单元查询业主和微信用户", function(done) {
+
+      request(app)
+        .post("/api/units/queryUserBindByUnit")
+        .send({
+          id: 2
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
     })
 
   })
