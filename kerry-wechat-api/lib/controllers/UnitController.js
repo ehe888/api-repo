@@ -16,6 +16,7 @@ module.exports = function(app, db, options){
         unit_desc = param.unit_desc,
         sys_user_id = param.sys_user_id,
         property_id = param.property_id;
+    debug(param)
     Units.create({
       unit_number: unit_number,
       sys_user_id: sys_user_id,
@@ -188,6 +189,7 @@ module.exports = function(app, db, options){
     var param = req.body,
         id = param.id,
         sys_user_id = param.sys_user_id,
+        unit_desc = param.unit_desc,
         unit_number = param.unit_number;
 
     Units.findOne({
@@ -204,7 +206,8 @@ module.exports = function(app, db, options){
       }else {
         unit.update({
           unit_number: unit_number,
-          sys_user_id: sys_user_id
+          sys_user_id: sys_user_id,
+          unit_desc: unit_desc
         })
         .then(function(instance) {
           return res.json({
