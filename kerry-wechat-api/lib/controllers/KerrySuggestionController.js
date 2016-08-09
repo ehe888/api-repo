@@ -238,6 +238,7 @@ module.exports = function(app, db, options){
             units: [{
               unit_id: row.unit_id,
               unit_number: row.unit_number
+              unit_desc: row.unit_desc
             }],
             users: [{
               username: row.username,
