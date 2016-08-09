@@ -591,7 +591,6 @@ module.exports = function(app, db, options){
         if (row.field2 == '账单开始日期') {
           continue;
         }
-        console.log(row.field5, row.field7)
 
         var start = row.field2+"",
             end = row.field3+"";
@@ -602,8 +601,10 @@ module.exports = function(app, db, options){
             start_date = new Date(start_time),
             end_date = new Date(end_time),
             gross_amount = (row.field4+'').replace(',', ''),
-            unit_number = row.field5 + row.field7,
+            unit_number = (row.field5+"") + (row.field7+""),
             username = row.field9;
+        debug(row.field5, row.field7)
+        debug(unit_number)
         if (!bill_lines[unit_number]) {
           bill_lines[unit_number] = [];
         }
