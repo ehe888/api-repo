@@ -219,7 +219,8 @@ module.exports = function(app, db, options){
         if (sameIdData) {
           sameIdData.units.push({
             unit_id: row.unit_id,
-            unit_number: row.unit_number
+            unit_number: row.unit_number,
+            unit_desc: row.unit_desc
           })
           sameIdData.users.push({
             username: row.username,
