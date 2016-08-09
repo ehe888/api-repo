@@ -598,7 +598,8 @@ module.exports = function(app, db, options){
         end_date: end_date,
         gross_amount: gross_amount,
         unit_number: unit_number,
-        is_pay: false
+        is_pay: false,
+        username: username
       })
     }
 
@@ -698,6 +699,7 @@ module.exports = function(app, db, options){
         year = billLine.start_date.getFullYear(),
         month = billLine.start_date.getMonth()+1,
         gross_amount = parseFloat(billLine.gross_amount),
+        username = billLine.username,
         description = billLine.description;
     PropertyBill.findOne({
       where: {
