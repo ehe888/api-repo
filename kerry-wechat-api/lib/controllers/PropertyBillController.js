@@ -235,12 +235,16 @@ module.exports = function(app, db, options){
         }
       }
     }
-    PropertyBill.findAll({
-      where: {
+    var billOption = {};
+    if (username && username.length > 0) {
+      billOption = {
         username: {
           $like: '%'+username+'%'
         }
-      },
+      }
+    }
+    PropertyBill.findAll({
+      where: billOption,
       include:[{
         model: sequelize.model("Units"),
         as: 'unit',
@@ -262,11 +266,7 @@ module.exports = function(app, db, options){
     })
     .then(function(results) {
       PropertyBill.count({
-        where:{
-          username: {
-            $like: '%'+username+'%'
-          }
-        },
+        where:billOption,
         include: [{
           model: sequelize.model("Units"),
           as: 'unit',
