@@ -591,6 +591,7 @@ module.exports = function(app, db, options){
         if (row.field2 == '账单开始日期') {
           continue;
         }
+        console.log(row.field5, row.field7)
 
         var start = row.field2+"",
             end = row.field3+"";
@@ -763,6 +764,7 @@ module.exports = function(app, db, options){
         gross_amount = parseFloat(billLine.gross_amount),
         username = billLine.username,
         description = billLine.description;
+    debug(billLine)
     PropertyBill.findOne({
       where: {
         year: year,
