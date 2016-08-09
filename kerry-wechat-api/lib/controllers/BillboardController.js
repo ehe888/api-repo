@@ -49,7 +49,9 @@ module.exports = function(app, db, options){
         }
       })
       .then(function(asset) {
-        img_url = host+asset.url;
+        if (asset) {
+          img_url = host+asset.url;
+        }
         console.log(img_url);
         KerryBillboard.create({
           title: title,
@@ -76,6 +78,14 @@ module.exports = function(app, db, options){
           })
         })
 
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
       })
 
 
