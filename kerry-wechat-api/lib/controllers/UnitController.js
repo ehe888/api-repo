@@ -284,6 +284,42 @@ module.exports = function(app, db, options){
 
   })
 
+  router.post("/queryByWechat", function(req, res, next) {
+    var param = req.body,
+        unit_desc = param.unit_desc;
+    Units.findAll({
+      attributes:['id', 'unit_number', 'unit_desc'],
+      where: {
+        unit_desc: {
+          $like: '%'+unit_desc+'%'
+        }
+      },
+      include: [{
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: param.appId
+        }
+      }]
+    })
+    .then(function(units) {
+      return res.json({
+        success: true,
+        data: units
+      })
+    })
+    .catch(function(err) {
+
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
+
 
   app.use("/units", router);
 }

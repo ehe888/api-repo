@@ -18,7 +18,7 @@ module.exports = function(app, db, options){
   router.post('/bind', function(req, res, next) {
 
     var param = req.body,
-        unit_number = param.unit_number,
+        unit_desc = param.unit_desc,
         reg_code = param.reg_code,
         username = param.username,
         mobile = param.mobile,
@@ -34,7 +34,7 @@ module.exports = function(app, db, options){
       if(property){
         Units.findOne({   //根据户号查询单元对象
           where:{
-            unit_number:unit_number,
+            unit_desc:unit_desc,
             property_id: property.id
           }
         })
