@@ -52,14 +52,15 @@ module.exports = function(app, db, options){
       propertyOption.appId = appId;
     }
 
-    var unitOption = {
-      unit_desc: {
-        $like: '%'+unit_desc+'%'
-      }
-    };
+    var unitOption = {};
     if (req.units) {
       unitOption.id = {
         $in: req.units
+      }
+    }
+    if (unit_desc && unit_desc.length > 0) {
+      unitOption.unit_desc =  {
+        $like: '%'+unit_desc+'%'
       }
     }
     console.log(unitOption)
