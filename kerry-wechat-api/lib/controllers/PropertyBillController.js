@@ -300,7 +300,7 @@ module.exports = function(app, db, options){
 
   router.post("/queryPropertyBillsView", function(req, res,next) {
     var param = req.body,
-        username = param.username || '',
+        unit_desc = param.unit_desc || '',
         offset = param.offset || 0,
         limit = param.limit || 20,
         appId = param.appId;
@@ -310,8 +310,8 @@ module.exports = function(app, db, options){
       unitOption = "["+unitOption+"]"
     }
     var billOption = "";
-    if (username && username.length > 0) {
-      billOption += "'%"+username+"%'"
+    if (unit_desc && unit_desc.length > 0) {
+      billOption += "'%"+unit_desc+"%'"
     }
 
     var query = 'SELECT * FROM vw_property_bill WHERE app_id = ?';
@@ -319,7 +319,7 @@ module.exports = function(app, db, options){
       query += ' AND unit_id in '+unitOption
     }
     if (billOption.length > 2) {
-      query += ' AND username LIKE ' + billOption
+      query += ' AND unit_desc LIKE ' + billOption
     }
 
     query += ' ORDER BY id DESC offset ? limit ?'
@@ -387,7 +387,7 @@ module.exports = function(app, db, options){
         countQuery += ' AND unit_id in '+unitOption
       }
       if (billOption.length > 2) {
-        countQuery += ' AND username LIKE ' + billOption
+        countQuery += ' AND unit_desc LIKE ' + billOption
       }
       countQuery += ') as count'
       sequelize.query(countQuery, { replacements: [appId], type: sequelize.QueryTypes.SELECT})

@@ -14,7 +14,7 @@ module.exports = function(app, db, options){
 
   router.post("/query", function(req, res, next) {
     var param = req.body,
-        name = param.name || '',
+        unit_desc = param.unit_desc || '',
         offset = param.offset || 0,
         limit = param.limit || 20,
         appId = param.appId
@@ -31,6 +31,10 @@ module.exports = function(app, db, options){
           $in: req.units
         }
       }
+    }
+
+    if (unit_desc && unit_desc.length > 0) {
+      unitOption.unit_desc = unit_desc;
     }
 
     KerryUserUnit.findAndCountAll({
@@ -54,12 +58,7 @@ module.exports = function(app, db, options){
         }]
       }, {
         model: KerryUsers,
-        as: 'kerry_user',
-        where: {
-          name: {
-            $like: '%'+name+'%'
-          }
-        }
+        as: 'kerry_user'
       }]
     })
     .then(function(results) {

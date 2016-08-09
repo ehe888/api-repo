@@ -282,7 +282,7 @@ module.exports = function(app, db, config){
           .post("/api/propertyBills/queryPropertyBillsView")
           .send({
             appId: 'shanghai',
-            username: 'AAA'
+            unit_desc: 'AAA'
           })
           .expect(200)
           .expect(function(res){
