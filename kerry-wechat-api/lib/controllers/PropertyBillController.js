@@ -575,7 +575,7 @@ module.exports = function(app, db, options){
 
     sequelize.model("KerryProperty").findOne({
       where:{
-        app_id: appId
+        app_id: param.appId
       }
     })
     .then(function(property) {
