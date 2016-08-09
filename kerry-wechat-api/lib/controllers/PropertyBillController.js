@@ -773,7 +773,8 @@ module.exports = function(app, db, options){
           bill_number: ' ',
           year: year,
           month: month,
-          unit_id: unit_id
+          unit_id: unit_id,
+          username: username
         })
         .then(function(bill) {
           var billId = bill.id;
