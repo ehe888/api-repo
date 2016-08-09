@@ -139,7 +139,7 @@ module.exports = function(app, db, options){
         reg_code = param.reg_code || '',
         mobile = param.mobile || '',
         unit_id = param.unit_id,
-        unit_number = param.unit_number || '',
+        unit_desc = param.unit_desc || '',
         id = param.id;
     KerryUserUnit.findOne({
       where: {
@@ -200,11 +200,11 @@ module.exports = function(app, db, options){
 
           user.update(updateOptioin)
           .then(function(user) {
-            if (unit_number && unit_number.length > 0) {
+            if (unit_desc && unit_desc.length > 0) {
 
               Units.findOne({
                 where: {
-                  unit_number: unit_number
+                  unit_desc: unit_desc
                 }
               })
               .then(function(unit) {
@@ -331,11 +331,11 @@ module.exports = function(app, db, options){
         reg_code = param.reg_code,
         appId = param.appId,
         expire_date = param.expire_date,
-        unit_number = param.unit_number;
+        unit_desc = param.unit_desc;
 
     Units.findOne({
       where: {
-        unit_number: unit_number
+        unit_desc: unit_desc
       },
       include: [{
         model: sequelize.model("KerryProperty"),
