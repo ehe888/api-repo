@@ -52,23 +52,8 @@ module.exports = [
     "link": "/suggestions"
   },
   {
-    "name": "意见反馈",
-    "icon": "ti-comment-alt",
-    "link": "/suggestions"
-  },
-  {
     "name": "个人中心",
     "icon": "ti-user",
     "link": "/usercenter"
-  },
-  {
-    "name": "系统设置",
-    "icon": "ti-settings",
-    "link": "/syssetting"
-  },
-  {
-    "name": "系统账号管理",
-    "icon": "ti-panel",
-    "link": "/backgroundUsers"
-  },
+  }
 ]
