@@ -392,7 +392,7 @@ module.exports = function(app, db, options){
       countQuery += ') as count'
       sequelize.query(countQuery, { replacements: [appId], type: sequelize.QueryTypes.SELECT})
       .then(function(count) {
-        
+
         return res.json({
           success: true,
           data: data,
@@ -541,7 +541,7 @@ module.exports = function(app, db, options){
         var address = "";
         if (bill.unit && bill.unit.property) {
           var property = bill.unit.property;
-          address = property.city+property.street+bill.unit.unit_number;
+          address = property.city+property.street+bill.unit.unit_desc;
           url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
                 + "&unit_id="+bill.unit.id
         }
