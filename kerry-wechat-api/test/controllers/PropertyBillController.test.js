@@ -12,113 +12,127 @@ module.exports = function(app, db, config){
 
   describe("API平台系统账单管理", function(){
 
-    // it("POST提交账单", function(done){
-    //   var date = new Date();
-    //   request(app)
-    //     .post("/api/propertyBills/create")
-    //     .send({
-    //       year:date.getFullYear(),
-    //       month:date.getMonth(),
-    //       is_push:false,
-    //       unit_id:1,
-    //       property_bill_lines:[{
-    //         description:"11111111111111",
-    //         taxable_amount:100,
-    //         tax:10,
-    //         gross_amount:110,
-    //         is_pay:false,
-    //         expire_date:date,
-    //         active:true
-    //       },{
-    //         description:"2222222222222",
-    //         taxable_amount:200,
-    //         tax:20,
-    //         gross_amount:220,
-    //         is_pay:false,
-    //         expire_date:date,
-    //         active:true
-    //       }]
-    //     })
-    //     .expect(200)
-    //     .expect(function(res){
-    //       console.log(res.body.data);
-    //       expect(res.body.success).to.be.true;
-    //       expect(res.body.data).to.exist;
-    //     })
-    //     .end(done);
-    // })
-    //
-    // it("POST更新账单", function(done){
-    //   var date = new Date();
-    //
-    //   request(app)
-    //     .post("/api/propertyBills/update")
-    //     .send({
-    //       id:6,
-    //       property_bill_lines:[{
-    //         id:2,
-    //         description:"11111111111111",
-    //         taxable_amount:100,
-    //         tax:10,
-    //         gross_amount:110,
-    //         is_pay:false,
-    //         expire_date:date,
-    //         active:true
-    //       },{
-    //         id:3,
-    //         description:"2222222222222",
-    //         taxable_amount:200,
-    //         tax:20,
-    //         gross_amount:220,
-    //         is_pay:false,
-    //         expire_date:date,
-    //         active:true
-    //       },{
-    //         description:"3333333333333333",
-    //         taxable_amount:300,
-    //         tax:30,
-    //         gross_amount:330,
-    //         is_pay:false,
-    //         expire_date:date,
-    //         active:true
-    //       }]
-    //     })
-    //     .expect(200)
-    //     .expect(function(res){
-    //       expect(res.body.success).to.be.true;
-    //     })
-    //     .end(done);
-    // })
-    //
-    // it("POST查询账单", function(done){
-    //   request(app)
-    //     .post("/api/propertyBills/queryPropertyBills")
-    //     .send({
-    //       bill_number:''
-    //     })
-    //     .expect(200)
-    //     .expect(function(res){
-    //       console.log(res.body.data);
-    //       expect(res.body.success).to.be.true;
-    //     })
-    //     .end(done);
-    // })
-    //
-    // it("根据userid查询账单", function(done) {
-    //   request(app)
-    //     .post("/api/propertyBills/queryUserBills")
-    //     .send({
-    //       wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
-    //       unit_id: 1,
-    //       year: 2016
-    //     })
-    //     .expect(200)
-    //     .expect(function(res){
-    //       console.log(res.body.data);
-    //       expect(res.body.success).to.be.true;
-    //     })
-    //     .end(done);
-    // })
+    before(function(done) {
+      db.sequelize.model("PropertyBillLine").sync({force: true})
+      .then(function() {
+        return db.sequelize.model("PropertyBill").sync({force: true})
+      })
+      .then(function() {
+        done();
+      })
+      .catch(function(err) {
+        console.error(err);
+        done(err)
+      })
+    })
+
+    it("POST提交账单", function(done){
+      var date = new Date();
+      request(app)
+        .post("/api/propertyBills/create")
+        .send({
+          year:date.getFullYear(),
+          month:date.getMonth(),
+          is_push:false,
+          unit_id:1,
+          property_bill_lines:[{
+            description:"11111111111111",
+            taxable_amount:100,
+            tax:10,
+            gross_amount:110,
+            is_pay:false,
+            expire_date:date,
+            active:true
+          },{
+            description:"2222222222222",
+            taxable_amount:200,
+            tax:20,
+            gross_amount:220,
+            is_pay:false,
+            expire_date:date,
+            active:true
+          }]
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body.data);
+          expect(res.body.success).to.be.true;
+          expect(res.body.data).to.exist;
+        })
+        .end(done);
+    })
+
+    it("POST更新账单", function(done){
+      var date = new Date();
+
+      request(app)
+        .post("/api/propertyBills/update")
+        .send({
+          id:6,
+          property_bill_lines:[{
+            id:2,
+            description:"11111111111111",
+            taxable_amount:100,
+            tax:10,
+            gross_amount:110,
+            is_pay:false,
+            expire_date:date,
+            active:true
+          },{
+            id:3,
+            description:"2222222222222",
+            taxable_amount:200,
+            tax:20,
+            gross_amount:220,
+            is_pay:false,
+            expire_date:date,
+            active:true
+          },{
+            description:"3333333333333333",
+            taxable_amount:300,
+            tax:30,
+            gross_amount:330,
+            is_pay:false,
+            expire_date:date,
+            active:true
+          }]
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
+    it("POST查询账单", function(done){
+      request(app)
+        .post("/api/propertyBills/queryPropertyBills")
+        .send({
+          bill_number:''
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body.data);
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
+    it("根据userid查询账单", function(done) {
+      request(app)
+        .post("/api/propertyBills/queryUserBills")
+        .send({
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
+          unit_id: 1,
+          year: 2016
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body.data);
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
 
     it("上传csv", function(done) {
       var requestData = [
@@ -136,55 +150,11 @@ module.exports = function(app, db, config){
           field3: 20160430,
           field4: 694.6,
           field5: 'A0001',
-          field6: '103A',
-          field7: 10010549,
-          field8: 'XXX',
-          field9: 103631 },
-        { field1: '电费',
-          field2: 20160401,
-          field3: 20160430,
-          field4: '15,592.00',
-          field5: 'A0001',
-          field6: '103A',
-          field7: 10010549,
-          field8: 'XXX',
-          field9: 103631 },
-        { field1: '电费',
-          field2: 20160401,
-          field3: 20160430,
-          field4: '5,592.00',
-          field5: 'A0001',
-          field6: '103A',
-          field7: 10010549,
-          field8: 'XXX',
-          field9: 103631 },
-        { field1: '管理费',
-          field2: 20160601,
-          field3: 20160630,
-          field4: '3,676.00',
-          field5: 'A0001',
-          field6: '103A',
-          field7: 10010549,
-          field8: 'XXX',
-          field9: 103631 },
-        { field1: '公共部位占用费',
-          field2: 20150901,
-          field3: 20150930,
-          field4: 800,
-          field5: 'A0001',
-          field6: '103C',
-          field7: 10090306,
-          field8: 'XXX',
-          field9: 115027 },
-        { field1: '公共部位占用费',
-          field2: 20151001,
-          field3: 20151023,
-          field4: 645.16,
-          field5: 'A0001',
-          field6: '103C',
-          field7: 10090306,
-          field8: 'XXX',
-          field9: 115027 }
+          field6: 'A0001',
+          field7: '0',
+          field8: 10010549,
+          field9: 'XXX',
+          field10: 103631 }
         ];
 
         request(app)

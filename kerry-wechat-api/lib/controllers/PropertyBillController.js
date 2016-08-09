@@ -23,53 +23,88 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body;
     var id;
-    PropertyBill.create({
-      bill_number:' ',
-      year:param.year,
-      month:param.month,
-      is_push:false,
-      unit_id:param.unit_id
+    sequelize.model("KerryUserUnit").findAll({
+      where: {
+        unit_id: param.unit_id
+      },
+      include: [{
+        model: sequelize.model("KerryUsers"),
+        as: 'kerry_user'
+      }]
     })
-    .then(function(propertyBill) {
-      id = propertyBill.id;
-      if(param.property_bill_lines){
-        param.property_bill_lines.forEach(function(data){
-          data.property_bill_id = id;
-        })
+    .then(function(kerryUserUnits) {
+      var username = "";
+      if (kerryUserUnits && kerryUserUnits.length > 0) {
+        for (var i = 0; i < kerryUserUnits.length; i++) {
+          var user = kerryUserUnits[i].kerry_user;
+          if (user) {
+            if (username.length > 0) {
+              username += ", "+(user.name)
+            }else {
+              username = user.name
+            }
+          }
+        }
+      }
+      PropertyBill.create({
+        bill_number:' ',
+        year:param.year,
+        month:param.month,
+        is_push:false,
+        unit_id:param.unit_id,
+        username: username
+      })
+      .then(function(propertyBill) {
+        id = propertyBill.id;
+        if(param.property_bill_lines){
+          param.property_bill_lines.forEach(function(data){
+            data.property_bill_id = id;
+          })
 
-        PropertyBillLine.bulkCreate(param.property_bill_lines)
-        .then(function(){
-          PropertyBill.findOne({
-            where:{
-              id:id
-            },
-            include:[{
-              model: sequelize.model("PropertyBillLine"),
-              as: 'property_bill_lines'
-            }]
-          })
-          .then(function(propertyBill){
-            return res.json({
-              success:true,
-              data:propertyBill
+          PropertyBillLine.bulkCreate(param.property_bill_lines)
+          .then(function(){
+            PropertyBill.findOne({
+              where:{
+                id:id
+              },
+              include:[{
+                model: sequelize.model("PropertyBillLine"),
+                as: 'property_bill_lines'
+              }]
+            })
+            .then(function(propertyBill){
+              return res.json({
+                success:true,
+                data:propertyBill
+              })
+            })
+            .catch(function(err){
+              console.log(err)
+              return res.status(500).json({
+                success: false,
+                errMsg: err.message,
+                errors: err
+              })
             })
           })
-          .catch(function(err){
-            console.log(err)
-            return res.status(500).json({
-              success: false,
-              errMsg: err.message,
-              errors: err
-            })
+        }
+        else{
+          return res.json({
+            success:true,
+            data:propertyBill
           })
+        }
+      })
+      .catch(function(err){
+        console.log(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
         })
-      }
-      else{
-        return res.json({
-          success:true,
-          data:propertyBill
-        })
-      }
+      })
+
+
     })
     .catch(function(err){
       console.log(err)
@@ -79,6 +114,8 @@ module.exports = function(app, db, options){
         errors: err
       })
     })
+
+
   })
 
   //修改账单
@@ -185,7 +222,8 @@ module.exports = function(app, db, options){
   //查询账单
   router.post('/queryPropertyBills', function(req, res, next) {
     var param = req.body,
-        bill_number = param.bill_number || '',
+        // bill_number = param.bill_number || '',
+        username = param.username || '',
         offset = param.offset || 0,
         limit = param.limit || 20,
         appId = param.appId;
@@ -199,8 +237,8 @@ module.exports = function(app, db, options){
     }
     PropertyBill.findAll({
       where: {
-        bill_number: {
-          $like: '%'+bill_number+'%'
+        username: {
+          $like: '%'+username+'%'
         }
       },
       include:[{
@@ -549,7 +587,8 @@ module.exports = function(app, db, options){
           start_date = new Date(start_time),
           end_date = new Date(end_time),
           gross_amount = (row.field4+'').replace(',', ''),
-          unit_number = row.field5 + row.field7;
+          unit_number = row.field5 + row.field7,
+          username = row.field9;
       if (!bill_lines[unit_number]) {
         bill_lines[unit_number] = [];
       }
