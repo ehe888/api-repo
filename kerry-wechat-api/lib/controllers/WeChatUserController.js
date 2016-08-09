@@ -37,7 +37,9 @@ router.post("/queryWechatUsers", function(req, res, next) {
  }
 
  if (unit_desc && unit_desc.length > 0) {
-   unitOption.unit_desc = unit_desc;
+   unitOption.unit_desc = {
+     $like: '%'+unit_desc+'%'
+   }
  }
 
  UserUnitBinding.findAndCountAll({
