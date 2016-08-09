@@ -788,9 +788,14 @@ module.exports = function(app, db, options){
                 }
                 debug(billLines)
                 //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
-                searchAndUpdateBillLines(billLines, 0, function() {
+                searchAndUpdateBillLines(billLines, 0, 0, 0, 0, function(success, failure, amount) {
                   return res.json({
-                    success: true
+                    success: true,
+                    data:{
+                      success: success,
+                      failure: failure,
+                      amount: amount
+                    }
                   })
                 })
               })
@@ -876,9 +881,9 @@ module.exports = function(app, db, options){
   //    如果有, 那么update
   //    如果没有, create
   //如果没有, 新建账单记录, 再create账单行
-  function searchAndUpdateBillLines(billLines, index, callback) {
+  function searchAndUpdateBillLines(billLines, index, success, failure, amount, callback) {
     if (index >= billLines.length) {
-      return callback();
+      return callback(success, failure, amount);
     }
 
     var billLine = billLines[index],
@@ -913,7 +918,10 @@ module.exports = function(app, db, options){
               gross_amount: gross_amount
             })
             .then(function(line) {
-              return searchAndUpdateBillLines(billLines, ++index, callback);
+              //更新成功
+              amount += parseFloat(gross_amount);
+              success++;
+              return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback);
             })
             .catch(function(error) {
               console.log("update billLine error: " + error);
@@ -923,7 +931,9 @@ module.exports = function(app, db, options){
                 description: description,
                 property_bill_id: billId
               })
-              return searchAndUpdateBillLines(billLines, ++index, callback)
+              //失败
+              failure++;
+              return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
             })
           }
           else {
@@ -934,7 +944,9 @@ module.exports = function(app, db, options){
               property_bill_id: billId
             })
             .then(function(line) {
-              return searchAndUpdateBillLines(billLines, ++index, callback)
+              success++;
+              amount+= parseFloat(gross_amount)
+              return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
             })
             .catch(function(error) {
               console.log("create billLine error: " + error);
@@ -943,7 +955,8 @@ module.exports = function(app, db, options){
                 description: description,
                 property_bill_id: billId
               })
-              return searchAndUpdateBillLines(billLines, ++index, callback)
+              failure++;
+              return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
             })
           }
 
@@ -954,7 +967,8 @@ module.exports = function(app, db, options){
             description: description,
             property_bill_id: billId
           })
-          return searchAndUpdateBillLines(billLines, ++index, callback)
+          failure++;
+          return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
         })
 
       }
@@ -975,7 +989,9 @@ module.exports = function(app, db, options){
             property_bill_id: billId
           })
           .then(function(line) {
-            return searchAndUpdateBillLines(billLines, ++index, callback)
+            success++;
+            amount+=parseFloat(gross_amount)
+            return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
           })
           .catch(function(error) {
             console.log("create billLine error: " + error);
@@ -984,7 +1000,8 @@ module.exports = function(app, db, options){
               description: description,
               property_bill_id: billId
             })
-            return searchAndUpdateBillLines(billLines, ++index, callback)
+            failure++;
+            return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
           })
         })
         .catch(function(error) {
@@ -994,7 +1011,8 @@ module.exports = function(app, db, options){
             month: month,
             unit_id: unit_id
           })
-          return searchAndUpdateBillLines(billLines, ++index, callback)
+          failure++;
+          return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
         })
 
       }
@@ -1007,7 +1025,8 @@ module.exports = function(app, db, options){
         month: month,
         unit_id: unit_id
       })
-      return searchAndUpdateBillLines(billLines, ++index, callback)
+      failure++;
+      return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
     })
 
 

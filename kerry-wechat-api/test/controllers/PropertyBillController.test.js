@@ -171,7 +171,7 @@ module.exports = function(app, db, config){
           field4: 694.6,
           field5: 'A0001',
           field6: 'A0001',
-          field7: '0',
+          field7: '0000',
           field8: 10010549,
           field9: 'XXX',
           field10: 103631 }
@@ -203,7 +203,17 @@ module.exports = function(app, db, config){
           field7: '0',
           field8: 10010549,
           field9: 'XXX',
-          field10: 103631 }
+          field10: 103631 },
+          { field1: '电费',
+            field2: 20160401,
+            field3: 20160430,
+            field4: 1000,
+            field5: 'A0001',
+            field6: 'A0001',
+            field7: '0',
+            field8: 10010549,
+            field9: 'XXX',
+            field10: 103631 }
         ];
 
         request(app)
