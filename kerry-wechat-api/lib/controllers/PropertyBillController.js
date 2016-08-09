@@ -222,7 +222,6 @@ module.exports = function(app, db, options){
   //查询账单
   router.post('/queryPropertyBills', function(req, res, next) {
     var param = req.body,
-        // bill_number = param.bill_number || '',
         username = param.username || '',
         offset = param.offset || 0,
         limit = param.limit || 20,
@@ -260,7 +259,7 @@ module.exports = function(app, db, options){
         model: sequelize.model("PropertyBillLine"),
         as: 'property_bill_lines'
       }],
-      order: 'id desc',
+      order: 'created_at desc',
       offset: offset,
       limit: limit
     })
@@ -297,6 +296,130 @@ module.exports = function(app, db, options){
         ,errors: err
       })
     })
+  })
+
+  router.post("/queryPropertyBillsView", function(req, res,next) {
+    var param = req.body,
+        username = param.username || '',
+        offset = param.offset || 0,
+        limit = param.limit || 20,
+        appId = param.appId;
+    var unitOption = "";
+    if (req.units) {
+      unitOption = req.units.join(',');
+      unitOption = "["+unitOption+"]"
+    }
+    var billOption = "";
+    if (username && username.length > 0) {
+      billOption += "'%"+username+"%'"
+    }
+
+    var query = 'SELECT * FROM vw_property_bill WHERE app_id = ?';
+    if (unitOption.length > 2) {
+      query += ' AND unit_id in '+unitOption
+    }
+    if (billOption.length > 2) {
+      query += ' AND username LIKE ' + billOption
+    }
+
+    query += ' ORDER BY id DESC offset ? limit ?'
+
+    sequelize.query(query, { replacements: [appId, offset, limit], type: sequelize.QueryTypes.SELECT})
+    .then(function(results) {
+      var data = [];
+      for (var i = 0; i < results.length; i++) {
+        var row = results[i];
+        var bill = _.find(data, function(o) {
+          return row.id == o.id
+        })
+        if (!bill) {
+          data.push({
+            id: row.id,
+            bill_number: row.bill_number,
+            year: row.year,
+            month: row.month,
+            print_data: row.print_data,
+            is_push: row.is_push,
+            username: row.username,
+            active: row.active,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            deleted_at: row.deleted_at,
+            unit_id: row.unit_id,
+            property_bill_lines: [{
+              id: row.bill_line_id,
+              work_order_number: row.work_order_number,
+              description: row.description,
+              taxable_amount: row.taxable_amount,
+              tax: row.tax,
+              gross_amount: row.gross_amount,
+              is_pay: row.is_pay,
+              expire_date: row.expire_date
+            }],
+            unit: [{
+              id: row.unit_id,
+              unit_number: row.unit_number,
+              unit_desc: row.unit_desc
+            }]
+          })
+        }else {
+          bill.property_bill_lines.push({
+            id: row.bill_line_id,
+            work_order_number: row.work_order_number,
+            description: row.description,
+            taxable_amount: row.taxable_amount,
+            tax: row.tax,
+            gross_amount: row.gross_amount,
+            is_pay: row.is_pay,
+            expire_date: row.expire_date
+          })
+
+          bill.unit.push({
+            id: row.unit_id,
+            unit_number: row.unit_number,
+            unit_desc: row.unit_desc
+          })
+        }
+      }
+
+      var countQuery = 'SELECT count(1) FROM (SELECT DISTINCT id FROM vw_property_bill WHERE app_id = ? ';
+      if (unitOption.length > 2) {
+        countQuery += ' AND unit_id in '+unitOption
+      }
+      if (billOption.length > 2) {
+        countQuery += ' AND username LIKE ' + billOption
+      }
+      countQuery += ') as count'
+      sequelize.query(countQuery, { replacements: [appId], type: sequelize.QueryTypes.SELECT})
+      .then(function(count) {
+        
+        return res.json({
+          success: true,
+          data: data,
+          offset: offset,
+          limit: limit,
+          count: count.length>0?count[0].count:0
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
   })
 
   //根据wechat_username查询账单

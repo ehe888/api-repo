@@ -13,9 +13,9 @@ module.exports = function(app, db, config){
   describe("API平台系统账单管理", function(){
 
     before(function(done) {
-      db.sequelize.model("PropertyBillLine").sync({force: true})
+      db.sequelize.model("PropertyBillLine").sync({force: false})
       .then(function() {
-        return db.sequelize.model("PropertyBill").sync({force: true})
+        return db.sequelize.model("PropertyBill").sync({force: false})
       })
       .then(function() {
         done();
@@ -246,6 +246,40 @@ module.exports = function(app, db, config){
             var result = res.body
             console.log(res.body)
             expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
+    it("查询账单", function(done) {
+
+        request(app)
+          .post("/api/propertyBills/queryPropertyBillsView")
+          .send({
+            appId: 'shanghai'
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
+    it("查询账单, 没有结果", function(done) {
+
+        request(app)
+          .post("/api/propertyBills/queryPropertyBillsView")
+          .send({
+            appId: 'shanghai',
+            username: 'AAA'
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+            expect(result.data.length).to.be.equal(0)
           })
           .end(done);
     })
