@@ -16,7 +16,7 @@ module.exports = function(app, db, options){
         unit_desc = param.unit_desc,
         sys_user_id = param.sys_user_id,
         property_id = param.property_id;
-    debug(param)
+
     Units.create({
       unit_number: unit_number,
       sys_user_id: sys_user_id,
@@ -42,7 +42,7 @@ module.exports = function(app, db, options){
 
   router.post("/query", function(req, res, next) {
     var param = req.body,
-        unit_number = param.unit_number || '',
+        unit_desc = param.unit_desc || '',
         offset = param.offset || 0,
         limit = param.limit || 20,
         appId = param.appId;
@@ -53,8 +53,8 @@ module.exports = function(app, db, options){
     }
 
     var unitOption = {
-      unit_number: {
-        $like: '%'+unit_number+'%'
+      unit_desc: {
+        $like: '%'+unit_desc+'%'
       }
     };
     if (req.units) {
@@ -101,12 +101,12 @@ module.exports = function(app, db, options){
 
   router.post("/query_all", function(req, res, next) {
     var param = req.body,
-        unit_number = param.unit_number;
+        unit_desc = param.unit_desc;
     Units.findAll({
-      attributes:['id', 'unit_number'],
+      attributes:['id', 'unit_number', 'unit_desc'],
       where: {
-        unit_number: {
-          $like: '%'+unit_number+'%'
+        unit_desc: {
+          $like: '%'+unit_desc+'%'
         }
       },
       include: [{

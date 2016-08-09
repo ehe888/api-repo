@@ -77,7 +77,7 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body,
         content = param.content,
-        unit_number = param.unit_number,
+        unit_desc = param.unit_desc,
         topcolor = param.topcolor,
         url = param.url,
         app_id = req.query.app_id
@@ -86,7 +86,7 @@ module.exports = function(app, db, options){
     var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
     Units.findOne({
       where: {
-        unit_number: unit_number
+        unit_desc: unit_desc
       },
       include: [{
         model: sequelize.model("UserUnitBinding"),

@@ -99,8 +99,6 @@ module.exports = function(app, db, options){
                           }
 
                         })
-
-
                       }
                       else{
                         return res.json({
