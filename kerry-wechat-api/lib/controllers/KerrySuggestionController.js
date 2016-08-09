@@ -237,7 +237,7 @@ module.exports = function(app, db, options){
             property_name: row.property_name,
             units: [{
               unit_id: row.unit_id,
-              unit_number: row.unit_number
+              unit_number: row.unit_number,
               unit_desc: row.unit_desc
             }],
             users: [{
