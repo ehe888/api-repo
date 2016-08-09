@@ -260,9 +260,9 @@ module.exports = function(app, db, options){
         model: sequelize.model("PropertyBillLine"),
         as: 'property_bill_lines'
       }],
+      order: 'id desc',
       offset: offset,
-      limit: limit,
-      order: ' id desc'
+      limit: limit
     })
     .then(function(results) {
       PropertyBill.count({
