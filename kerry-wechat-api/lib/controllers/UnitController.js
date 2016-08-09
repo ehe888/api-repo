@@ -13,12 +13,14 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body,
         unit_number = param.unit_number,
+        unit_desc = param.unit_desc,
         sys_user_id = param.sys_user_id,
         property_id = param.property_id;
     Units.create({
       unit_number: unit_number,
       sys_user_id: sys_user_id,
-      property_id: property_id
+      property_id: property_id,
+      unit_desc: unit_desc
     })
     .then(function(unit) {
       return res.json({
