@@ -192,7 +192,8 @@ router.post("/queryThisMonth", function(req, res, next) {
     where: {
       created_at: {
         $gt: thisMonth
-      }
+      },
+      app_id: req.body.appId
     }
   })
   .then(function(results) {

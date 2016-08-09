@@ -95,6 +95,12 @@ module.exports = function(app, db, options){
           model: sequelize.model("User"),
           as: 'wechat_user'
         }]
+      },{
+        model: sequelize.model("KerryProperty"),
+        as: 'property',
+        where: {
+          app_id: app_id
+        }
       }]
     })
     .then(function(unit) {
