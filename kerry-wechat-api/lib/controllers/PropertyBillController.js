@@ -263,8 +263,8 @@ module.exports = function(app, db, options){
     .then(function(results) {
       PropertyBill.count({
         where:{
-          bill_number: {
-            $like: '%'+bill_number+'%'
+          username: {
+            $like: '%'+username+'%'
           }
         },
         include: [{
