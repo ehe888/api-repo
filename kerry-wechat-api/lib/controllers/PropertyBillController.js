@@ -572,78 +572,134 @@ module.exports = function(app, db, options){
     var param = req.body,
         rows = param.data;
     var bill_lines = {};
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (row.field2 == '账单开始日期') {
-        continue;
+
+    sequelize.model("KerryProperty").findOne({
+      where:{
+        app_id: appId
+      }
+    })
+    .then(function(property) {
+      if (!property) {
+        return res.json({
+          success: false,
+          errMsg: '找不到对应物业'
+        })
       }
 
-      var start = row.field2+"",
-          end = row.field3+"";
-      var start_time = start.substring(0, 4)+"-"+start.substring(4, 6)+"-"+start.substring(6, 8),
-          end_time = end.substring(0, 4)+"-"+end.substring(4, 6)+"-"+end.substring(6, 8)
-
-      var description = row.field1,
-          start_date = new Date(start_time),
-          end_date = new Date(end_time),
-          gross_amount = (row.field4+'').replace(',', ''),
-          unit_number = row.field5 + row.field7,
-          username = row.field9;
-      if (!bill_lines[unit_number]) {
-        bill_lines[unit_number] = [];
-      }
-      bill_lines[unit_number].push({
-        description: description,
-        start_date: start_date,
-        end_date: end_date,
-        gross_amount: gross_amount,
-        unit_number: unit_number,
-        is_pay: false,
-        username: username
-      })
-    }
-
-    if (rows.length > 0) {
-      PropertyBillLine.destroy({
-        where: {
-          is_pay: false
+      for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        if (row.field2 == '账单开始日期') {
+          continue;
         }
-      })
-      .then(function() {
 
-        //通过CSV中的建筑编号+户号, 查询系统里对应的户号id;
-        searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
+        var start = row.field2+"",
+            end = row.field3+"";
+        var start_time = start.substring(0, 4)+"-"+start.substring(4, 6)+"-"+start.substring(6, 8),
+            end_time = end.substring(0, 4)+"-"+end.substring(4, 6)+"-"+end.substring(6, 8)
 
-          var billLines = [];
-          var unitKeys = Object.keys(bill_lines)
-          for (var i = 0; i < unitKeys.length; i++) {
-            var lines = bill_lines[unitKeys[i]];
-            billLines = _.concat(lines, billLines);
+        var description = row.field1,
+            start_date = new Date(start_time),
+            end_date = new Date(end_time),
+            gross_amount = (row.field4+'').replace(',', ''),
+            unit_number = row.field5 + row.field7,
+            username = row.field9;
+        if (!bill_lines[unit_number]) {
+          bill_lines[unit_number] = [];
+        }
+        bill_lines[unit_number].push({
+          description: description,
+          start_date: start_date,
+          end_date: end_date,
+          gross_amount: gross_amount,
+          unit_number: unit_number,
+          is_pay: false,
+          username: username,
+          property_id: property.id
+        })
+      }
+
+      if (rows.length > 0) {
+
+        sequelize.model("Units").findAll({
+          where: {
+            property_id: property.id
           }
-          console.log(billLines)
-          //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
-          searchAndUpdateBillLines(billLines, 0, function() {
-            return res.json({
-              success: true
+        }).then(function(units) {
+          var unitIds = [];
+          for (var i = 0; i < units.length; i++) {
+            unitIds.push(units[i].id)
+          }
+          sequelize.model("PropertyBill").findAll({
+            where: {
+              unit_id: {
+                $in: unitIds
+              }
+            }
+          })
+          .then(function(bills) {
+            var billIds = [];
+            for (var i = 0; i < bills.length; i++) {
+              billIds.push(bills[i].id)
+            }
+
+            PropertyBillLine.destroy({
+              where: {
+                is_pay: false,
+                property_bill_id:{
+                  $in: billIds
+                }
+              }
+            })
+            .then(function() {
+
+              //通过CSV中的建筑编号+户号, 查询系统里对应的户号id;
+              searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
+
+                var billLines = [];
+                var unitKeys = Object.keys(bill_lines)
+                for (var i = 0; i < unitKeys.length; i++) {
+                  var lines = bill_lines[unitKeys[i]];
+                  billLines = _.concat(lines, billLines);
+                }
+                debug(billLines)
+                //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
+                searchAndUpdateBillLines(billLines, 0, function() {
+                  return res.json({
+                    success: true
+                  })
+                })
+              })
+
+            })
+            .catch(function(err){
+              console.error(err)
+              return res.status(500).json({
+                success:false,
+                errMsg:err.message,
+                errors:err
+              })
             })
           })
         })
-
-      })
-      .catch(function(err){
-        console.error(err)
-        return res.status(500).json({
-          success:false,
-          errMsg:err.message,
-          errors:err
+      }
+      else {
+        return res.json({
+          success: false,
+          errMsg: '没有有效的账单'
         })
+      }
+
+    })
+    .catch(function(err){
+      console.error(err)
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
       })
-    }else {
-      return res.json({
-        success: false,
-        errMsg: '没有有效的账单'
-      })
-    }
+    })
+
+
 
   })
 
@@ -657,9 +713,15 @@ module.exports = function(app, db, options){
     }
 
     var unit_number = unitNumbers[index];
+    var lines = billLines[unit_number];
+    if (lines.length == 0) {
+      return searchUnitIdByUnitNumbers(billLines, ++index, callback)
+    }
+    var property_id = lines[0].property_id;
     Units.findOne({
       where: {
-        unit_number: unit_number
+        unit_number: unit_number,
+        property_id: property_id
       }
     })
     .then(function(unit) {
