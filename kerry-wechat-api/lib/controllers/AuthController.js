@@ -133,6 +133,50 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/changePassword", function(req, res, next) {
+    var param = req.body,
+        oldPassword = param.oldPassword+"",
+        newPassword = param.newPassword+"",
+        username = param.username
+
+    SysUser.getAuthenticated(username, oldPassword, function(err, user) {
+      if(err){
+        console.error("auth error: ", err);
+        return res.status(403).json({
+                                     success: false
+                                     ,errMsg: err.message
+                                     ,errors: err
+                                    });
+      }
+
+      if(!user){
+        var err = new Error("invalid_username_and_password")
+        return res.status(403).json({
+                                     success: false
+                                     ,errMsg: '请输入正确的用户名和密码'
+                                     ,errors: err
+                                    });
+      }
+
+      user.update({
+        password: newPassword
+      })
+      .then(function(user) {
+        return res.json({
+          success: true
+        })
+      })
+      .catch(function(err) {
+        return res.status(403).json({
+                                     success: false
+                                     ,errMsg: err.message
+                                     ,errors: err
+                                    });
+      })
+    })
+
+  })
+
   /**
   * PATH: /auth/logout
   * Remove or Disable previously retrived accessToken
