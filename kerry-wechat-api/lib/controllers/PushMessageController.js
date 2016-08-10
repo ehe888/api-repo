@@ -81,5 +81,69 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post('/getTemplate', function(req, res, next) {
+    var param = req.body,
+        appId = param.appId,
+        template_type = param.template_type;
+    Template.findOne({
+      where: {
+        app_id: appId,
+        template_type: template_type
+      }
+    })
+    .then(function(template) {
+      return res.json({
+        success: true,
+        data: template
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
+
+  router.post("/updateTemplate", function(req, res, next) {
+    var param = req.body,
+        appId = param.appId,
+        template_type = param.template_type,
+        data = param.data;
+    Template.findOne({
+      where: {
+        app_id: appId,
+        template_type: template_type
+      }
+    })
+    .then(function(template) {
+      if (!template) {
+        return res.status(404).json({
+          success: false,
+          errMsg: '找不到对应模板'
+        })
+      }
+      return template.update({
+        data: data
+      })
+    })
+    .then(function(template) {
+      return res.json({
+        success: true,
+        data: template
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
+
   app.use("/pushMessage", router);
 }
