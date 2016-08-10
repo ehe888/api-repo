@@ -17,6 +17,11 @@ module.exports = [
       httpPath: "^\/api\/units.*"
     },
     {
+      name: "查询业主",
+      httpMethod: "POST",
+      httpPath: "^\/api\/user_settings\/query"
+    },
+    {
       name: "编辑业主",
       httpMethod: "POST",
       httpPath: "^\/api\/user_settings.*"
