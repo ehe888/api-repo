@@ -32,7 +32,7 @@ module.exports = [
     "link": "/user"
   },
   {
-    "name": "微信用户管理",
+    "name": "微信绑定管理",
     "icon": "ti-comments",
     "link": "/wechatUser"
   },

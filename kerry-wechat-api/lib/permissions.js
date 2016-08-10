@@ -39,7 +39,7 @@ module.exports = [
     {
       name: "模版消息",
       httpMethod: "POST",
-      httpPath: "^\/api\/delivery.*"
+      httpPath: "^\/api(\/pushMessage.*|\/delivery.*)"
     },
     {
       name: "图文推送",
@@ -67,7 +67,7 @@ module.exports = [
       httpPath: "^\/api\/suggestions.*"
     },
     {
-      name: "编辑菜单",
+      name: "微信素材",
       httpMethod: "POST",
       httpPath: "^(\/api\/wechatAssets.*|\/wxapi.*)"
     },
