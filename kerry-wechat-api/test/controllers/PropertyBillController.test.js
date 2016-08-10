@@ -13,12 +13,12 @@ module.exports = function(app, db, config){
   describe("API平台系统账单管理", function(){
 
     before(function(done) {
-      db.sequelize.model("PropertyBillLine").sync({force: false})
+      db.sequelize.query('DELETE FROM property_bill_lines')
       .then(function() {
-        return db.sequelize.model("PropertyBill").sync({force: false})
+        return db.sequelize.query('DELETE FROM property_bills')
       })
       .then(function() {
-        done();
+        done()
       })
       .catch(function(err) {
         console.error(err);
@@ -333,30 +333,19 @@ module.exports = function(app, db, config){
 
     it("更新账单行为已付款", function(done) {
 
-      db.sequelize.model("PropertyBillLine").findOne({
+      db.sequelize.model("PropertyBillLine").update({
+        is_pay: true
+      }, {
         where: {
-          property_bill_id: 1
+          is_pay: false
         }
       })
-      .then(function(bill_line) {
-        bill_line.update({
-          is_pay: true
-        })
-        .then(function() {
-
-          request(app)
-            .post("/api/propertyBillLines/updatePay")
-            .send({
-              id: bill_line.id
-            })
-            .expect(200)
-            .expect(function(res) {
-              var result = res.body
-              console.log(res.body)
-              expect(result.success).to.be.true
-            })
-            .end(done);
-        })
+      .then(function() {
+        done();
+      })
+      .catch(function(err) {
+        console.error(err)
+        done(err)
       })
     })
 
@@ -380,6 +369,26 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("根据月份查询账单2", function(done) {
+
+      var start_time = new Date('2016-04-01')
+      var end_time = new Date('2016-04-01')
+      request(app)
+        .post("/api/billHistory/queryByTime")
+        .send({
+          appId: 'shanghai',
+          start_time: start_time,
+          end_time: end_time
+        })
+        .expect(200)
+        .expect(function(res){
+          var result = res.body
+          console.log(res.body)
+          expect(result.success).to.be.true
+          expect(result.data.length).to.be.equal(1)
+        })
+        .end(done);
+    })
 
   });
 }

@@ -42,11 +42,11 @@ module.exports = function(app, db, options){
       var endDate = new Date(end_time);
       if (endDate != 'Invalid Date') {
         var year = endDate.getFullYear(),
-            month = endDate.getMonth()+2
+            month = endDate.getMonth()+1
         if (timeOption.length > 0) {
-          timeOption += " AND year >= "+year+" AND month >= "+month
+          timeOption += " AND year <= "+year+" AND month <= "+month
         }else {
-          timeOption = "year >= "+year+" AND month >= "+month
+          timeOption = "year <= "+year+" AND month <= "+month
         }
       }
     }
@@ -126,7 +126,7 @@ module.exports = function(app, db, options){
         countQuery += ' AND unit_desc LIKE ' + billOption
       }
       if (timeOption.length > 0) {
-        query += ' AND ' + timeOption
+        countQuery += ' AND ' + timeOption
       }
 
       countQuery += ') as count'
