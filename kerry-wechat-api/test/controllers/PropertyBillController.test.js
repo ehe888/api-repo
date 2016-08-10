@@ -136,7 +136,7 @@ module.exports = function(app, db, config){
 
     it("上传csv", function(done) {
       var requestData = [
-        { field1: '水费',
+        { field1: '水费'+(new Date()).getTime(),
           field2: 20160401,
           field3: 20160430,
           field4: 694.6,
@@ -162,6 +162,7 @@ module.exports = function(app, db, config){
           })
           .end(done);
     })
+
 
     it("上传csv, 不存在的单元号, 同步忽略", function(done) {
       var requestData = [
@@ -242,6 +243,26 @@ module.exports = function(app, db, config){
           field7: '0',
           field8: 10010549,
           field9: 'XXX',
+          field10: 103631 },
+        { field1: '水费',
+          field2: 20160501,
+          field3: 20160530,
+          field4: 694.6,
+          field5: 'A0001',
+          field6: 'A0001',
+          field7: '0',
+          field8: 10010549,
+          field9: 'XXX',
+          field10: 103631 },
+        { field1: '水费',
+          field2: 20160601,
+          field3: 20160630,
+          field4: 694.6,
+          field5: 'A0001',
+          field6: 'A0001',
+          field7: '0',
+          field8: 10010549,
+          field9: 'XXX',
           field10: 103631 }
         ];
 
@@ -292,6 +313,71 @@ module.exports = function(app, db, config){
             expect(result.data.length).to.be.equal(0)
           })
           .end(done);
+    })
+
+    it("查询已付款账单", function(done) {
+
+        request(app)
+          .post("/api/billHistory/queryByTime")
+          .send({
+            appId: 'shanghai'
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+    })
+
+    it("更新账单行为已付款", function(done) {
+
+      db.sequelize.model("PropertyBillLine").findOne({
+        where: {
+          property_bill_id: 1
+        }
+      })
+      .then(function(bill_line) {
+        bill_line.update({
+          is_pay: true
+        })
+        .then(function() {
+
+          request(app)
+            .post("/api/propertyBillLines/updatePay")
+            .send({
+              id: bill_line.id
+            })
+            .expect(200)
+            .expect(function(res) {
+              var result = res.body
+              console.log(res.body)
+              expect(result.success).to.be.true
+            })
+            .end(done);
+        })
+      })
+    })
+
+    it("根据月份查询账单1", function(done) {
+
+      var start_time = new Date('2016-05-01')
+
+      request(app)
+        .post("/api/billHistory/queryByTime")
+        .send({
+          appId: 'shanghai',
+          start_time: start_time
+        })
+        .expect(200)
+        .expect(function(res){
+          var result = res.body
+          console.log(res.body)
+          expect(result.success).to.be.true
+          expect(result.data.length).to.be.equal(2)
+        })
+        .end(done);
     })
 
 

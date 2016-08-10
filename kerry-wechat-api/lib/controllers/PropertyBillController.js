@@ -220,6 +220,7 @@ module.exports = function(app, db, options){
   })
 
   //查询账单
+  //************已经弃用, 改用视图查询*****************
   router.post('/queryPropertyBills', function(req, res, next) {
     var param = req.body,
         username = param.username || '',

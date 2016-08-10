@@ -111,7 +111,7 @@ module.exports = function(app, db, options){
           errMsg: '找不到该房屋'
         })
       }
-      else if (unit.user_unit_binding) {
+      else if (unit.user_unit_binding && unit.user_unit_binding.length > 0) {
 
         Template.findOne({
           where: {
