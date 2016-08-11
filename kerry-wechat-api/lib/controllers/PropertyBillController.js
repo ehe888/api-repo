@@ -7,6 +7,7 @@ module.exports = function(app, db, options){
      express = require('express'),
      util = require('util'),
      path = require('path'),
+     env = process.env.NODE_ENV;
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      PropertyBill =  sequelize.model("PropertyBill"),
@@ -497,178 +498,91 @@ module.exports = function(app, db, options){
         topcolor = param.topcolor
         app_id = param.appId;
 
+    var bearer = req.headers['authorization'];
+    var access_token = bearer.substring("Bearer".length).trim();
 
     var port = req.app.settings.port
     var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
     var config = req.x_app_config;
 
-    PropertyBill.findOne({
+    sequelize.model("Template").findOne({
       where: {
-        id: bill_id
-      },
-      include:[{
-        model: sequelize.model("Units"),
-        as: 'unit',
-        attributes: ['id', 'unit_number'],
-        include: [{
-          model: sequelize.model("UserUnitBinding"),
-          as: 'user_unit_binding',
-          attributes:['is_master', 'wechat_user_id'],
-          include: [{
-            model: sequelize.model("User"),
-            as: 'wechat_user',
-            attributes: ['wechatId']
-          }]
-        }, {
-          model: sequelize.model("KerryProperty"),
-          as: 'property',
-          attributes: ['city', 'street', 'name']
-        }]
-      },{
-        model: sequelize.model("PropertyBillLine"),
-        as: 'property_bill_lines'
-      }]
-
-    })
-    .then(function(bill) {
-      if (bill) {
-        var amount = 0;
-        var date = bill.year + "年" + bill.month + "月";
-        var billLines = bill.property_bill_lines;
-        for (var i = 0; i < billLines.length; i++) {
-          var billLine = billLines[i];
-          amount += parseFloat(billLine.gross_amount);
-        }
-        amount = amount.toFixed(2);
-        var url = config.wechatHost+"/wechat/my_bind";
-        var address = "";
-        if (bill.unit && bill.unit.property) {
-          var property = bill.unit.property;
-          address = property.city+property.street+bill.unit.unit_desc;
-          url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
-                + "&unit_id="+bill.unit.id
-        }
-        sequelize.model("Template").findOne({
-          where: {
-            template_type: 'bill',
-            app_id: app_id
-          }
-        })
-        .then(function(template) {
-          if (!template) {
-            return res.status(500).json({
-              success: false,
-              errMsg: '没有找到相应模板'
-            })
-          }
-
-          var templateData = JSON.parse(template.data);
-          var content = {
-            first: templateData.first,
-            keyword1: {
-              value: "每月的01-10号",
-              color: '#173177'
-            },
-            keyword2: {
-              value: date,
-              color: '#173177'
-            },
-            keyword3: {
-              value: address,
-              color: '#173177'
-            },
-            remark:{
-              value: '当期总计费用: '+amount+"元, 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！",
-              color: '#173177'
-            }
-          }
-
-          var contentStr = JSON.stringify(content)
-
-
-
-          var openids = [];
-          var logs = [];
-          if (bill.unit && bill.unit.user_unit_binding && bill.unit.user_unit_binding.length > 0) {
-            for (var i = 0; i < bill.unit.user_unit_binding.length; i++) {
-              var bind = bill.unit.user_unit_binding[i];
-              if (bind.wechat_user) {
-                // console.log(bind.wechat_user.wechatId)
-                openids.push(bind.wechat_user.wechatId)
-                logs.push({
-                  openid: bind.wechat_user.wechatId,
-                  template_id: template.id,
-                  content: contentStr,
-                  template_type: 'bill',
-                  unit_id: bill.unit.id
-                })
-              }
-            }
-          }
-          // console.log(logs)
-          if (openids.length > 0) {
-            sequelize.model("PushMessageLog").bulkCreate(logs)
-            .then(function(results) {
-              // console.log(results)
-              // return res.json({
-              //   success: true,
-              //   data: logs
-              // })
-              var bearer = req.headers['authorization'];
-              var access_token = bearer.substring("Bearer".length).trim();
-              SendTemplateMessage(openids, contentStr, template.template_id, url, topcolor, access_token, app_id, host,function() {
-                bill.update({
-                  is_push: true
-                })
-                .then(function() {
-                  return res.json({
-                    success: true
-                  })
-                })
-                .catch(function(err) {
-                  console.error(err)
-                  return res.status(500).json({
-                    success: false
-                    ,errMsg: err.message
-                    ,errors: err
-                  })
-                })
-              })
-            })
-            .catch(function(err) {
-              console.error(err)
-              return res.status(500).json({
-                success: false
-                ,errMsg: err.message
-                ,errors: err
-              })
-            })
-
-          }
-          else {
-            return res.json({
-              success: false,
-              errMsg: '现在没有微信用户与该户号绑定'
-            })
-          }
-
-
-        })
-        .catch(function(err) {
-          console.error(err)
-          return res.status(500).json({
-            success:false,
-            errMsg:err.message,
-            errors:err
-          })
-        })
+        app_id: app_id,
+        template_type: 'bill'
       }
-      else {
+    })
+    .then(function(template) {
+      if (!template) {
         return res.json({
           success: false,
-          errMsg: '找不到该账单'
+          errMsg: '找不到模板'
         })
       }
+      PropertyBill.findOne({
+        where: {
+          id: bill_id
+        },
+        include:[{
+          model: sequelize.model("Units"),
+          as: 'unit',
+          attributes: ['id', 'unit_number'],
+          include: [{
+            model: sequelize.model("UserUnitBinding"),
+            as: 'user_unit_binding',
+            attributes:['is_master', 'wechat_user_id'],
+            include: [{
+              model: sequelize.model("User"),
+              as: 'wechat_user',
+              attributes: ['wechatId']
+            }]
+          }, {
+            model: sequelize.model("KerryProperty"),
+            as: 'property',
+            attributes: ['city', 'street', 'name']
+          }]
+        },{
+          model: sequelize.model("PropertyBillLine"),
+          as: 'property_bill_lines'
+        }]
+
+      })
+      .then(function(bill) {
+        if (bill) {
+          debug(app_id)
+          sendBillTemplateMessage(bill, config, template, access_token, topcolor, app_id, host, function(err, logs) {
+            if (err) {
+              console.error(err)
+              return res.status(500).json({
+                success:false,
+                errMsg:err.message?err.message: err,
+                errors:err
+              })
+            }
+            else {
+              debug(logs)
+              return res.json({
+                success: true
+              })
+            }
+          })
+        }
+        else {
+          return res.json({
+            success: false,
+            errMsg: '找不到该账单'
+          })
+        }
+      })
+      .catch(function(err){
+        console.error(err)
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+
+
     })
     .catch(function(err){
       console.error(err)
@@ -678,9 +592,223 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
-
-
   })
+
+  //查询未付款的账单行, 群发模板消息
+  router.post("/pushMessageAll", function(req, res, next) {
+    var param = req.body,
+        bill_id = param.bill_id,
+        topcolor = param.topcolor
+        app_id = param.appId;
+
+    var bearer = req.headers['authorization'];
+    var access_token = bearer.substring("Bearer".length).trim();
+
+    var port = req.app.settings.port
+    var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
+    var config = req.x_app_config;
+
+    sequelize.model("Template").findOne({
+      where: {
+        app_id: app_id,
+        template_type: 'bill'
+      }
+    })
+    .then(function(template) {
+      if (!template) {
+        return res.json({
+          success: false,
+          errMsg: '找不到模板'
+        })
+      }
+      PropertyBill.findAll({
+        include:[{
+          model: sequelize.model("Units"),
+          as: 'unit',
+          attributes: ['id', 'unit_number'],
+          include: [{
+            model: sequelize.model("UserUnitBinding"),
+            as: 'user_unit_binding',
+            attributes:['is_master', 'wechat_user_id'],
+            include: [{
+              model: sequelize.model("User"),
+              as: 'wechat_user',
+              attributes: ['wechatId']
+            }]
+          }, {
+            model: sequelize.model("KerryProperty"),
+            as: 'property',
+            attributes: ['city', 'street', 'name']
+          }]
+        },{
+          model: sequelize.model("PropertyBillLine"),
+          as: 'property_bill_lines',
+          where: {
+            is_pay: false
+          }
+        }]
+
+      })
+      .then(function(bills) {
+        if (bills) {
+          debug(app_id)
+          sendBillTemplateMessageAsync(bills, 0, 0, 0, config, template,
+          access_token, topcolor, app_id, host, function(success, failure) {
+            return res.json({
+              success: true,
+              data: {
+                success: success,
+                failure: failure
+              }
+            })
+          })
+        }
+        else {
+          return res.json({
+            success: false,
+            errMsg: '找不到该账单'
+          })
+        }
+      })
+      .catch(function(err){
+        console.error(err)
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+    })
+    .catch(function(err){
+      console.error(err)
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+  })
+
+
+
+  function sendBillTemplateMessage(bill, config, template, access_token, topcolor, app_id, host, callback) {
+
+    var amount = 0;
+    var date = bill.year + "年" + bill.month + "月";
+    var billLines = bill.property_bill_lines;
+    for (var i = 0; i < billLines.length; i++) {
+      var billLine = billLines[i];
+      amount += parseFloat(billLine.gross_amount);
+    }
+    amount = amount.toFixed(2);
+    var url = config.wechatHost+"/wechat/my_bind";
+    var address = "";
+    if (bill.unit && bill.unit.property) {
+      var property = bill.unit.property;
+      address = property.city+property.street+bill.unit.unit_desc;
+      url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
+            + "&unit_id="+bill.unit.id
+    }
+
+
+    var templateData = JSON.parse(template.data);
+    var content = {
+      first: templateData.first,
+      keyword1: {
+        value: "每月的01-10号",
+        color: '#173177'
+      },
+      keyword2: {
+        value: date,
+        color: '#173177'
+      },
+      keyword3: {
+        value: address,
+        color: '#173177'
+      },
+      remark:{
+        value: '当期总计费用: '+amount+"元, 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！",
+        color: '#173177'
+      }
+    }
+
+    var contentStr = JSON.stringify(content)
+
+    var openids = [];
+    var logs = [];
+    if (bill.unit && bill.unit.user_unit_binding && bill.unit.user_unit_binding.length > 0) {
+      for (var i = 0; i < bill.unit.user_unit_binding.length; i++) {
+        var bind = bill.unit.user_unit_binding[i];
+        if (bind.wechat_user) {
+          // console.log(bind.wechat_user.wechatId)
+          openids.push(bind.wechat_user.wechatId)
+          logs.push({
+            openid: bind.wechat_user.wechatId,
+            template_id: template.id,
+            content: contentStr,
+            template_type: 'bill',
+            unit_id: bill.unit.id
+          })
+        }
+
+      }
+      // console.log(logs)
+      if (openids.length > 0) {
+        sequelize.model("PushMessageLog").bulkCreate(logs)
+        .then(function(results) {
+
+          if (env == 'development') {
+            return callback(null, logs)
+          }
+          else {
+            SendTemplateMessage(openids, contentStr, template.template_id, url, topcolor, access_token, app_id, host,function() {
+                bill.update({
+                  is_push: true
+                })
+                .then(function() {
+                  return callback()
+                })
+                .catch(function(err) {
+                  console.error(err)
+                  return callback(err)
+                })
+            })
+          }
+
+        })
+        .catch(function(err) {
+          console.error(err)
+          return callback(err)
+        })
+
+      }
+      else {
+        return callback(new Error('现在没有微信用户与该户号绑定'));
+      }
+    }else {
+      return callback(new Error('现在没有微信用户与该户号绑定'));
+    }
+  }
+
+  function sendBillTemplateMessageAsync(bills, index, success, failure, config, template, access_token, topcolor, app_id, host, callback) {
+
+    if (index >= bills.length) {
+      return callback(success, failure)
+    }
+
+    var bill = bills[index];
+    sendBillTemplateMessage(bill, config, template, access_token, topcolor, app_id, host, function(err, logs) {
+      if (err) {
+        console.error(err)
+        failure++;
+        return sendBillTemplateMessageAsync(bills, ++index, success, failure, config, template, access_token, topcolor, app_id, host, callback)
+      }
+      else {
+        success++;
+        return sendBillTemplateMessageAsync(bills, ++index, success, failure, config, template, access_token, topcolor, app_id, host, callback)
+      }
+    })
+  }
 
 
   //上传CSV账单
@@ -874,8 +1002,6 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
-
-
 
   })
 
