@@ -1071,7 +1071,15 @@ module.exports = function(app, db, options){
       }
 
       return sequelize.transaction(function(t1) {
-        return PropertyBill.bulkCreate(billTemps, {transaction: t1})
+        return PropertyBill
+                .bulkCreate(billTemps, {transaction: t1})
+                .then(function() {
+                  return PropertyBillLine.destroy({
+                    where: {
+                      is_pay: false
+                    }
+                  }, {transaction: t1})
+                })
       })
       .then(function(results) {
 
