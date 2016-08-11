@@ -11,6 +11,8 @@ module.exports = function(app, db, options){
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      PropertyBill =  sequelize.model("PropertyBill"),
      PropertyBillLine = sequelize.model("PropertyBillLine"),
+     PropertyBillInsertTemp = sequelize.model("PropertyBillInsertTemp"),
+     PropertyBillLineInsertTemp = sequelize.model("PropertyBillLineInsertTemp"),
      Units = sequelize.model("Units"),
      models = options.db;
 
@@ -740,7 +742,8 @@ module.exports = function(app, db, options){
           unit_number: unit_number,
           is_pay: false,
           username: username,
-          property_id: property.id
+          property_id: property.id,
+          index: i+2
         })
       }
 
@@ -768,18 +771,29 @@ module.exports = function(app, db, options){
               billIds.push(bills[i].id)
             }
 
-            PropertyBillLine.destroy({
-              where: {
-                is_pay: false,
-                property_bill_id:{
-                  $in: billIds
-                }
-              }
+            PropertyBillInsertTemp.destroy({
+              truncate: true
+            })
+            .then(function() {
+              return PropertyBillLineInsertTemp.destroy({
+                truncate: true
+              })
             })
             .then(function() {
 
               //通过CSV中的建筑编号+户号, 查询系统里对应的户号id;
-              searchUnitIdByUnitNumbers(bill_lines, 0, function(bill_lines) {
+              searchUnitIdByUnitNumbers(bill_lines, 0, [], function(fails, bill_lines) {
+
+                if (fails.length > 0) {
+                  return res.status(500).json({
+                    success: false,
+                    data: {
+                      success: bill_lines.length - fails.length,
+                      failure: fails.length
+                    },
+                    errMsg: '更新账单出错'
+                  })
+                }
 
                 var billLines = [];
                 var unitKeys = Object.keys(bill_lines)
@@ -788,16 +802,47 @@ module.exports = function(app, db, options){
                   billLines = _.concat(lines, billLines);
                 }
                 debug(billLines)
-                //查询系统是否有相应的账单和账单行, 根据description, 户号, 日期查询, 如果有的话update, 没有的话create
-                searchAndUpdateBillLines(billLines, 0, 0, 0, 0, function(success, failure, amount) {
-                  return res.json({
-                    success: true,
-                    data:{
-                      success: success,
-                      failure: failure,
-                      amount: amount
-                    }
-                  })
+                //查询系统是否有相应的账单和账单行, 插入账单, 账单行临时表内
+                searchAndInsertBillLinesTemp(billLines, 0, 0, 0, 0, function(success, failure, amount) {
+                  debug(billLines)
+                  //插入临时表失败, 返回错误
+                  if (failure > 0 && success <= 0) {
+                    return res.status(500).json({
+                      success: false,
+                      data:{
+                        success: success,
+                        failure: failure,
+                        amount: amount
+                      },
+                      errMsg: '更新账单出错'
+                    })
+                  }
+                  else {
+                    //插入临时表成功, 准备插入目标表
+                    insertToPropertyBill(function(err, results) {
+                      if (err) {
+                        debug(err)
+                        return res.status(500).json({
+                          success: false,
+                          data:{
+                            success: success,
+                            failure: failure,
+                            amount: amount
+                          },
+                          errMsg: '更新账单出错'
+                        })
+                      }
+                      debug(results)
+                      return res.json({
+                        success: true,
+                        data:{
+                          success: success,
+                          failure: failure,
+                          amount: amount
+                        }
+                      })
+                    })
+                  }
                 })
               })
 
@@ -835,18 +880,19 @@ module.exports = function(app, db, options){
   })
 
   //查询billLines中的户号, 找出unit_id, 添加到billLines中对应该unit_number的对象中
-  function searchUnitIdByUnitNumbers(billLines, index, callback) {
+  //2016.8.18更新, 如果Unit没有, 直接返回错误
+  function searchUnitIdByUnitNumbers(billLines, index, fails, callback) {
 
     var unitNumbers = Object.keys(billLines);
 
     if (index >= unitNumbers.length) {
-      return callback(billLines);
+      return callback(fails, billLines);
     }
 
     var unit_number = unitNumbers[index];
     var lines = billLines[unit_number];
     if (lines.length == 0) {
-      return searchUnitIdByUnitNumbers(billLines, ++index, callback)
+      return searchUnitIdByUnitNumbers(billLines, ++index, fails, callback)
     }
     var property_id = lines[0].property_id;
     Units.findOne({
@@ -858,7 +904,8 @@ module.exports = function(app, db, options){
     .then(function(unit) {
       if (!unit) {
         console.error("unit did not find: "+unit_number);
-        return searchUnitIdByUnitNumbers(billLines, ++index, callback)
+        fails.push(unit_number)
+        return searchUnitIdByUnitNumbers(billLines, ++index, fails, callback)
       }
       var unit_id = unit.id;
       var lines = billLines[unit_number];
@@ -866,15 +913,226 @@ module.exports = function(app, db, options){
         var line = lines[i];
         line.unit_id = unit_id
       }
-      return searchUnitIdByUnitNumbers(billLines, ++index, callback)
+      return searchUnitIdByUnitNumbers(billLines, ++index, fails, callback)
     })
     .catch(function(error) {
       console.error("unit find error: " + unit_number)
       console.error(error);
-      return searchUnitIdByUnitNumbers(billLines, ++index, callback)
+      fails.push(unit_number)
+      return searchUnitIdByUnitNumbers(billLines, ++index, fails, callback)
     })
 
   }
+
+
+  //先根据Unit_id, year, month查询是否有bill,
+  //如果有的话,
+  //  插入账单行
+  //如果没有, 新建账单记录, 再create账单行
+  //2016.8.18更新, 先把数据插入到临时表内
+  function searchAndInsertBillLinesTemp(billLines, index, success, failure, amount, callback) {
+    if (index >= billLines.length) {
+      return callback(success, failure, amount);
+    }
+
+    var billLine = billLines[index],
+        unit_id = billLine.unit_id,
+        year = billLine.start_date.getFullYear(),
+        month = billLine.start_date.getMonth()+1,
+        gross_amount = parseFloat(billLine.gross_amount),
+        username = billLine.username,
+        description = billLine.description;
+    debug(billLine)
+    PropertyBill.findOne({
+      where: {
+        year: year,
+        month: month,
+        unit_id: unit_id
+      }
+    })
+    .then(function(bill) {
+
+      if (bill) {
+        var billId = bill.id;
+        PropertyBillLineInsertTemp.create({
+          gross_amount: gross_amount,
+          description: description,
+          is_pay: false,
+          property_bill_id: billId,
+          bill_number: bill.bill_number
+        })
+        .then(function(line) {
+          success++;
+          amount+= parseFloat(gross_amount)
+          return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+        })
+        .catch(function(error) {
+          console.log("create billLine error: " + error);
+          console.error({
+            gross_amount: gross_amount,
+            description: description,
+            property_bill_id: billId
+          })
+          failure++;
+          return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+        })
+
+      }
+      else {
+        PropertyBillInsertTemp.create({
+          bill_number: ' ',
+          year: year,
+          month: month,
+          unit_id: unit_id,
+          username: username
+        })
+        .then(function(bill) {
+          var billId = bill.id;
+          PropertyBillLineInsertTemp.create({
+            gross_amount: gross_amount,
+            description: description,
+            is_pay: false,
+            property_bill_id: billId,
+            bill_number: bill.bill_number
+          })
+          .then(function(line) {
+            success++;
+            amount+=parseFloat(gross_amount)
+            return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+          })
+          .catch(function(error) {
+            console.log("create billLine error: " + error);
+            console.error({
+              gross_amount: gross_amount,
+              description: description,
+              property_bill_id: billId
+            })
+            failure++;
+            return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+          })
+        })
+        .catch(function(error) {
+          console.error("create bill error: " + error)
+          console.error({
+            year: year,
+            month: month,
+            unit_id: unit_id
+          })
+          failure++;
+          return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+        })
+
+      }
+
+    })
+    .catch(function(error) {
+      console.error("find bill error: " + error)
+      console.error({
+        year: year,
+        month: month,
+        unit_id: unit_id
+      })
+      failure++;
+      return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+    })
+  }
+
+  //把临时表内的数据插入到目标楼
+  function insertToPropertyBill(callback) {
+    var billLineTemps = []
+    var billTemps = [];
+    PropertyBillLineInsertTemp.findAll()
+    .then(function(_billLineTemps) {
+      for (var i = 0; i < _billLineTemps.length; i++) {
+        var temp = _billLineTemps[i];
+        billLineTemps.push({
+          bill_number: temp.bill_number,
+          description: temp.description,
+          gross_amount: temp.gross_amount,
+          is_pay: temp.is_pay,
+          expire_date: temp.expire_date
+        })
+      }
+      return PropertyBillInsertTemp.findAll()
+    })
+    .then(function(_billTemps) {
+
+      for (var i = 0; i < _billTemps.length; i++) {
+        var temp = _billTemps[i];
+        billTemps.push({
+          bill_number: temp.bill_number,
+          year: temp.year,
+          month: temp.month,
+          print_data: temp.print_data,
+          is_push: temp.is_push,
+          username: temp.username,
+          unit_id: temp.unit_id
+        })
+      }
+
+      return sequelize.transaction(function(t1) {
+        return PropertyBill.bulkCreate(billTemps, {transaction: t1})
+      })
+      .then(function(results) {
+
+        var insertQuery = "INSERT INTO property_bill_lines(description, gross_amount, is_pay, bill_number, property_bill_id, created_at, updated_at) VALUES";
+        var replacement = [];
+        for (var i = 0; i < billLineTemps.length; i++) {
+          var temp = billLineTemps[i];
+          if (i == 0) {
+            insertQuery += "(?, ?, false, ?, (select id from property_bills where bill_number = ?), now(), now())"
+          }else {
+            insertQuery += ",(?, ?, false, ?, (select id from property_bills where bill_number = ?), now(), now())"
+          }
+          replacement = _.concat(replacement, [temp.description, temp.gross_amount, temp.bill_number, temp.bill_number]);
+        }
+
+        return sequelize.query(insertQuery, {replacements: replacement})
+      })
+      .then(function(results) {
+        return callback(null, results)
+      })
+      .catch(function(err) {
+
+        //插入到目标表出现错误, 逻辑补偿, 将之前插入的数据全部清除
+        var bill_numbers = [];
+        for (var i = 0; i < billTemps.length; i++) {
+          var temp = billTemps[i];
+          if (temp.bill_number && temp.bill_number.length > 0) {
+            bill_numbers.push(temp.bill_number)
+          }
+        }
+
+        PropertyBillLine.destroy({
+          where: {
+            bill_number: {
+              $in: bill_numbers
+            }
+          }
+        })
+        .then(function() {
+          return PropertyBill.destroy({
+            where: {
+              bill_number: {
+                $in: bill_numbers
+              }
+            }
+          })
+        })
+        .then(function() {
+          return callback(err)
+        })
+        .catch(function(error) {
+          console.error("roll back error")
+          return callback(error)
+        })
+
+
+      })
+    })
+  }
+
+
 
   //先根据Unit_id, year, month查询是否有bill,
   //如果有的话,
@@ -882,6 +1140,7 @@ module.exports = function(app, db, options){
   //    如果有, 那么update
   //    如果没有, create
   //如果没有, 新建账单记录, 再create账单行
+  //8.11更新, 弃用, 先把数据放入临时表, 再插入到目标表内
   function searchAndUpdateBillLines(billLines, index, success, failure, amount, callback) {
     if (index >= billLines.length) {
       return callback(success, failure, amount);
@@ -1029,9 +1288,9 @@ module.exports = function(app, db, options){
       failure++;
       return searchAndUpdateBillLines(billLines, ++index, success, failure, amount, callback)
     })
-
-
   }
+
+
 
   app.use("/propertyBills", router);
 }

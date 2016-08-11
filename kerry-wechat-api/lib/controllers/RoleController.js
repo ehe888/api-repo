@@ -193,7 +193,8 @@ router.post("/queryRoles", function(req, res, next) {
    include:[{
      model: sequelize.model("SysRolePermission"),
      as: 'permissions'
-   }]
+   }],
+   order: 'id desc'
  })
  .then(function(sysRoles){
    return res.json({

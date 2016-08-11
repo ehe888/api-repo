@@ -13,7 +13,13 @@ module.exports = function(app, db, config){
   describe("API平台系统账单管理", function(){
 
     before(function(done) {
-      db.sequelize.query('DELETE FROM property_bill_lines')
+      db.sequelize.model("PropertyBillInsertTemp").sync({force: true})
+      .then(function() {
+        return db.sequelize.model("PropertyBillLineInsertTemp").sync({force: true})
+      })
+      .then(function() {
+        return db.sequelize.query('DELETE FROM property_bill_lines')
+      })
       .then(function() {
         return db.sequelize.query('DELETE FROM property_bills')
       })
@@ -136,7 +142,7 @@ module.exports = function(app, db, config){
 
     it("上传csv", function(done) {
       var requestData = [
-        { field1: '水费'+(new Date()).getTime(),
+        { field1: '水费',
           field2: 20160401,
           field3: 20160430,
           field4: 694.6,
@@ -162,8 +168,8 @@ module.exports = function(app, db, config){
           })
           .end(done);
     })
-
-
+    //
+    //
     it("上传csv, 不存在的单元号, 同步忽略", function(done) {
       var requestData = [
         { field1: '水费',
@@ -184,11 +190,11 @@ module.exports = function(app, db, config){
             data: requestData,
             appId: 'shanghai'
           })
-          .expect(200)
+          .expect(500)
           .expect(function(res){
             var result = res.body
             console.log(res.body)
-            expect(result.success).to.be.true
+            expect(result.success).to.be.false
           })
           .end(done);
     })
