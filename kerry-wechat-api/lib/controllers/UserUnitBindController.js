@@ -23,6 +23,7 @@ module.exports = function(app, db, options){
         username = param.username,
         mobile = param.mobile,
         appId = param.appId,
+        user_type = param.user_type,
         wechat_user_id = param.wechat_user_id;
 
     KerryProperty.findOne({
@@ -82,7 +83,8 @@ module.exports = function(app, db, options){
                               unit_id:unit.id,
                               master_username:kerryUser.name,
                               expire_date:kerryUser.expire_date,
-                              is_master:is_master
+                              is_master:is_master,
+                              user_type: user_type
                             })
                             .then(function(UserUnitBinding){
                               return res.json({

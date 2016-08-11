@@ -49,7 +49,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/UnitController.test")(app, db, config);
 require("./controllers/SysUserController.test")(app, db, config);
 
-// require("./controllers/UserUnitBindController.test")(app, db, config);
+require("./controllers/UserUnitBindController.test")(app, db, config);
 // require("./controllers/SysPermissionController.test")(app, db, config);
 // require("./controllers/DeliveryController.test")(app, db, config);
 // require("./controllers/WechatUserController.test")(app, db, config);
