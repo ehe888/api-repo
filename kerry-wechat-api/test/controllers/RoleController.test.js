@@ -12,6 +12,8 @@ module.exports = function(app, db, config){
 
   describe("API平台系统角色管理", function(){
 
+
+
     // it("POST提交角色名", function(done){
     //   request(app)
     //     .post("/api/roles/create")
@@ -93,18 +95,35 @@ module.exports = function(app, db, config){
     //     .end(done);
     // })
     //
-    it("PGET删除角色权限", function(done){
+  //   it("PGET删除角色权限", function(done){
+  //     request(app)
+  //       .post("/api/roles/deleteRoles")
+  //       .send({
+  //         role_id: 1,
+  //         name: "创建角色"
+  //       })
+  //       .expect(200)
+  //       .expect(function(res){
+  //         expect(res.body.success).to.be.true;
+  //       })
+  //       .end(done);
+  //   })
+  //
+
+    it("根据角色查询用户", function(done) {
       request(app)
-        .post("/api/roles/deleteRoles")
+        .post("/api/roles/querySysUsers")
         .send({
-          role_id: 1,
-          name: "创建角色"
+          role_id: 1
         })
         .expect(200)
         .expect(function(res){
+          console.log(res.body.data)
           expect(res.body.success).to.be.true;
         })
         .end(done);
     })
+
   });
+
 }

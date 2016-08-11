@@ -42,7 +42,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./Sequelize.test")(db, config.sequelize )
 // require("./controllers/SysController.test")(app, db, config);
 
-// require("./controllers/RoleController.test")(app, db, config);
+require("./controllers/RoleController.test")(app, db, config);
 // require("./controllers/KerryPropertyController.test")(app, db, config);
 // require("./controllers/UserManagerController.test")(app, db, config);
 // require("./controllers/UnitController.test")(app, db, config);
@@ -53,7 +53,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/DeliveryController.test")(app, db, config);
 // require("./controllers/WechatUserController.test")(app, db, config);
 // require("./controllers/WechatAssetController.test")(app, db, config)
-require("./controllers/PropertyBillController.test")(app, db, config);
+// require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)

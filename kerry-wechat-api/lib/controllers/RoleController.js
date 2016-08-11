@@ -250,6 +250,40 @@ router.get("/delete", function(req, res, next) {
  })
 })
 
+//根据角色查询系统用户
+router.post("/querySysUsers", function(req, res, next) {
+  var param = req.body,
+      role_id = param.role_id,
+      offset = param.offset || 0,
+      limit = param.limit || 20
+  sequelize.model("SysRoleUser").findAndCountAll({
+    where: {
+      role_id: role_id
+    },
+    include: [{
+      attributes: ['username', 'email', 'mobile', 'firstName', 'lastName', 'userType'],
+      model: sequelize.model("SysUser"),
+      as: 'sysuser',
+      include: [{
+        model: sequelize.model("KerryProperty"),
+        as: 'WorkingProperty',
+        attributes: ['name']
+      }]
+    }],
+    offset: offset,
+    limit: limit
+  })
+  .then(function(results) {
+    return res.json({
+      success: true,
+      data: results.rows,
+      count: results.count,
+      offset: offset,
+      limit: limit
+    })
+  })
+})
+
 
 app.use("/roles", router);
 }
