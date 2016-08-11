@@ -597,6 +597,36 @@ module.exports = function(app, db, options){
     })
   })
 
+  //启用, 关闭用户
+  router.post("/active", function(req, res, next) {
+    var param = req.body,
+        sys_user_id = param.sys_user_id,
+        active = param.active;
+
+    SysUser.update({
+      active: active
+    }, {
+      where: {
+        id: sys_user_id
+      }
+    })
+    .then(function(sysUser) {
+      return res.json({
+        success: true,
+        data: sysUser
+      })
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+  })
+
   //查询该物业下所有系统用户
   router.post("/querySysUsersByProperty", function(req, res, next) {
     var param = req.body;

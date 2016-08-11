@@ -47,7 +47,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/KerryPropertyController.test")(app, db, config);
 // require("./controllers/UserManagerController.test")(app, db, config);
 // require("./controllers/UnitController.test")(app, db, config);
-// require("./controllers/SysUserController.test")(app, db, config);
+require("./controllers/SysUserController.test")(app, db, config);
 
 // require("./controllers/UserUnitBindController.test")(app, db, config);
 // require("./controllers/SysPermissionController.test")(app, db, config);
@@ -57,7 +57,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
-require("./controllers/PushBill.test")(app, db, config)
+// require("./controllers/PushBill.test")(app, db, config)
 // require("./controllers/Debug.test")(app, db, config);
 //require("./controllers/BillboardController.test")(app, db, config);
 // require("./controllers/PushMessageController.test")(app, db, config)

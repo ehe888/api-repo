@@ -48,6 +48,13 @@ module.exports = function(app, db, options){
                                     });
       }
 
+      if (!user.active) {
+        return res.status(403).json({
+          success: false,
+          errMsg: '该用户已关闭'
+        })
+      }
+
       SysRoleUser.getUserRoles(user.username)
         .then(function(roleUsers){
           var roles = [];
