@@ -497,9 +497,15 @@ module.exports = function(app, db, options){
     var param = req.body;
     var username = param.username || "",
         userType = param.userType,
+        property = param.property || "",
         offset = param.offset || 0,
         limit = param.limit || 20;
 
+    var propertyOption = {}
+    if (property && property.length > 0) {
+      propertyOption.name = property
+    }
+    debug("query")
     SysUser.findAll({
       where: {
         username: {
@@ -516,20 +522,28 @@ module.exports = function(app, db, options){
         }]
       }, {
         model: sequelize.model("KerryProperty"),
-        as: 'WorkingProperty'
+        as: 'WorkingProperty',
+        where: propertyOption
       }],
       offset: offset,
       limit: limit,
       order: 'id desc'
     })
     .then(function(results) {
+      debug("count")
       SysUser.count({
         where: {
           username: {
             $like: "%"+username+"%"
           },
           userType: userType
-        }
+        },
+        include: [{
+          model: sequelize.model("KerryProperty"),
+          as: 'WorkingProperty',
+          where: propertyOption
+        }]
+
       })
       .then(function(count) {
 
