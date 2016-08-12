@@ -491,7 +491,7 @@ module.exports = function(app, db, options){
 
   })
 
-  //根据bill_id 发送Bill 模板消息
+  //根据bill_id 发送Bill未付款模板消息
   router.post("/pushMessage", function(req, res, next) {
     var param = req.body,
         bill_id = param.bill_id,
@@ -542,7 +542,10 @@ module.exports = function(app, db, options){
           }]
         },{
           model: sequelize.model("PropertyBillLine"),
-          as: 'property_bill_lines'
+          as: 'property_bill_lines',
+          where: {
+            is_pay: false
+          }
         }]
 
       })
@@ -715,7 +718,7 @@ module.exports = function(app, db, options){
     var content = {
       first: templateData.first,
       keyword1: {
-        value: "每月的01-10号",
+        value: "每月的01-30号",
         color: '#173177'
       },
       keyword2: {
@@ -727,7 +730,7 @@ module.exports = function(app, db, options){
         color: '#173177'
       },
       remark:{
-        value: '当期总计费用: '+amount+"元, 请您在百忙中尽快安排时间到管理处缴纳。 谢谢您的配合！",
+        value: '当期总计费用: '+amount+"元, 请您在百忙中尽快安排时间在线缴费或到管理处缴费。 谢谢您的配合！",
         color: '#173177'
       }
     }

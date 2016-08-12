@@ -145,5 +145,93 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/queryTemplatesByProperty", function(req, res, next) {
+    var appId = req.body.appId;
+    Template.findAll({
+      where: {
+        app_id: appId
+      }
+    })
+    .then(function(templates) {
+      return res.json({
+        success: true,
+        data: templates
+      })
+    })
+  })
+
+  //更新模板Id, 查询是否有模板Id
+  router.post("/updateTemplatesByProperty", function(req, res, next) {
+    var param = req.body,
+        appId = param.appId,
+        deliveryId = param.deliveryId,
+        billId = param.billId;
+
+    if (!deliveryId || !billId) {
+      return res.status(400).json({
+        success: false,
+        errMsg: '请输入完整信息'
+      })
+    }
+
+    Template.findOne({
+      where: {
+        template_type: 'delivery',
+        app_id: appId
+      }
+    })
+    .then(function(template) {
+      if (!template) {
+        return Template.create({
+          template_id: deliveryId,
+          template_type: 'delivery',
+          data: '{"first":"欢迎123","remark":"如有疑问，请联系物业服务中心，联系电话：023"}',
+          app_id: appId
+        })
+      }else {
+        return template.update({
+          template_id: deliveryId
+        })
+      }
+    })
+    .then(function() {
+      return Template.findOne({
+        where: {
+          template_type: 'bill',
+          app_id: appId
+        }
+      })
+    })
+    .then(function(template) {
+      if (!template) {
+        return Template.create({
+          template_id: billId,
+          template_type: 'bill',
+          data: '{"first":"尊敬的业主", "keyword1":"每月的01-30号","keyword2":"","keyword3":"","remark":""}',
+          app_id: appId
+        })
+      }else {
+        return template.update({
+          template_id: billId
+        })
+      }
+    })
+    .then(function() {
+      return res.json({
+        success: true
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+
+  })
+
   app.use("/pushMessage", router);
 }

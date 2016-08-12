@@ -99,6 +99,68 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("获取所有模板", function(done) {
+      request(app)
+        .post("/api/pushMessage/queryTemplatesByProperty")
+        .send({
+          appId: 'wxa0c45fc6d9e269ed'
+        })
+        .expect(200)
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.true
+          expect(res.body.data).to.be.exist;
+        })
+        .end(done);
+    })
+
+    it("新建模板成功", function(done) {
+      request(app)
+        .post("/api/pushMessage/updateTemplatesByProperty")
+        .send({
+          appId: 'shanghai',
+          deliveryId: '123456',
+          billId: '54321'
+        })
+        .expect(200)
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.true
+        })
+        .end(done);
+    })
+
+    it("新建模板失败", function(done) {
+      request(app)
+        .post("/api/pushMessage/updateTemplatesByProperty")
+        .send({
+          appId: 'shanghai',
+          deliveryId: '123456'
+        })
+        .expect(400)
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.false
+        })
+        .end(done);
+    })
+
+    it("更新模板成功", function(done) {
+      request(app)
+        .post("/api/pushMessage/updateTemplatesByProperty")
+        .send({
+          appId: 'shanghai',
+          deliveryId: '123456',
+          billId: '54321000000'
+        })
+        .expect(200)
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.true
+        })
+        .end(done);
+    })
+
 
   })
 }
