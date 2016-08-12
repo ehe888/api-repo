@@ -149,7 +149,7 @@ module.exports = function(app, db, options){
 
   router.post('/query', function(req, res, next) {
     var content = req.body.content || '';
-    var offset = req.body.offse || 0;
+    var offset = req.body.offset || 0;
     var limit = req.body.limit || 20;
     var appId = req.body.appId;
     KerrySuggestion
