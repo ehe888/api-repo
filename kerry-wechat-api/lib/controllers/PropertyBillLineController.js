@@ -88,7 +88,8 @@ module.exports = function(app, db, options){
 
   router.post("/updatePay", function(req, res, next) {
     var param = req.body,
-        id = param.id;
+        id = param.id,
+        remark = param.remark || "";
 
     PropertyBillLine.findOne({
       where: {
@@ -104,7 +105,8 @@ module.exports = function(app, db, options){
       }
 
       line.update({
-        is_pay: true
+        is_pay: true,
+        remark: remark
       })
       .then(function(line) {
         return res.json({
