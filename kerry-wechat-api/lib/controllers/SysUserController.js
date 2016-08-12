@@ -692,7 +692,7 @@ module.exports = function(app, db, options){
     .then(function(sysUser) {
       if (!sysUser) {
         return res.json({
-          success: fasle,
+          success: false,
           errMsg: '找不到账号'
         })
       }
