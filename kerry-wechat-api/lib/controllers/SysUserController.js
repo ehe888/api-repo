@@ -523,7 +523,8 @@ module.exports = function(app, db, options){
       }, {
         model: sequelize.model("KerryProperty"),
         as: 'WorkingProperty',
-        where: propertyOption
+        where: propertyOption,
+        required: false
       }],
       offset: offset,
       limit: limit,
@@ -541,7 +542,8 @@ module.exports = function(app, db, options){
         include: [{
           model: sequelize.model("KerryProperty"),
           as: 'WorkingProperty',
-          where: propertyOption
+          where: propertyOption,
+          required: false
         }]
 
       })
