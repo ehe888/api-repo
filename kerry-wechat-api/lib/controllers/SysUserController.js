@@ -112,7 +112,7 @@ module.exports = function(app, db, options){
     })
     .then(function(sysUser){
       id = sysUser.id;
-      if(param.sys_role_user){
+      if(param.sys_role_user && param.sys_role_user.length > 0){
         param.sys_role_user.forEach(function(data){
           data.username = sysUser.username;
           data.sys_user_id = sysUser.id;
