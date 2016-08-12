@@ -708,7 +708,10 @@ module.exports = function(app, db, options){
     var address = "";
     if (bill.unit && bill.unit.property) {
       var property = bill.unit.property;
-      address = property.city+property.street+bill.unit.unit_desc;
+      var city = property.city?property.city: "",
+          street = property.street?property.street:"",
+          desc = bill.unit.unit_desc?bill.unit.unit_desc:""
+      address = city + street + desc;
       url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
             + "&unit_id="+bill.unit.id
     }
@@ -937,7 +940,7 @@ module.exports = function(app, db, options){
                 searchAndInsertBillLinesTemp(billLines, 0, 0, 0, 0, function(success, failure, amount) {
                   debug(billLines)
                   //插入临时表失败, 返回错误
-                  if (failure > 0 && success <= 0) {
+                  if (failure > 0 || success <= 0) {
                     return res.status(500).json({
                       success: false,
                       data:{
