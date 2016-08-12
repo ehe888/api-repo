@@ -318,7 +318,7 @@ module.exports = function(app, db, options){
       billOption += "'%"+unit_desc+"%'"
     }
 
-    var query = 'SELECT * FROM vw_property_bill WHERE app_id = ?';
+    var query = 'SELECT vw_property_bill.* FROM vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ? ';
     if (unitOption.length > 2) {
       query += ' AND unit_id in '+unitOption
     }
@@ -326,7 +326,7 @@ module.exports = function(app, db, options){
       query += ' AND unit_desc LIKE ' + billOption
     }
 
-    query += ' ORDER BY id DESC offset ? limit ?'
+    query += ' ORDER BY id DESC offset ? limit ? ) x ON vw_property_bill.id = x.id;'
 
     sequelize.query(query, { replacements: [appId, offset, limit], type: sequelize.QueryTypes.SELECT})
     .then(function(results) {
@@ -386,14 +386,14 @@ module.exports = function(app, db, options){
         }
       }
 
-      var countQuery = 'SELECT count(1) FROM (SELECT DISTINCT id FROM vw_property_bill WHERE app_id = ? ';
+      var countQuery = 'SELECT count(1) FROM  vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ?';
       if (unitOption.length > 2) {
         countQuery += ' AND unit_id in '+unitOption
       }
       if (billOption.length > 2) {
         countQuery += ' AND unit_desc LIKE ' + billOption
       }
-      countQuery += ') as count'
+      countQuery += 'ORDER BY id DESC) x ON vw_property_bill.id = x.id;'
       sequelize.query(countQuery, { replacements: [appId], type: sequelize.QueryTypes.SELECT})
       .then(function(count) {
 
@@ -733,7 +733,7 @@ module.exports = function(app, db, options){
         color: '#173177'
       },
       remark:{
-        value: '当期总计费用: '+amount+"元, 请您在百忙中尽快安排时间在线缴费或到管理处缴费。 谢谢您的配合！",
+        value: '当期费用: '+amount+"元, 请您在百忙中尽快安排时间在线缴费或到管理处缴费。 谢谢您的配合！",
         color: '#173177'
       }
     }
