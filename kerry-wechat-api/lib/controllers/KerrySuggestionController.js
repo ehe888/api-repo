@@ -152,6 +152,9 @@ module.exports = function(app, db, options){
     var offset = req.body.offset || 0;
     var limit = req.body.limit || 20;
     var appId = req.body.appId;
+
+    debug(req.body)
+    debug(offset)
     KerrySuggestion
     .findAndCountAll({
       where: {
