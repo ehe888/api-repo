@@ -119,6 +119,12 @@ module.exports = function(app, db, options){
 
         })
       }
+      else {
+        return res.json({
+          success: true,
+          data: sysUser
+        })
+      }
 
       SysRoleUser.bulkCreate(param.sys_role_user)
       .then(function(){
