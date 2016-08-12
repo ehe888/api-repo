@@ -679,6 +679,53 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/changePassword", function(req, res, next) {
+    var param = req.body,
+        password = param.password,
+        sys_user_id = param.sys_user_id;
+
+    SysUser.findOne({
+      where: {
+        id: sys_user_id
+      }
+    })
+    .then(function(sysUser) {
+      if (!sysUser) {
+        return res.json({
+          success: fasle,
+          errMsg: '找不到账号'
+        })
+      }
+
+      sysUser.update({
+        password: password
+      })
+      .then(function(sysUser) {
+        return res.json({
+          success: true,
+          data: sysUser
+        })
+      })
+      .catch(function(err){
+        console.log(err);
+        return res.status(500).json({
+          success:false,
+          errMsg:err.message,
+          errors:err
+        })
+      })
+    })
+    .catch(function(err){
+      console.log(err);
+      return res.status(500).json({
+        success:false,
+        errMsg:err.message,
+        errors:err
+      })
+    })
+
+
+  })
 
   app.use("/sysusers", router);
 }

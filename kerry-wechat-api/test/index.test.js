@@ -54,7 +54,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/DeliveryController.test")(app, db, config);
 // require("./controllers/WechatUserController.test")(app, db, config);
 // require("./controllers/WechatAssetController.test")(app, db, config)
-require("./controllers/PropertyBillController.test")(app, db, config);
+// require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)
@@ -66,4 +66,4 @@ require("./controllers/PropertyBillController.test")(app, db, config);
  // require("./controllers/UpdateBillLine.test")(app, db, config)
  // require("./controllers/WechatNewsController.test")(app, db, config)
 // require("./controllers/SysRoleMenuController.test")(app, db, config)
-// require("./controllers/AuthController.test")(app, db, config);
+require("./controllers/AuthController.test")(app, db, config);

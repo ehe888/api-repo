@@ -104,5 +104,33 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("修改密码成功", function(done) {
+      request(app)
+        .post('/api/sysusers/changePassword')
+        .send({
+          password: '1234',
+          sys_user_id: 4
+        })
+        .expect(function(res) {
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
+    it("修改密码后, 登录成功", function(done){
+      request(app)
+        .post("/api/auth/login")
+        .send({
+          username: "wang",
+          password: "1234"
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
   });
 }
