@@ -318,7 +318,7 @@ module.exports = function(app, db, options){
       billOption += "'%"+unit_desc+"%'"
     }
 
-    var query = 'SELECT vw_property_bill.* FROM vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ? ';
+    var query = 'SELECT vw_property_bill.* FROM vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ?';
     if (unitOption.length > 2) {
       query += ' AND unit_id in '+unitOption
     }
@@ -386,14 +386,14 @@ module.exports = function(app, db, options){
         }
       }
 
-      var countQuery = 'SELECT count(1) FROM  vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ?';
+      var countQuery = 'SELECT count(1) FROM (SELECT DISTINCT id FROM vw_property_bill WHERE app_id = ? ';
       if (unitOption.length > 2) {
         countQuery += ' AND unit_id in '+unitOption
       }
       if (billOption.length > 2) {
         countQuery += ' AND unit_desc LIKE ' + billOption
       }
-      countQuery += 'ORDER BY id DESC) x ON vw_property_bill.id = x.id;'
+      countQuery += ') as count'
       sequelize.query(countQuery, { replacements: [appId], type: sequelize.QueryTypes.SELECT})
       .then(function(count) {
 
