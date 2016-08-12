@@ -197,7 +197,7 @@ module.exports = function(app, db, options){
 
   //通过视图查询
   router.post("/queryByView", function(req, res, next) {
-    var offset = req.body.offse || 0;
+    var offset = req.body.offset || 0;
     var limit = req.body.limit || 20;
     var appId = req.body.appId;
 
