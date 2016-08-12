@@ -501,11 +501,19 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20;
 
-    var propertyOption = {}
-    if (property && property.length > 0) {
-      propertyOption.name = property
+    var propertyOption = {
+      model: sequelize.model("KerryProperty"),
+      as: 'WorkingProperty'
     }
-    debug("query")
+
+    if (property && property.length > 0) {
+      if (userType == 'PROPERTY') {
+        propertyOption.where = {
+          name: property
+        }
+      }
+    }
+    debug(propertyOption)
     SysUser.findAll({
       where: {
         username: {
@@ -520,12 +528,7 @@ module.exports = function(app, db, options){
           model: SysRole,
           as: 'role'
         }]
-      }, {
-        model: sequelize.model("KerryProperty"),
-        as: 'WorkingProperty',
-        where: propertyOption,
-        required: false
-      }],
+      }, propertyOption],
       offset: offset,
       limit: limit,
       order: 'id desc'
@@ -539,12 +542,7 @@ module.exports = function(app, db, options){
           },
           userType: userType
         },
-        include: [{
-          model: sequelize.model("KerryProperty"),
-          as: 'WorkingProperty',
-          where: propertyOption,
-          required: false
-        }]
+        include: [propertyOption]
 
       })
       .then(function(count) {

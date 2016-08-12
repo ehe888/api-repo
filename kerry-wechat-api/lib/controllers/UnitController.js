@@ -103,13 +103,20 @@ module.exports = function(app, db, options){
   router.post("/query_all", function(req, res, next) {
     var param = req.body,
         unit_desc = param.unit_desc;
+
+    var unitOption = {
+      unit_desc: {
+        $like: '%'+unit_desc+'%'
+      }
+    };
+    if (req.units) {
+      unitOption.id = {
+        $in: req.units
+      }
+    }
     Units.findAll({
       attributes:['id', 'unit_number', 'unit_desc'],
-      where: {
-        unit_desc: {
-          $like: '%'+unit_desc+'%'
-        }
-      },
+      where: unitOption,
       include: [{
         model: sequelize.model("KerryProperty"),
         as: 'property',
