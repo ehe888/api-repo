@@ -58,7 +58,7 @@ module.exports = function(app, db, options){
     if (timeOption.length > 0) {
       query += ' AND ' + timeOption
     }
-    if (typeof param.is_pay != 'undefined') {
+    if (typeof param.is_pay != 'undefined' && param.is_pay != null) {
       query += ' AND is_pay=' + param.is_pay
     }
 
@@ -131,7 +131,7 @@ module.exports = function(app, db, options){
       if (timeOption.length > 0) {
         countQuery += ' AND ' + timeOption
       }
-      if (typeof param.is_pay != 'undefined') {
+      if (typeof param.is_pay != 'undefined' &&  param.is_pay != null) {
         countQuery += ' AND is_pay=' + param.is_pay
       }
 
