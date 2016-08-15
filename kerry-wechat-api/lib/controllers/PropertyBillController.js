@@ -919,6 +919,7 @@ module.exports = function(app, db, options){
               searchUnitIdByUnitNumbers(bill_lines, 0, [], function(fails, bill_lines) {
 
                 if (fails.length > 0) {
+                  debug("search Unit error")
                   return res.status(500).json({
                     success: false,
                     data: {
@@ -941,6 +942,7 @@ module.exports = function(app, db, options){
                   debug(billLines)
                   //插入临时表失败, 返回错误
                   if (failure > 0 || success <= 0) {
+                    debug("insert bill line error")
                     return res.status(500).json({
                       success: false,
                       data:{
@@ -956,6 +958,7 @@ module.exports = function(app, db, options){
                     insertToPropertyBill(function(err, results) {
                       if (err) {
                         debug(err)
+                        debug("insert to property bill error")
                         return res.status(500).json({
                           success: false,
                           data:{
