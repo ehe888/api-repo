@@ -925,8 +925,9 @@ module.exports = function(app, db, options){
                   return res.status(500).json({
                     success: false,
                     data: {
-                      success: bill_lines.length - fails.length,
-                      failure: fails.length
+                      success: 0,
+                      failure: fails.length,
+                      amount: 0
                     },
                     errMsg: '更新账单出错: 户号' + fails.join(",")+'找不到'
                   })
