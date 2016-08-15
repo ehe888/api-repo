@@ -1,8 +1,8 @@
 
-var UpdateWechatPayBill = function(bill_lines, sequelize, callback) {
+var UpdateWechatPayBill = function(bill_lines, trade_no, sequelize, callback) {
   try {
     var billLines = bill_lines.split(",");
-    updateBillLinesAsync(billLines, 0, sequelize, function() {
+    updateBillLinesAsync(billLines, 0, trade_no, sequelize, function() {
       console.log("UPDATE FINISH!");
       return callback();
     })
@@ -13,7 +13,7 @@ var UpdateWechatPayBill = function(bill_lines, sequelize, callback) {
   }
 }
 
-function updateBillLinesAsync(array, index, sequelize, callback) {
+function updateBillLinesAsync(array, index, trade_no, sequelize, callback) {
   if (index >= array.length) {
     return callback();
   }
@@ -27,19 +27,20 @@ function updateBillLinesAsync(array, index, sequelize, callback) {
   .then(function(billLine) {
     if (!billLine) {
       console.error("CAN NOT FOUND BILLLINE BY ID: ", billLineId);
-      return updateBillLinesAsync(array, ++index, sequelize, callback)
+      return updateBillLinesAsync(array, ++index, trade_no, sequelize, callback)
     }
 
     return billLine.update({
-      is_pay: true
+      is_pay: true,
+      wechat_trade_no: trade_no
     })
   })
   .then(function(billLine) {
-    return updateBillLinesAsync(array, ++index, sequelize, callback)
+    return updateBillLinesAsync(array, ++index, trade_no, sequelize, callback)
   })
   .catch(function(err) {
     console.error("UPDATE BILLLINE ERROR, ID: ", billLineId);
-    return updateBillLinesAsync(array, ++index, sequelize, callback)
+    return updateBillLinesAsync(array, ++index, trade_no, sequelize, callback)
   })
 
 }
