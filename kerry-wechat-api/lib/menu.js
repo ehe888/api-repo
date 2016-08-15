@@ -2,6 +2,16 @@
 
 module.exports = [
   {
+    "name": "上传账单",
+    "icon": "ti-files",
+    "link": "/bill"
+  },
+  {
+    "name": "账单管理",
+    "icon": "ti-files",
+    "link": "/billManager"
+  },
+  {
     "name": "账单管理",
     "icon": "ti-files",
     "link": "/bill"

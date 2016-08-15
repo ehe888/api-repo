@@ -59,12 +59,12 @@ module.exports = [
     {
       name: "查询账单",
       httpMethod: "POST",
-      httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills)"
+      httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills|\/billHistory\/queryByTime)"
     },
     {
       name: "编辑账单",
       httpMethod: "POST",
-      httpPath: "^\/api(\/propertyBills.*|\/propertyBillLines.*)"
+      httpPath: "^\/api(\/propertyBills.*|\/propertyBillLines.*|\/billHistory.*)"
     },
     {
       name: "反馈意见",

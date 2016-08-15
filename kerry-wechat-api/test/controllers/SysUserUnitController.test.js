@@ -22,7 +22,7 @@ module.exports = function(app, db, config){
         })
         .expect(200)
         .expect(function(res){
-          console.log(res.body);
+          console.log(res.body.data[0].unit);
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.be.exist;
         })
