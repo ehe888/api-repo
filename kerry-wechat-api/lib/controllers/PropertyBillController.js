@@ -920,13 +920,15 @@ module.exports = function(app, db, options){
 
                 if (fails.length > 0) {
                   debug("search Unit error")
+                  debug(fails)
+                  debug(bill_lines.length)
                   return res.status(500).json({
                     success: false,
                     data: {
                       success: bill_lines.length - fails.length,
                       failure: fails.length
                     },
-                    errMsg: '更新账单出错'
+                    errMsg: '更新账单出错: 户号' + fails.join(",")+'找不到'
                   })
                 }
 
