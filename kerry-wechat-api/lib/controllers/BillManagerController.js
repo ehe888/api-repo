@@ -28,13 +28,18 @@ module.exports = function(app, db, options){
       billOption += "'%"+unit_desc+"%'"
     }
 
+    var now = new Date(),
+        thisYear = now.getFullYear(),
+        thisMonth = now.getMonth() + 1
+
     var timeOption = ""
     if (start_time.length > 0) {
       var startDate = new Date(start_time);
       if (startDate != 'Invalid Date') {
         var year = startDate.getFullYear(),
             month = startDate.getMonth()+1
-        timeOption = "year >="+year+" AND month >= "+month
+
+        timeOption = " (year > "+year+" OR (year="+year+" AND month >= "+month+")) "
       }
     }
 
@@ -44,9 +49,9 @@ module.exports = function(app, db, options){
         var year = endDate.getFullYear(),
             month = endDate.getMonth()+1
         if (timeOption.length > 0) {
-          timeOption += " AND year <= "+year+" AND month <= "+month
+          timeOption += " AND (year < "+year+" OR (year = "+year+" AND month <= "+month+")) "
         }else {
-          timeOption = "year <= "+year+" AND month <= "+month
+          timeOption = " (year < "+year+" OR (year = "+year+" AND month <= "+month+")) "
         }
       }
     }
