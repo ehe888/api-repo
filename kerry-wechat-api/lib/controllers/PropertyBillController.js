@@ -318,7 +318,7 @@ module.exports = function(app, db, options){
       billOption += "'%"+unit_desc+"%'"
     }
 
-    var query = 'SELECT vw_property_bill.* FROM vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ?';
+    var query = 'SELECT distinct on (bill_line_id) vw_property_bill.* FROM vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ?';
     if (unitOption.length > 2) {
       query += ' AND unit_id in '+unitOption
     }
@@ -326,7 +326,7 @@ module.exports = function(app, db, options){
       query += ' AND unit_desc LIKE ' + billOption
     }
 
-    query += ' ORDER BY id DESC offset ? limit ? ) x ON vw_property_bill.id = x.id;'
+    query += ' ORDER BY id DESC offset ? limit ? ) x ON vw_property_bill.id = x.id ORDER BY bill_line_id DESC;'
 
     sequelize.query(query, { replacements: [appId, offset, limit], type: sequelize.QueryTypes.SELECT})
     .then(function(results) {
