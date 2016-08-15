@@ -396,6 +396,25 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("导出", (done)=> {
+
+      var start_time = new Date('2016-04-01')
+      var end_time = new Date('2016-04-01')
+      request(app)
+        .post("/api/billManager/export")
+        .send({
+          appId: 'shanghai',
+          start_time: start_time,
+          end_time: end_time
+        })
+        .expect(200)
+        .expect((res)=> {
+          console.log(res)
+        })
+        .end(done)
+
+    })
+
 
   });
 }

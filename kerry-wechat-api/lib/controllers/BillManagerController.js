@@ -10,7 +10,10 @@ module.exports = function(app, db, options){
      models = options.db;
 
   var router = express.Router();
-
+  var stringify = require('csv-stringify');
+  var fs = require('fs')
+  var iconv = require('iconv-lite');
+  var env = process.env.NODE_ENV
 
   //查询已付款的账单信息
   //根据时间和户号, 查询已付款账单
@@ -103,8 +106,73 @@ module.exports = function(app, db, options){
 
   })
 
-  router.post("export", function(req, res, next) {
+  router.post("/export", function(req, res, next) {
 
+    var param = req.body,
+        start_time = param.start_time || "",
+        end_time = param.end_time || "",
+        appId = param.appId,
+        offset = param.offset || 0,
+        limit = param.limit || 20,
+        is_pay = param.is_pay,
+        unit_desc = param.unit_desc || ""
+
+    queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay,
+      (err, results, offset, limit, count) => {
+        debug(results)
+        if (err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false,
+            error: err,
+            errMsg: err.message
+          })
+        }
+
+        var data = [{id: 'id', 'bill_number':'账单号', 'year':'年份',
+                    'month': '月份', 'username': '租户', 'description': '描述', 'gross_amount': '总额',
+                    'is_pay': '支付状态', 'unit_number': '户号编号', 'unit_desc': '户号'}];
+        for (var i = 0; i < results.length; i++) {
+          var result = results[i];
+          data.push({
+            id: result.id,
+            bill_number: result.bill_number,
+            year: result.year,
+            month: result.month,
+            username: result.username,
+            description: result.description,
+            gross_amount: result.gross_amount,
+            is_pay: result.is_pay?"已支付":"未支付",
+            unit_number: result.unit_number,
+            unit_desc: result.unit_desc
+          })
+        }
+
+        stringify(data, (err, results) => {
+          if (err) {
+            console.error(err)
+            return res.status(500).json({
+              success: false,
+              error: err,
+              errMsg: err.message
+            })
+          }
+          var fileName = req.x_app_config.billPath + '/test.csv';
+          var newCsv = iconv.encode(results, 'GBK')
+          fs.writeFile(fileName, newCsv, (err)=> {
+            if (err) {
+              console.error(err)
+              return res.status(500).json({
+                success: false,
+                error: err,
+                errMsg: err.message
+              })
+            }
+            return res.download(fileName)
+          })
+
+        })
+      })
   })
 
   function queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay, callback) {

@@ -22,6 +22,7 @@ var app = express();
 app.use(cookieParser());
 app.use(bodyParser());
 app.use(xmlparser({ explicitArray: false }));
+config.billPath = './'
 app.locals.config = config;
 
 /**
