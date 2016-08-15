@@ -51,15 +51,18 @@ module.exports = function(app, db, options){
       }
     }
 
-    var query = 'SELECT * FROM vw_property_bill WHERE app_id = ? AND is_pay = TRUE';
+    var query = 'SELECT * FROM vw_property_bill INNER JOIN (select distinct on (id)  t.* from vw_property_bill t WHERE app_id = ?';
     if (billOption.length > 2) {
       query += ' AND unit_desc LIKE ' + billOption
     }
     if (timeOption.length > 0) {
       query += ' AND ' + timeOption
     }
+    if (typeof param.is_pay != 'undefined') {
+      query += ' AND is_pay=' + param.is_pay
+    }
 
-    query += ' ORDER BY id DESC offset ? limit ?'
+    query += ' ORDER BY id DESC offset ? limit ? ) x ON vw_property_bill.id = x.id;'
 
     sequelize.query(query, { replacements: [appId, offset, limit], type: sequelize.QueryTypes.SELECT})
     .then(function(results) {
@@ -120,7 +123,7 @@ module.exports = function(app, db, options){
         }
       }
 
-      var countQuery = 'SELECT count(1) FROM (SELECT DISTINCT id FROM vw_property_bill WHERE app_id = ?  AND is_pay = TRUE ';
+      var countQuery = 'SELECT count(1) FROM (SELECT DISTINCT id FROM vw_property_bill WHERE app_id = ?';
 
       if (billOption.length > 2) {
         countQuery += ' AND unit_desc LIKE ' + billOption
@@ -128,6 +131,10 @@ module.exports = function(app, db, options){
       if (timeOption.length > 0) {
         countQuery += ' AND ' + timeOption
       }
+      if (typeof param.is_pay != 'undefined') {
+        countQuery += ' AND is_pay=' + param.is_pay
+      }
+
 
       countQuery += ') as count'
 

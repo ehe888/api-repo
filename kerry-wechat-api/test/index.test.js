@@ -66,4 +66,5 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
  // require("./controllers/UpdateBillLine.test")(app, db, config)
  // require("./controllers/WechatNewsController.test")(app, db, config)
 // require("./controllers/SysRoleMenuController.test")(app, db, config)
-require("./controllers/AuthController.test")(app, db, config);
+// require("./controllers/AuthController.test")(app, db, config);
+require("./controllers/SysUserUnitController.test")(app, db, config);

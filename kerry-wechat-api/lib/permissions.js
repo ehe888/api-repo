@@ -37,6 +37,11 @@ module.exports = [
       httpPath: "^\/api\/sysuser"
     },
     {
+      name: "管家单元绑定",
+      httpMethod: "POST",
+      httpPath: "^\/api\/sysUserUnit"
+    },
+    {
       name: "模版消息",
       httpMethod: "POST",
       httpPath: "^\/api(\/pushMessage.*|\/delivery.*)"
