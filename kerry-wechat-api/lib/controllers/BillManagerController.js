@@ -171,6 +171,6 @@ module.exports = function(app, db, options){
 
   })
 
-  app.use("/billHistory", router);
+  app.use("/billManager", router);
 
 }

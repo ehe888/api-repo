@@ -12,11 +12,6 @@ module.exports = [
     "link": "/billManager"
   },
   {
-    "name": "账单管理",
-    "icon": "ti-files",
-    "link": "/bill"
-  },
-  {
     "name": "自定义菜单",
     "icon": "ti-view-grid",
     "link": "/menusetting"

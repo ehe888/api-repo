@@ -324,7 +324,7 @@ module.exports = function(app, db, config){
     it("查询已付款账单", function(done) {
 
         request(app)
-          .post("/api/billHistory/queryByTime")
+          .post("/api/billManager/queryByTime")
           .send({
             appId: 'shanghai'
           })
@@ -360,7 +360,7 @@ module.exports = function(app, db, config){
       var start_time = new Date('2016-05-01')
 
       request(app)
-        .post("/api/billHistory/queryByTime")
+        .post("/api/billManager/queryByTime")
         .send({
           appId: 'shanghai',
           start_time: start_time
@@ -380,7 +380,7 @@ module.exports = function(app, db, config){
       var start_time = new Date('2016-04-01')
       var end_time = new Date('2016-04-01')
       request(app)
-        .post("/api/billHistory/queryByTime")
+        .post("/api/billManager/queryByTime")
         .send({
           appId: 'shanghai',
           start_time: start_time,
