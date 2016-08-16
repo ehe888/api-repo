@@ -221,7 +221,7 @@ module.exports = function(app, db, options){
 
   router.post('/sync', function(req, res, next) {
     var syncExec = req.x_app_config.syncExec
-    exec(syncExec, (error, stdout, stderr) => {
+    exec(syncExec, {maxBuffer: 1024 * 2000}, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return res.status(500).json({
