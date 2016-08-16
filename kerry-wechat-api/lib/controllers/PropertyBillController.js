@@ -358,7 +358,8 @@ module.exports = function(app, db, options){
               tax: row.tax,
               gross_amount: row.gross_amount,
               is_pay: row.is_pay,
-              expire_date: row.expire_date
+              expire_date: row.expire_date,
+              wechat_trade_no: row.wechat_trade_no
             }],
             unit: [{
               id: row.unit_id,
@@ -375,7 +376,8 @@ module.exports = function(app, db, options){
             tax: row.tax,
             gross_amount: row.gross_amount,
             is_pay: row.is_pay,
-            expire_date: row.expire_date
+            expire_date: row.expire_date,
+            wechat_trade_no: row.wechat_trade_no
           })
 
           bill.unit.push({
