@@ -15,7 +15,7 @@ module.exports = function(app, db, options){
   var router = express.Router();
 
 
-  //创建物业
+  //创建反馈
   router.post("/create", function(req, res, next) {
     var param = req.body;
     var content = param.content,
@@ -206,7 +206,14 @@ module.exports = function(app, db, options){
       offset: offset,
       limit: limit
     }
-    sequelize.query('SELECT * FROM vw_suggestion WHERE app_id = ? ORDER BY id DESC OFFSET ? LIMIT ?',
+
+    var query = "SELECT * FROM vw_suggestion WHERE app_id = ? "
+    if (req.units) {
+      query += " AND unit_id in (" + req.units.join(",") + ") "
+    }
+    query += " ORDER BY id DESC OFFSET ? LIMIT ?";
+
+    sequelize.query(query,
                     {
                       replacements: [appId, offset, limit],
                        type: sequelize.QueryTypes.SELECT
