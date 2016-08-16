@@ -207,7 +207,7 @@ module.exports = function(app, db, options){
         //支付回调成功,
         if (result.result_code == 'SUCCESS') {
           //支付成功
-          var trade_no = result.out_trade_no;
+          var trade_no = result.transaction_id;
           sequelize.model("WechatPay").findOne({
             where: {
               trade_no: trade_no
@@ -216,7 +216,8 @@ module.exports = function(app, db, options){
           .then(function(wechatpay) {
             wechatpay.update({
               status: "PAID",
-              wechat_response_content: JSON.stringify(req.body)
+              wechat_response_content: JSON.stringify(req.body),
+              transaction_id: trade_no
             })
             .then(function(instance) {
               UpdateWechatPayBill(wechatpay.bill_lines, trade_no, sequelize, function(err) {
