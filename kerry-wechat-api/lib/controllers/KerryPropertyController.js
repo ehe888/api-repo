@@ -10,7 +10,8 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      KerryProperty =  sequelize.model("KerryProperty"),
-     models = options.db;
+     models = options.db,
+     exec = require("child_process").exec;
 
   var router = express.Router();
 
@@ -218,7 +219,22 @@ module.exports = function(app, db, options){
     })
   })
 
-
+  router.post('/sync', function(req, res, next) {
+    var syncExec = req.x_app_config.syncExec
+    exec(syncExec, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return res.status(500).json({
+          success: false,
+          error: error,
+          errMsg: error.message
+        })
+      }
+      return res.json({
+        success: true
+      })
+    })
+  })
 
   app.use("/properties", router);
 }

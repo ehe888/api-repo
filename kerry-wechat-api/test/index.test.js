@@ -23,6 +23,7 @@ app.use(cookieParser());
 app.use(bodyParser());
 app.use(xmlparser({ explicitArray: false }));
 config.billPath = './'
+config.syncExec = 'node ./test/test_sync.js'
 app.locals.config = config;
 
 /**
@@ -55,7 +56,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/DeliveryController.test")(app, db, config);
 // require("./controllers/WechatUserController.test")(app, db, config);
 // require("./controllers/WechatAssetController.test")(app, db, config)
-require("./controllers/PropertyBillController.test")(app, db, config);
+// require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/PropertyBillLineController.test")(app, db, config);
 // require("./controllers/permissions.test")(app, db, config)
 // require("./controllers/PushBill.test")(app, db, config)
@@ -69,3 +70,4 @@ require("./controllers/PropertyBillController.test")(app, db, config);
 // require("./controllers/SysRoleMenuController.test")(app, db, config)
 // require("./controllers/AuthController.test")(app, db, config);
 // require("./controllers/SysUserUnitController.test")(app, db, config);
+require("./controllers/KerrySync.test")(app, db, config);
