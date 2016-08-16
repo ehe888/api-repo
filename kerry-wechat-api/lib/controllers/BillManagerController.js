@@ -112,8 +112,8 @@ module.exports = function(app, db, options){
         start_time = param.start_time || "",
         end_time = param.end_time || "",
         appId = param.appId,
-        offset = param.offset || 0,
-        limit = param.limit || 20,
+        offset = null,
+        limit = null,
         is_pay = param.is_pay,
         unit_desc = param.unit_desc || ""
 
@@ -135,7 +135,7 @@ module.exports = function(app, db, options){
         for (var i = 0; i < results.length; i++) {
           var result = results[i];
           data.push({
-            id: result.id,
+            bill_id: result.id,
             bill_number: result.bill_number,
             year: result.year,
             month: result.month,
@@ -157,7 +157,9 @@ module.exports = function(app, db, options){
               errMsg: err.message
             })
           }
-          var fileName = req.x_app_config.billPath + '/test.csv';
+          var now = new Date();
+
+          var fileName = req.x_app_config.billPath + now.toLocaleString() + ".csv";
           var newCsv = iconv.encode(results, 'GBK')
           fs.writeFile(fileName, newCsv, (err)=> {
             if (err) {
@@ -216,13 +218,19 @@ module.exports = function(app, db, options){
     if (timeOption.length > 0) {
       query += ' AND ' + timeOption
     }
-    if (typeof is_pay != 'undefined' && is_pay != null) {
+    if (typeof is_pay != 'undefined' && is_pay != null && is_pay != '') {
       query += ' AND is_pay=' + is_pay
     }
 
-    query += ' ORDER BY id DESC offset ? limit ? ) x ON vw_property_bill.id = x.id ORDER BY bill_line_id DESC;'
+    if (offset>=0 && limit>=0) {
+      query += ' ORDER BY id DESC offset '+offset+' limit '+limit+' ) x ON vw_property_bill.id = x.id ORDER BY bill_line_id DESC;'
+    }
+    else {
+      query += ' ORDER BY id DESC ) x ON vw_property_bill.id = x.id ORDER BY bill_line_id DESC;'
+    }
 
-    sequelize.query(query, { replacements: [appId, offset, limit], type: sequelize.QueryTypes.SELECT})
+
+    sequelize.query(query, { replacements: [appId], type: sequelize.QueryTypes.SELECT})
     .then(function(results) {
 
       var countQuery = 'SELECT count(1) FROM (SELECT DISTINCT id FROM vw_property_bill WHERE app_id = ?';
