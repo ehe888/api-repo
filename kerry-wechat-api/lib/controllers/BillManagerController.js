@@ -129,13 +129,13 @@ module.exports = function(app, db, options){
           })
         }
 
-        var data = [{id: 'id', 'bill_number':'账单号', 'year':'年份',
+        var data = [{bill_line_id: '账单行id', 'bill_number':'账单号', 'year':'年份',
                     'month': '月份', 'username': '租户', 'description': '描述', 'gross_amount': '总额',
                     'is_pay': '支付状态', 'unit_number': '户号编号', 'unit_desc': '户号'}];
         for (var i = 0; i < results.length; i++) {
           var result = results[i];
           data.push({
-            bill_id: result.id,
+            bill_line_id: result.bill_line_id,
             bill_number: result.bill_number,
             year: result.year,
             month: result.month,
