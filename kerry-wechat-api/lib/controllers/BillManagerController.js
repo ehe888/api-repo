@@ -241,7 +241,7 @@ module.exports = function(app, db, options){
       if (timeOption.length > 0) {
         countQuery += ' AND ' + timeOption
       }
-      if (typeof is_pay != 'undefined' &&  is_pay != null) {
+      if (typeof is_pay != 'undefined' &&  is_pay != null && is_pay != '') {
         countQuery += ' AND is_pay=' + is_pay
       }
 
