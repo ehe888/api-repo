@@ -911,13 +911,9 @@ module.exports = function(app, db, options){
               billIds.push(bills[i].id)
             }
 
-            PropertyBillInsertTemp.destroy({
-              truncate: true
-            })
+            sequelize.model("DELETE FROM property_bill_line_insert_temps")
             .then(function() {
-              return PropertyBillLineInsertTemp.destroy({
-                truncate: true
-              })
+              return sequelize.model("DELETE FROM property_bill_insert_temps")
             })
             .then(function() {
 
