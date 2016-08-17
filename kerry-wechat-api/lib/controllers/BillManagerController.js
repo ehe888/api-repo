@@ -25,9 +25,10 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 20,
         is_pay = param.is_pay,
+        pay_date = param.pay_date || "",
         unit_desc = param.unit_desc || ""
 
-    queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay,
+    queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay, pay_date,
       function(error, results, offset, limit, count) {
 
         var data = [];
@@ -120,6 +121,7 @@ module.exports = function(app, db, options){
         appId = param.appId,
         offset = null,
         limit = null,
+        pay_date = param.pay_date || "",
         is_pay = param.is_pay,
         unit_desc = param.unit_desc || ""
 
@@ -142,6 +144,10 @@ module.exports = function(app, db, options){
             month = endDate.getMonth()+1
         query += " AND (year < "+year+" OR (year = "+year+" AND month <= "+month+")) "
       }
+    }
+
+    if (pay_date.length > 0) {
+      query += " AND to_char(pay_date, 'YYYY-MM-DD') = " + pay_date
     }
 
     if (unit_desc && unit_desc.length > 0) {
@@ -216,7 +222,7 @@ module.exports = function(app, db, options){
 
   })
 
-  function queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay, callback) {
+  function queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay, pay_date, callback) {
     var billOption = ""
     if (unit_desc && unit_desc.length > 0) {
       billOption += "'%"+unit_desc+"%'"
@@ -247,6 +253,14 @@ module.exports = function(app, db, options){
         }else {
           timeOption = " (year < "+year+" OR (year = "+year+" AND month <= "+month+")) "
         }
+      }
+    }
+
+    if (pay_date.length > 0) {
+      if (timeOption.length > 0) {
+        timeOption += " AND to_char(pay_date, 'YYYY-MM-DD') = " + pay_date
+      }else {
+        timeOption = " to_char(pay_date, 'YYYY-MM-DD') = " + pay_date
       }
     }
 

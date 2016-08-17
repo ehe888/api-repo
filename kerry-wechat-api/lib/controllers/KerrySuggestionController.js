@@ -366,7 +366,9 @@ module.exports = function(app, db, options){
         suggestion_id = param.suggestion_id;
 
     sequelize.model("KerrySuggestionReply").findAll({
-      kerry_suggestion_id: suggestion_id
+      where: {
+        kerry_suggestion_id: suggestion_id
+      }
     })
     .then((replies) => {
       return res.json({
