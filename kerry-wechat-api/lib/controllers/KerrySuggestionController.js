@@ -468,6 +468,9 @@ module.exports = function(app, db, options){
                       })
                     }
                     var url = config.wechatHost+"/wechat/see_suggestion?appId="+appId
+                    var topcolor = '#173177';
+                    var bearer = req.headers['authorization'];
+                    var access_token = bearer.substring("Bearer".length).trim();
                     SendTemplateMessage([suggestion.wechat_id], content, template.template_id, url, topcolor, access_token, app_id, host, function() {
                       return res.json({
                         success: true,
