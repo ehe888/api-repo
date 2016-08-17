@@ -106,7 +106,8 @@ module.exports = function(app, db, options){
 
       line.update({
         is_pay: true,
-        remark: remark
+        remark: remark,
+        pay_date: (new Date())
       })
       .then(function(line) {
         return res.json({

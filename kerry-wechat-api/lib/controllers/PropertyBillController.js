@@ -360,7 +360,8 @@ module.exports = function(app, db, options){
               is_pay: row.is_pay,
               expire_date: row.expire_date,
               wechat_trade_no: row.wechat_trade_no,
-              remark: row.remark
+              remark: row.remark,
+              pay_date: row.pay_date
             }],
             unit: [{
               id: row.unit_id,
@@ -377,6 +378,7 @@ module.exports = function(app, db, options){
             tax: row.tax,
             gross_amount: row.gross_amount,
             is_pay: row.is_pay,
+            pay_date: row.pay_date,
             remark: row.remark,
             expire_date: row.expire_date,
             wechat_trade_no: row.wechat_trade_no

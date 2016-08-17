@@ -32,7 +32,8 @@ function updateBillLinesAsync(array, index, trade_no, sequelize, callback) {
 
     return billLine.update({
       is_pay: true,
-      wechat_trade_no: trade_no
+      wechat_trade_no: trade_no,
+      pay_date: (new Date())
     })
   })
   .then(function(billLine) {
