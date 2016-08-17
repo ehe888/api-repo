@@ -165,9 +165,10 @@ module.exports = function(app, db, options){
     var param = req.body,
         appId = param.appId,
         deliveryId = param.deliveryId,
+        replyId = param.replyId,
         billId = param.billId;
 
-    if (!deliveryId || !billId) {
+    if (!deliveryId || !billId || !replyId) {
       return res.status(400).json({
         success: false,
         errMsg: '请输入完整信息'
@@ -213,6 +214,29 @@ module.exports = function(app, db, options){
       }else {
         return template.update({
           template_id: billId
+        })
+      }
+    })
+    .then(function() {
+      return Template.findOne({
+        where: {
+          template_type: 'suggestion_reply',
+          app_id: appId
+        }
+      })
+    })
+    .then(function(template) {
+      if (!template) {
+        return Template.create({
+          template_id: replyId,
+          template_type: 'suggestion_reply',
+          data: '{"first":"您好，您有新的物业反馈提醒：", "keyword1":"","keyword2":"","keyword3":"",'+
+                  '"keyword4":"","keyword5":"","remark":""}',
+          app_id: appId
+        })
+      }else {
+        return template.update({
+          template_id: replyId
         })
       }
     })

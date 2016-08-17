@@ -120,7 +120,8 @@ module.exports = function(app, db, config){
         .send({
           appId: 'shanghai',
           deliveryId: '123456',
-          billId: '54321'
+          billId: '54321',
+          replyId: '123333'
         })
         .expect(200)
         .expect(function(res) {
@@ -151,7 +152,8 @@ module.exports = function(app, db, config){
         .send({
           appId: 'shanghai',
           deliveryId: '123456',
-          billId: '54321000000'
+          billId: '54321000000',
+          replyId: '2222222'
         })
         .expect(200)
         .expect(function(res) {
