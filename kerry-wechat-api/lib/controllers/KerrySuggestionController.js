@@ -440,7 +440,7 @@ module.exports = function(app, db, options){
                       color: '#173177'
                     },
                     keyword4: {
-                      value: templateData.keyword4,
+                      value: reply.content,
                       color: '#173177'
                     },
                     keyword5: {
@@ -449,7 +449,7 @@ module.exports = function(app, db, options){
                     },
                     remark:{
                       value: templateData.remark,
-                      color: '#173177'
+                      color: '#000000'
                     }
                   }
                   var contentStr = JSON.stringify(content)
