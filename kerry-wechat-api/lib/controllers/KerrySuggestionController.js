@@ -467,7 +467,7 @@ module.exports = function(app, db, options){
                         data: log
                       })
                     }
-                    var url = config.wechatHost+"/wechat/see_suggestion?appId="+app_id
+                    var url = config.wechatHost+"/wechat/see_suggestion?appId="+appId
                     SendTemplateMessage([suggestion.wechat_id], content, template.template_id, url, topcolor, access_token, app_id, host, function() {
                       return res.json({
                         success: true,
