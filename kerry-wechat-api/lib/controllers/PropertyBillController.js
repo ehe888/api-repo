@@ -531,7 +531,7 @@ module.exports = function(app, db, options){
         include:[{
           model: sequelize.model("Units"),
           as: 'unit',
-          attributes: ['id', 'unit_number'],
+          attributes: ['id', 'unit_number', 'unit_desc'],
           include: [{
             model: sequelize.model("UserUnitBinding"),
             as: 'user_unit_binding',
@@ -634,7 +634,7 @@ module.exports = function(app, db, options){
         include:[{
           model: sequelize.model("Units"),
           as: 'unit',
-          attributes: ['id', 'unit_number'],
+          attributes: ['id', 'unit_number', 'unit_desc'],
           include: [{
             model: sequelize.model("UserUnitBinding"),
             as: 'user_unit_binding',
@@ -739,7 +739,7 @@ module.exports = function(app, db, options){
         color: '#173177'
       },
       remark:{
-        value: '当期费用: '+amount+"元, 请您在百忙中尽快安排时间在线缴费或到管理处缴费。 谢谢您的配合！",
+        value: '当期费用: '+amount+"元, 请您在线支付或前往管理处缴费。 谢谢您的配合！",
         color: '#173177'
       }
     }
@@ -1229,6 +1229,7 @@ module.exports = function(app, db, options){
   function insertToPropertyBill(callback) {
     var billLineTemps = []
     var billTemps = [];
+    var billNumbers = [];
     PropertyBillLineInsertTemp.findAll()
     .then(function(_billLineTemps) {
       for (var i = 0; i < _billLineTemps.length; i++) {
@@ -1282,8 +1283,21 @@ module.exports = function(app, db, options){
           }
           replacement = _.concat(replacement, [temp.description, temp.gross_amount, temp.bill_number, temp.bill_number]);
         }
-
+        billNumbers.push(temp.bill_number)
         return sequelize.query(insertQuery, {replacements: replacement})
+      })
+      .then(function(results) {
+
+        return PropertyBill.update({
+            is_pay: false
+          }, {
+            where: {
+              bill_number: {
+                $in: billNumbers
+              }
+            }
+          })
+
       })
       .then(function(results) {
         return callback(null, results)

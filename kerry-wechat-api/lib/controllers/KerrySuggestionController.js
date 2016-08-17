@@ -392,7 +392,9 @@ module.exports = function(app, db, options){
         reply_id = param.reply_id,
         content = param.content
     sequelize.model("KerrySuggestionReply").findOne({
-      id: reply_id
+      where: {
+        id: reply_id
+      }
     })
     .then((reply) => {
       if (!reply) {
