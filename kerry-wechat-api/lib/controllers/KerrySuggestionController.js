@@ -7,12 +7,15 @@ module.exports = function(app, db, options){
      express = require('express'),
      util = require('util'),
      path = require('path'),
+     env = process.env.NODE_ENV,
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      KerrySuggestion =  sequelize.model("KerrySuggestion"),
      models = options.db;
 
   var router = express.Router();
+
+  var SendTemplateMessage = require('../Utils/SendTemplateMessage')
 
 
   //创建反馈
@@ -329,7 +332,13 @@ module.exports = function(app, db, options){
     var param = req.body,
         content = param.content,
         suggestion_id = param.suggestion_id,
+        appId = param.appId,
         from = param.from || 'SYS_USER';
+
+    var port = req.app.settings.port
+    var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port );
+    var config = req.x_app_config;
+
     var option = {
       content: content,
       from: from,
@@ -345,10 +354,179 @@ module.exports = function(app, db, options){
     sequelize.model("KerrySuggestionReply")
     .create(option)
     .then((reply) => {
-      return res.json({
-        success: true,
-        data: reply
-      })
+
+      //创建成功, 物业用户回复的话, 推送模板消息
+      if (from == 'SYS_USER') {
+        sequelize.query('SELECT * FROM vw_suggestion WHERE id = ? limit 1',
+          {replacements: [suggestion_id], type: sequelize.QueryTypes.SELECT})
+        .then(function(results) {
+          if (results.length > 0) {
+            var suggestion = results[0]
+            var wechat_user_id = 'wechat_'+suggestion.wechat_id
+
+            var units = "";
+            var unit_id;
+            sequelize.model("UserUnitBinding")
+            .findAll({
+              where: {
+                wechat_user_id: wechat_user_id
+              },
+              include: [{
+                model: sequelize.model("Units"),
+                as: "unit"
+              }]
+            })
+            .then(function(userUnits) {
+
+              userUnits.forEach(function(userUnit) {
+                if (userUnit.unit) {
+                  if (units.length > 0) {
+                    units += "," + userUnit.unit.unit_desc
+                  }else {
+                    units += userUnit.unit.unit_desc
+                  }
+                  unit_id = userUnit.unit.id
+                }
+              })
+
+              return sequelize.model("SysUser")
+              .findOne({
+                where: {
+                  id: param.sys_user_id
+                },
+                include: [{
+                  model: sequelize.model("KerryProperty"),
+                  as: 'WorkingProperty'
+                }]
+              })
+            })
+            .then(function(sysUser) {
+              if (!unit_id) {
+                return res.status(500).json({
+                  success: false,
+                  errMsg: '回复成功, 推送用户失败: 该用户没有绑定单元!',
+                  error: err
+                })
+              }
+              sequelize.model("Template").findOne({
+                where: {
+                  template_type: 'suggestion_reply',
+                  app_id:appId
+                }
+              })
+              .then(function(template) {
+                if (!template) {
+                  return res.status(500).json({
+                    success: false,
+                    errMsg: '回复成功, 推送用户失败: 物业没有配置模板',
+                  })
+                }
+
+                try {
+                  var templateData = JSON.parse(template.data);
+                  console.log(template.data)
+                  var content = {
+                    first: templateData.first,
+                    keyword1: {
+                      value: units,
+                      color: '#173177'
+                    },
+                    keyword2: {
+                      value: templateData.keyword2,
+                      color: '#173177'
+                    },
+                    keyword3: {
+                      value: templateData.keyword3,
+                      color: '#173177'
+                    },
+                    keyword4: {
+                      value: templateData.keyword4,
+                      color: '#173177'
+                    },
+                    keyword5: {
+                      value: sysUser.firstName+sysUser.lastName,
+                      color: '#173177'
+                    },
+                    remark:{
+                      value: templateData.remark,
+                      color: '#173177'
+                    }
+                  }
+                  var contentStr = JSON.stringify(content)
+                  sequelize.model("PushMessageLog").create({
+                    openid: suggestion.wechat_id,
+                    template_id: template.id,
+                    content: contentStr,
+                    template_type: 'bill',
+                    unit_id: unit_id
+                  })
+                  .then((log)=> {
+                    if (env == 'development') {
+                      return res.json({
+                        success: true,
+                        data: log
+                      })
+                    }
+                    var url = config.wechatHost+"/wechat/see_suggestion?appId="+app_id
+                    SendTemplateMessage([suggestion.wechat_id], content, template.template_id, url, topcolor, access_token, app_id, host, function() {
+                      return res.json({
+                        success: true,
+                        data: reply
+                      })
+                    })
+                  })
+                  .catch((err) => {
+                    console.error(err)
+                    return res.status(500).json({
+                      success: false,
+                      errMsg: '回复成功, 推送用户失败: 物业没有配置模板',
+                      error: err
+                    })
+                  })
+
+                } catch (e) {
+                  return res.status(500).json({
+                    success: false,
+                    errMsg: '回复成功, 推送用户失败: 物业模板错误',
+                    error: err
+                  })
+                }
+
+              })
+              .catch(function(err) {
+                console.error(err)
+                return res.status(500).json({
+                  success: false,
+                  errMsg: '回复成功, 推送用户失败: 系统用户错误',
+                  error: err
+                })
+              })
+
+            })
+            .catch(function(err) {
+              console.error(err)
+              return res.status(500).json({
+                success: false,
+                errMsg: '回复成功, 推送用户失败: 找不到该用户',
+                error: err
+              })
+            })
+
+          }
+          else {
+            return res.status(500).json({
+              success: false,
+              errMsg: '回复成功, 推送用户失败: 找不到该用户'
+            })
+          }
+        })
+      }
+      else {
+        return res.json({
+          success: true,
+          data: reply
+        })
+      }
     })
     .catch((err) => {
       console.error(err)

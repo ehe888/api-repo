@@ -230,8 +230,8 @@ module.exports = function(app, db, options){
         return Template.create({
           template_id: replyId,
           template_type: 'suggestion_reply',
-          data: '{"first":"您好，您有新的物业反馈提醒：", "keyword1":"","keyword2":"","keyword3":"",'+
-                  '"keyword4":"","keyword5":"","remark":""}',
+          data: '{"first":"您好，您有新的物业反馈提醒：", "keyword1":"","keyword2":"投诉反馈","keyword3":"已受理",'+
+                  '"keyword4":"您的投诉我们已经受理，目前正在处理中，请您耐心等待。","keyword5":"","remark":"感谢您对我们提出宝贵建议，若在处理过程中有任何疑问请随时与物业中心联系。"}',
           app_id: appId
         })
       }else {

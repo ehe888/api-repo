@@ -26,7 +26,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/suggestions/create")
         .send({
-          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf',
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
           content: 'test3'
         })
         .expect(200)
@@ -58,7 +58,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/suggestions/queryByWechatUser")
         .send({
-          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf'
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
         })
         .expect(200)
         .expect(function(res) {
@@ -88,7 +88,8 @@ module.exports = function(app, db, config){
         .send({
           content: 'lalalalalal',
           sys_user_id: 1,
-          suggestion_id: 1
+          suggestion_id: 31,
+          appId: 'shanghai'
         })
         .expect(200)
         .expect((res) => {
@@ -102,22 +103,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/suggestions/queryReply")
         .send({
-          suggestion_id: 1
-        })
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.success).to.be.true;
-          console.log(res.body.data)
-        })
-        .end(done)
-    })
-
-    it("修改回复", function(done) {
-      request(app)
-        .post("/api/suggestions/updateReply")
-        .send({
-          reply_id: 1,
-          content: 'hahhahhhhh'
+          suggestion_id: 31
         })
         .expect(200)
         .expect((res) => {
@@ -131,7 +117,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/suggestions/queryByWechatUser")
         .send({
-          wechat_user_id: 'wechat_wx_asfasdfasdfasdfasdfasdf'
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
         })
         .expect(200)
         .expect(function(res) {
@@ -141,6 +127,22 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("提交回复2", function(done) {
+      request(app)
+        .post("/api/suggestions/reply")
+        .send({
+          content: 'lalalalalalaaa',
+          sys_user_id: 1,
+          suggestion_id: 31,
+          appId: 'shanghai'
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.success).to.be.true;
+          console.log(res.body.data)
+        })
+        .end(done)
+    })
 
   });
 }
