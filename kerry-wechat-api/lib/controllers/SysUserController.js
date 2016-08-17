@@ -586,16 +586,48 @@ module.exports = function(app, db, options){
     })
     .then(function() {
 
-      SysUser.destroy({
-        where:{
-          id:id
+      SysUser.findOne({
+        where: {
+          id: id
         }
       })
-      .then(function(rows){
-        return res.json({
-          success:true,
-          rows:rows
-        });
+      .then(function(sysUser) {
+
+        var now = (new Date()).getTime();
+        sysUser.update({
+          username: now+"__"+sysUser.username,
+          email: now+"__"+sysUser.email,
+          mobile: now+"__"+sysUser.mobile
+        })
+        .then(function(sysUser) {
+          SysUser.destroy({
+            where:{
+              id:id
+            }
+          })
+          .then(function(rows){
+            return res.json({
+              success:true,
+              rows:rows
+            });
+          })
+          .catch(function(err){
+            console.error(err)
+            return res.status(500).json({
+              success:false,
+              errMsg:err.message,
+              errors:err
+            })
+          })
+        })
+        .catch(function(err){
+          console.error(err)
+          return res.status(500).json({
+            success:false,
+            errMsg:err.message,
+            errors:err
+          })
+        })
       })
       .catch(function(err){
         console.error(err)
@@ -605,7 +637,6 @@ module.exports = function(app, db, options){
           errors:err
         })
       })
-
     })
     .catch(function(err){
       console.error(err);
@@ -615,6 +646,8 @@ module.exports = function(app, db, options){
         errors:err
       })
     })
+
+
   })
 
   //启用, 关闭用户

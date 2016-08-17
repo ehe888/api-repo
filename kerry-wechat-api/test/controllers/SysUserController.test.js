@@ -153,6 +153,42 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    var id;
+    it("新建用户", function(done) {
+      request(app)
+        .post("/api/sysusers/create")
+        .send({
+          username: "now",
+          password: "123456",
+          email:"jiajun.wang@aivics.com",
+          mobile: "13454567654",
+          firstName: "wang",
+          lastName: "JJ",
+          userType: "CORP"
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+          id = res.body.data.id
+        })
+        .end(done);
+    })
+
+    it("删除用户", function(done) {
+      request(app)
+        .post("/api/sysusers/delete")
+        .send({
+          id: id
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
 
   });
 }

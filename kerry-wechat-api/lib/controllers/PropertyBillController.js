@@ -576,7 +576,7 @@ module.exports = function(app, db, options){
         else {
           return res.json({
             success: false,
-            errMsg: '找不到该账单'
+            errMsg: '找不到该账单或该账单已付清!'
           })
         }
       })
