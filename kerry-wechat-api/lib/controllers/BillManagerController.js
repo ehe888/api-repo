@@ -121,9 +121,61 @@ module.exports = function(app, db, options){
         is_pay = param.is_pay,
         unit_desc = param.unit_desc || ""
 
-    queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay,
-      (err, results, offset, limit, count) => {
-        debug(results)
+
+    var query = "SELECT * FROM vw_property_bill WHERE app_id = ? "
+    if (start_time.length > 0) {
+      var startDate = new Date(start_time);
+      if (startDate != 'Invalid Date') {
+        var year = startDate.getFullYear(),
+            month = startDate.getMonth()+1
+
+        query += " AND (year > "+year+" OR (year="+year+" AND month >= "+month+")) "
+      }
+    }
+
+    if (end_time.length > 0) {
+      var endDate = new Date(end_time);
+      if (endDate != 'Invalid Date') {
+        var year = endDate.getFullYear(),
+            month = endDate.getMonth()+1
+        query += " AND (year < "+year+" OR (year = "+year+" AND month <= "+month+")) "
+      }
+    }
+
+    if (unit_desc && unit_desc.length > 0) {
+      query += " AND unit_desc like '%"+unit_desc+"%' "
+    }
+
+    if (typeof is_pay != 'undefined' && is_pay != null && is_pay != '') {
+      query += ' AND is_pay=' + is_pay
+    }
+
+    sequelize.query(query, {replacements: [appId], type: sequelize.QueryTypes.SELECT})
+    .then(function(results) {
+      var data = [{bill_line_id: '账单行id', 'bill_number':'账单号', 'year':'年份',
+                  'month': '月份', 'username': '租户', 'description': '描述', 'gross_amount': '总额',
+                  'is_pay': '支付状态', 'unit_number': '户号编号', 'unit_desc': '户号',
+                  'wechat_trade_no': '微信交易号', 'remark': '备注'}];
+
+      for (var i = 0; i < results.length; i++) {
+        var result = results[i];
+        data.push({
+          bill_line_id: result.bill_line_id,
+          bill_number: result.bill_number,
+          year: result.year,
+          month: result.month,
+          username: result.username,
+          description: result.description,
+          gross_amount: result.gross_amount,
+          is_pay: result.is_pay?"已支付":"未支付",
+          unit_number: result.unit_number,
+          unit_desc: result.unit_desc,
+          wechat_trade_no: result.wechat_trade_no,
+          remark: result.remark
+        })
+      }
+
+      stringify(data, (err, results) => {
         if (err) {
           console.error(err)
           return res.status(500).json({
@@ -132,27 +184,11 @@ module.exports = function(app, db, options){
             errMsg: err.message
           })
         }
+        var now = new Date();
 
-        var data = [{bill_line_id: '账单行id', 'bill_number':'账单号', 'year':'年份',
-                    'month': '月份', 'username': '租户', 'description': '描述', 'gross_amount': '总额',
-                    'is_pay': '支付状态', 'unit_number': '户号编号', 'unit_desc': '户号'}];
-        for (var i = 0; i < results.length; i++) {
-          var result = results[i];
-          data.push({
-            bill_line_id: result.bill_line_id,
-            bill_number: result.bill_number,
-            year: result.year,
-            month: result.month,
-            username: result.username,
-            description: result.description,
-            gross_amount: result.gross_amount,
-            is_pay: result.is_pay?"已支付":"未支付",
-            unit_number: result.unit_number,
-            unit_desc: result.unit_desc
-          })
-        }
-
-        stringify(data, (err, results) => {
+        var fileName = req.x_app_config.billPath + now.toLocaleString() + ".csv";
+        var newCsv = iconv.encode(results, 'GBK')
+        fs.writeFile(fileName, newCsv, (err)=> {
           if (err) {
             console.error(err)
             return res.status(500).json({
@@ -161,24 +197,21 @@ module.exports = function(app, db, options){
               errMsg: err.message
             })
           }
-          var now = new Date();
-
-          var fileName = req.x_app_config.billPath + now.toLocaleString() + ".csv";
-          var newCsv = iconv.encode(results, 'GBK')
-          fs.writeFile(fileName, newCsv, (err)=> {
-            if (err) {
-              console.error(err)
-              return res.status(500).json({
-                success: false,
-                error: err,
-                errMsg: err.message
-              })
-            }
-            return res.download(fileName)
-          })
-
+          return res.download(fileName)
         })
+
       })
+
+    })
+    .catch(function(error) {
+      console.error(error)
+      return res.status(500).json({
+        success: false,
+        error: error,
+        errMsg: error.message
+      })
+    })
+
   })
 
   function queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay, callback) {
