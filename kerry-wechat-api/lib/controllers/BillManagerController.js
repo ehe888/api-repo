@@ -153,7 +153,7 @@ module.exports = function(app, db, options){
     sequelize.query(query, {replacements: [appId], type: sequelize.QueryTypes.SELECT})
     .then(function(results) {
       var data = [{bill_line_id: '账单行id', 'bill_number':'账单号', 'year':'年份',
-                  'month': '月份', 'username': '租户', 'description': '描述', 'gross_amount': '总额',
+                  'month': '月份', 'username': '住户', 'description': '描述', 'gross_amount': '总额',
                   'is_pay': '支付状态', 'unit_number': '户号编号', 'unit_desc': '户号',
                   'wechat_trade_no': '微信交易号', 'remark': '备注'}];
 
