@@ -471,7 +471,7 @@ module.exports = function(app, db, options){
                     var topcolor = '#173177';
                     var bearer = req.headers['authorization'];
                     var access_token = bearer.substring("Bearer".length).trim();
-                    SendTemplateMessage([suggestion.wechat_id], content, template.template_id, url, topcolor, access_token, appId, host, function() {
+                    SendTemplateMessage([suggestion.wechat_id], contentStr, template.template_id, url, topcolor, access_token, appId, host, function() {
                       return res.json({
                         success: true,
                         data: reply
