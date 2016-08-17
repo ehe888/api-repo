@@ -30,7 +30,14 @@ module.exports = function(app, db, options){
 
     queryBills(start_time, end_time, appId, offset, limit, unit_desc, is_pay, pay_date,
       function(error, results, offset, limit, count) {
-
+        if (error) {
+          console.error(error)
+          return res.status(500).json({
+            success: false,
+            error: error,
+            errMsg: error.message
+          })
+        }
         var data = [];
         for (var i = 0; i < results.length; i++) {
           var row = results[i];
@@ -147,7 +154,7 @@ module.exports = function(app, db, options){
     }
 
     if (pay_date.length > 0) {
-      query += " AND to_char(pay_date, 'YYYY-MM-DD') = " + pay_date
+      query += " AND to_char(pay_date, 'YYYY-MM-DD') = '" + pay_date + "'"
     }
 
     if (unit_desc && unit_desc.length > 0) {
@@ -163,7 +170,7 @@ module.exports = function(app, db, options){
       var data = [{bill_line_id: '账单行id', 'bill_number':'账单号', 'year':'年份',
                   'month': '月份', 'username': '住户', 'description': '描述', 'gross_amount': '总额',
                   'is_pay': '支付状态', 'unit_number': '户号编号', 'unit_desc': '户号',
-                  'wechat_trade_no': '微信交易号', 'remark': '备注'}];
+                  'wechat_trade_no': '微信交易号', 'remark': '备注', 'pay_date': '支付日期'}];
 
       for (var i = 0; i < results.length; i++) {
         var result = results[i];
@@ -179,7 +186,8 @@ module.exports = function(app, db, options){
           unit_number: result.unit_number,
           unit_desc: result.unit_desc,
           wechat_trade_no: result.wechat_trade_no,
-          remark: result.remark
+          remark: result.remark,
+          pay_date: result.pay_date
         })
       }
 
@@ -258,9 +266,9 @@ module.exports = function(app, db, options){
 
     if (pay_date.length > 0) {
       if (timeOption.length > 0) {
-        timeOption += " AND to_char(pay_date, 'YYYY-MM-DD') = " + pay_date
+        timeOption += " AND to_char(pay_date, 'YYYY-MM-DD') = '" + pay_date + "'"
       }else {
-        timeOption = " to_char(pay_date, 'YYYY-MM-DD') = " + pay_date
+        timeOption = " to_char(pay_date, 'YYYY-MM-DD') = '" + pay_date + "'"
       }
     }
 

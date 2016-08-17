@@ -396,24 +396,53 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
-    it("导出", (done)=> {
+    it("根据支付日期查询账单", (done) => {
+      var today = new Date('2016-08-18');
+      sequelize.model("PropertyBillLine").update({
+        pay_date: today
+      }, {
+        where: {
+          pay_date: null
+        }
+      })
+      .then(function(results) {
+        var pay_date = '2016-08-18'
+        request(app)
+          .post("/api/billManager/queryByTime")
+          .send({
+            appId: 'shanghai',
+            pay_date: pay_date
+          })
+          .expect(200)
+          .expect(function(res){
+            var result = res.body
+            console.log(res.body)
+            expect(result.success).to.be.true
+          })
+          .end(done);
+      })
 
-      var start_time = new Date('2016-04-01')
-      var end_time = new Date('2016-04-01')
-      request(app)
-        .post("/api/billManager/export")
-        .send({
-          appId: 'shanghai',
-          start_time: start_time,
-          end_time: end_time
-        })
-        .expect(200)
-        .expect((res)=> {
-          console.log(res)
-        })
-        .end(done)
 
     })
+
+    // it("导出", (done)=> {
+    //
+    //   var start_time = new Date('2016-04-01')
+    //   var end_time = new Date('2016-04-01')
+    //   request(app)
+    //     .post("/api/billManager/export")
+    //     .send({
+    //       appId: 'shanghai',
+    //       start_time: start_time,
+    //       end_time: end_time
+    //     })
+    //     .expect(200)
+    //     .expect((res)=> {
+    //       console.log(res)
+    //     })
+    //     .end(done)
+    //
+    // })
 
 
   });
