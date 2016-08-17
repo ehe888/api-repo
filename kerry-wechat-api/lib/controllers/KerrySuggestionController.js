@@ -280,6 +280,7 @@ module.exports = function(app, db, options){
 
   })
 
+  //某个微信用户查询
   router.post("/queryByWechatUser", function(req, res, next) {
     var offset = req.body.offset || 0;
     var limit = req.body.limit || 10;
@@ -292,6 +293,13 @@ module.exports = function(app, db, options){
       include: [{
         model: sequelize.model("User"),
         as: "wechat_user"
+      }, {
+        model: sequelize.model("KerrySuggestionReply"),
+        as: 'suggestion_reply',
+        include: [{
+          model: sequelize.model("SysUser"),
+          as: 'sys_user'
+        }]
       }],
       offset: offset,
       limit: limit,
@@ -307,6 +315,115 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
+
+  //新增回复
+  router.post("/reply", function(req, res, next) {
+    var param = req.body,
+        content = param.content,
+        suggestion_id = param.suggestion_id,
+        from = param.from || 'SYS_USER';
+    var option = {
+      content: content,
+      from: from,
+      kerry_suggestion_id: suggestion_id
+    }
+    if (from == 'SYS_USER') {
+      option.sys_user_id = param.sys_user_id
+    }
+    else {
+      option.wechat_user_id = param.wechat_user_id
+    }
+
+    sequelize.model("KerrySuggestionReply")
+    .create(option)
+    .then((reply) => {
+      return res.json({
+        success: true,
+        data: reply
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
+
+  //查询回复
+  router.post("/queryReply", function(req, res, next) {
+    var param = req.body,
+        suggestion_id = param.suggestion_id;
+
+    sequelize.model("KerrySuggestionReply").findAll({
+      kerry_suggestion_id: suggestion_id
+    })
+    .then((replies) => {
+      return res.json({
+        success: true,
+        data: replies
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+  })
+
+  //修改回复
+  router.post("/updateReply", function(req, res, next) {
+    var param = req.body,
+        reply_id = param.reply_id,
+        content = param.content
+    sequelize.model("KerrySuggestionReply").findOne({
+      id: reply_id
+    })
+    .then((reply) => {
+      if (!reply) {
+        return res.status(404).json({
+          success: false,
+          errMsg: '找不到该回复!'
+        })
+      }
+      else if (reply.from != 'SYS_USER') {
+        return res.status(403).json({
+          success: false,
+          errMsg: '不能修改用户回复!'
+        })
+      }
+      reply.update({
+        content: content
+      })
+      .then((reply) => {
+        return res.json({
+          success: true,
+          data: reply
+        })
+      })
+      .catch((err) => {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+    })
+    .catch((err) => {
       console.error(err)
       return res.status(500).json({
         success: false
