@@ -717,7 +717,7 @@ module.exports = function(app, db, options){
           desc = bill.unit.unit_desc?bill.unit.unit_desc:""
       address = city + street + desc;
       url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
-            + "&unit_id="+bill.unit.id
+            + "&unit_id="+bill.unit.id+"&appId="+app_id
     }
 
 
