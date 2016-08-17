@@ -911,9 +911,9 @@ module.exports = function(app, db, options){
               billIds.push(bills[i].id)
             }
 
-            sequelize.model("DELETE FROM property_bill_line_insert_temps")
+            sequelize.query("DELETE FROM property_bill_line_insert_temps")
             .then(function() {
-              return sequelize.model("DELETE FROM property_bill_insert_temps")
+              return sequelize.query("DELETE FROM property_bill_insert_temps")
             })
             .then(function() {
 
