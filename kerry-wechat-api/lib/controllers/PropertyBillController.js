@@ -1289,7 +1289,7 @@ module.exports = function(app, db, options){
       .then(function(results) {
 
         return PropertyBill.update({
-            is_pay: false
+            is_push: false
           }, {
             where: {
               bill_number: {
