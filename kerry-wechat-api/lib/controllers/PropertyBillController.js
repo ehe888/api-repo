@@ -1123,44 +1123,92 @@ module.exports = function(app, db, options){
 
       }
       else {
-        PropertyBillInsertTemp.create({
-          bill_number: ' ',
-          year: year,
-          month: month,
-          unit_id: unit_id,
-          username: username
-        })
-        .then(function(bill) {
-          var billId = bill.id;
-          PropertyBillLineInsertTemp.create({
-            gross_amount: gross_amount,
-            description: description,
-            is_pay: false,
-            property_bill_id: billId,
-            bill_number: bill.bill_number
-          })
-          .then(function(line) {
-            success++;
-            amount+=parseFloat(gross_amount)
-            return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
-          })
-          .catch(function(error) {
-            console.log("create billLine error: " + error);
-            console.error({
-              gross_amount: gross_amount,
-              description: description,
-              property_bill_id: billId
-            })
-            failure++;
-            return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
-          })
-        })
-        .catch(function(error) {
-          console.error("create bill error: " + error)
-          console.error({
+        PropertyBillInsertTemp.findOne({
+          where: {
             year: year,
             month: month,
             unit_id: unit_id
+          }
+        })
+        .then(function(bill) {
+          if (bill) {
+            var billId = bill.id;
+            PropertyBillLineInsertTemp.create({
+              gross_amount: gross_amount,
+              description: description,
+              is_pay: false,
+              property_bill_id: billId,
+              bill_number: bill.bill_number
+            })
+            .then(function(line) {
+              success++;
+              amount+=parseFloat(gross_amount)
+              return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+            })
+            .catch(function(error) {
+              console.log("create billLine error: " + error);
+              console.error({
+                gross_amount: gross_amount,
+                description: description,
+                property_bill_id: billId
+              })
+              failure++;
+              return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+            })
+          }
+          else {
+            PropertyBillInsertTemp.create({
+              bill_number: ' ',
+              year: year,
+              month: month,
+              unit_id: unit_id,
+              username: username
+            })
+            .then(function(bill) {
+              var billId = bill.id;
+              PropertyBillLineInsertTemp.create({
+                gross_amount: gross_amount,
+                description: description,
+                is_pay: false,
+                property_bill_id: billId,
+                bill_number: bill.bill_number
+              })
+              .then(function(line) {
+                success++;
+                amount+=parseFloat(gross_amount)
+                return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+              })
+              .catch(function(error) {
+                console.log("create billLine error: " + error);
+                console.error({
+                  gross_amount: gross_amount,
+                  description: description,
+                  property_bill_id: billId
+                })
+                failure++;
+                return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+              })
+
+            })
+            .catch(function(error) {
+              console.error("create bill error: " + error)
+              console.error({
+                year: year,
+                month: month,
+                unit_id: unit_id
+              })
+              failure++;
+              return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
+            })
+          }
+
+        })
+        .catch(function(error) {
+          console.log("create billLine error: " + error);
+          console.error({
+            gross_amount: gross_amount,
+            description: description,
+            property_bill_id: billId
           })
           failure++;
           return searchAndInsertBillLinesTemp(billLines, ++index, success, failure, amount, callback)
