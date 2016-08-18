@@ -72,6 +72,19 @@ module.exports = function(app, db, options){
       }
     })
     .then(function() {
+
+      return Units.update({
+        sys_user_id: null
+      }, {
+        where: {
+          id: {
+            $notIn: unit_ids
+          },
+          sys_user_id: sys_user_id
+        }
+      })
+    })
+    .then(function() {
       return res.json({
         success: true
       })
