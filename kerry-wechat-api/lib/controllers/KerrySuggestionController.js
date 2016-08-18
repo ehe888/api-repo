@@ -297,6 +297,9 @@ module.exports = function(app, db, options){
         model: sequelize.model("User"),
         as: "wechat_user"
       }, {
+        model: sequelize.model("KerryProperty"),
+        as: "property"
+      }, {
         model: sequelize.model("KerrySuggestionReply"),
         as: 'suggestion_reply',
         include: [{
