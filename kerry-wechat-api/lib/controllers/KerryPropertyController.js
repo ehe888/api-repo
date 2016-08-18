@@ -46,8 +46,8 @@ module.exports = function(app, db, options){
       zipcode: zipcode,
       isjde: isjde,
       bill_sync_date: bill_sync_date,
-      mch_id: mch_id,
-      partner_key: partner_key
+      mchId: mch_id,
+      partnerKey: partner_key
     })
     .then(function(property) {
       return res.json({
@@ -103,8 +103,8 @@ module.exports = function(app, db, options){
           zipcode: zipcode,
           isjde: isjde,
           bill_sync_date: bill_sync_date,
-          mch_id: mch_id,
-          partner_key: partner_key
+          mchId: mch_id,
+          partnerKey: partner_key
         })
         .then(function(property) {
           return res.json({
@@ -232,7 +232,9 @@ module.exports = function(app, db, options){
   })
 
   router.post('/sync', function(req, res, next) {
-    var syncExec = req.x_app_config.syncExec
+    var now = new Date()
+    var syncExec = req.x_app_config.syncExec + ">sync_"+now.getFullYear()+(now.getMonth()+1)+now.getDate()
+    console.log("exec: "+syncExec)
     exec(syncExec, {maxBuffer: 1024 * 2000}, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);

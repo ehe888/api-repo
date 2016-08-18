@@ -11,20 +11,42 @@ module.exports = function(app, db, config){
 
   describe("API平台系统创建物业", function(){
 
+    before(function(done) {
+      db.sequelize.model("KerryProperty").sync({ force: false})
+      .then(function() {
+        return db.sequelize.model("KerryProperty").destroy({
+          where: {
+            $or: [{
+              name: 'tes1t21'
+            }, {
+              name: 'te2st11'
+            }]
+          }
+        })
+      })
+      .then(function() {
+        done()
+      })
+    })
+
     it("POST提交物业", function(done){
+      var now = (new Date()).getTime()
       request(app)
         .post("/api/properties/create")
         .send({
-          name: 'tes1t21',
-          appId: 'test3',
-          telephone: '13311312111',
+          name: now+"",
+          appId: now+"",
+          telephone: now+"",
           province: 'test',
           city: 'test',
           street: 'tes2t',
           start_time: (new Date()),
           end_time: (new Date()),
           zipcode: 'test',
-          isjde: false
+          isjde: false,
+          mchId: '123456',
+          partnerKey: '123456',
+          bill_sync_date: 5
         })
         .expect(200)
         .expect(function(res){
@@ -115,7 +137,10 @@ module.exports = function(app, db, config){
           start_time: (new Date()),
           end_time: (new Date()),
           zipcode: 'test',
-          isjde: false
+          isjde: false,
+          mchId: '1234567',
+          partnerKey: '2222222',
+          bill_sync_date: 10
         })
         .expect(200)
         .expect(function(res) {
@@ -156,19 +181,23 @@ module.exports = function(app, db, config){
     })
 
     it("提交物业", function(done){
+      var now = (new Date()).getTime();
       request(app)
         .post("/api/properties/create")
         .send({
-          name: 'te2st11',
-          appId: 'test2',
-          telephone: '13113111311',
+          name: 'te2st11'+now,
+          appId: 'test2'+now,
+          telephone: now+"",
           province: 'te2st',
           city: 't3est',
           street: 't1est',
           start_time: (new Date()),
           end_time: (new Date()),
           zipcode: 'test',
-          isjde: false
+          isjde: false,
+          mchId: '1234567',
+          partnerKey: '2222222',
+          bill_sync_date: 10
         })
         .expect(200)
         .expect(function(res){
