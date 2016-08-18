@@ -30,8 +30,8 @@ module.exports = function(app, db, options){
         zipcode = param.zipcode,
         isjde = param.isjde,
         bill_sync_date = param.bill_sync_date,
-        mch_id = param.mch_id,
-        partner_key = param.partner_key
+        mch_id = param.mchId,
+        partner_key = param.partnerKey
 
 
     KerryProperty.create({
@@ -80,8 +80,8 @@ module.exports = function(app, db, options){
         zipcode = param.zipcode,
         isjde = param.isjde,
         bill_sync_date = param.bill_sync_date,
-        mch_id = param.mch_id,
-        partner_key = param.partner_key
+        mch_id = param.mchId,
+        partner_key = param.partnerKey
 
 
     KerryProperty.findOne({
