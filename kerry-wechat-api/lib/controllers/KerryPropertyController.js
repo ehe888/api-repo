@@ -28,7 +28,10 @@ module.exports = function(app, db, options){
         start_time = param.start_time,
         end_time = param.end_time,
         zipcode = param.zipcode,
-        isjde = param.isjde
+        isjde = param.isjde,
+        bill_sync_date = param.bill_sync_date,
+        mch_id = param.mch_id,
+        partner_key = param.partner_key
 
 
     KerryProperty.create({
@@ -41,7 +44,10 @@ module.exports = function(app, db, options){
       start_time: start_time,
       end_time: end_time,
       zipcode: zipcode,
-      isjde: isjde
+      isjde: isjde,
+      bill_sync_date: bill_sync_date,
+      mch_id: mch_id,
+      partner_key: partner_key
     })
     .then(function(property) {
       return res.json({
@@ -72,7 +78,10 @@ module.exports = function(app, db, options){
         start_time = param.start_time,
         end_time = param.end_time,
         zipcode = param.zipcode,
-        isjde = param.isjde
+        isjde = param.isjde,
+        bill_sync_date = param.bill_sync_date,
+        mch_id = param.mch_id,
+        partner_key = param.partner_key
 
 
     KerryProperty.findOne({
@@ -92,7 +101,10 @@ module.exports = function(app, db, options){
           start_time: start_time,
           end_time: end_time,
           zipcode: zipcode,
-          isjde: isjde
+          isjde: isjde,
+          bill_sync_date: bill_sync_date,
+          mch_id: mch_id,
+          partner_key: partner_key
         })
         .then(function(property) {
           return res.json({
