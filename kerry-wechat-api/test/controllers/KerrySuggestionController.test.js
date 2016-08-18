@@ -18,10 +18,17 @@ module.exports = function(app, db, config){
         return db.sequelize.model("KerrySuggestionReply").sync({force: false})
       })
       .then(function() {
+        return db.sequelize.query("DELETE FROM kerry_suggestion_replies")
+      })
+      .then(function() {
+        return db.sequelize.query("DELETE FROM kerry_suggestions")
+      })
+      .then(function() {
         done();
       })
     })
 
+    var id;
     it("POST提交意见", function(done){
       request(app)
         .post("/api/suggestions/create")
@@ -33,7 +40,7 @@ module.exports = function(app, db, config){
         .expect(function(res){
           expect(res.body.success).to.be.true;
           expect(res.body.data).to.exist;
-
+          id = res.body.data.id
         })
         .end(done);
     })
@@ -88,7 +95,7 @@ module.exports = function(app, db, config){
         .send({
           content: 'lalalalalal',
           sys_user_id: 1,
-          suggestion_id: 31,
+          suggestion_id: id,
           appId: 'shanghai'
         })
         .expect(200)
@@ -133,7 +140,7 @@ module.exports = function(app, db, config){
         .send({
           content: 'lalalalalalaaa',
           sys_user_id: 1,
-          suggestion_id: 31,
+          suggestion_id: id,
           appId: 'shanghai'
         })
         .expect(200)

@@ -248,6 +248,7 @@ module.exports = function(app, db, options){
             wechat_id: row.wechat_id,
             wechat_nickname: row.wechat_nickname,
             property_name: row.property_name,
+            has_reply: row.has_reply,
             units: [{
               unit_id: row.unit_id,
               unit_number: row.unit_number,
@@ -294,17 +295,16 @@ module.exports = function(app, db, options){
         wechat_user_id: wechat_user_id
       },
       include: [{
-        model: sequelize.model("User"),
-        as: "wechat_user"
-      }, {
         model: sequelize.model("KerryProperty"),
-        as: "property"
+        as: "property",
+        attributes: ["name"]
       }, {
         model: sequelize.model("KerrySuggestionReply"),
         as: 'suggestion_reply',
         include: [{
           model: sequelize.model("SysUser"),
-          as: 'sys_user'
+          as: 'sys_user',
+          attributes: ["firstName", "lastName"]
         }]
       }],
       offset: offset,
