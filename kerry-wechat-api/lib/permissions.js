@@ -57,12 +57,14 @@ module.exports = [
       httpPath: "^\/api\/billboards.*"
     },
     {
-      name: "查询账单",
+      name: "上传账单",
       httpMethod: "POST",
-      httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills|\/billManager\/queryByTime)"
+      httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills|"+
+                "\/propertyBills\/queryPropertyBillsView|\/propertyBills\/queryPropertyBillsView)|"+
+                "\/propertyBills\/pushMessage)|\/propertyBills\/pushMessageAll)|\/propertyBills\/upload)"
     },
     {
-      name: "编辑账单",
+      name: "账单管理",
       httpMethod: "POST",
       httpPath: "^\/api(\/propertyBills.*|\/propertyBillLines.*|\/billManager.*)"
     },
