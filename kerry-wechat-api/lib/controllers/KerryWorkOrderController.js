@@ -19,9 +19,8 @@ module.exports = function(app, db, options){
     var param = req.body,
         unit_id = param.unit_id,
         title = param.title,
-        assetIds = param.assetIds,
-        owner = param.owner,
-        mobile = param.mobile
+        assetIds = param.assetIds || [],
+        wechat_user_id = param.wechat_user_id
 
     if (!unit_id) {
       return res.status(400).json({
@@ -37,48 +36,73 @@ module.exports = function(app, db, options){
       })
     }
 
-    if (!owner) {
+    if (!wechat_user_id) {
       return res.status(400).json({
         success: false,
-        errMsg: '请输入联系人'
+        errMsg: '无效的微信号'
       })
     }
 
-    if (!mobile) {
-      return res.status(400).json({
-        success: false,
-        errMsg: '请输入手机号'
-      })
-    }
+    sequelize.model("UserUnitBinding").findOne({
+      where: {
+        wechat_user_id: wechat_user_id,
+        unit_id: unit_id
+      }
+    })
+    .then(function(userUnit) {
+      if (!userUnit) {
+        return res.status(400).json({
+          success: false,
+          errMsg: '微信号没有与该单元绑定!'
+        })
+      }
 
-    KerryWorkOrder.create({
-      unit_id: unit_id,
-      owner: owner,
-      mobile: mobile
-    })
-    .then(function(order) {
-      return KerryWorkOrderLine.create({
-        kerry_work_order_id: order.id,
-        title: title,
-        count: 1
+      KerryWorkOrder.create({
+        unit_id: unit_id,
+        owner: userUnit.username,
+        mobile: userUnit.mobile
       })
-    })
-    .then(function(orderLine) {
-      WechatAssets.update({
-        kerry_work_order_id: orderLine.kerry_work_order_id
-      }, {
-        where: {
-          id:{
-            $in: assetIds
+      .then(function(order) {
+        return KerryWorkOrderLine.create({
+          kerry_work_order_id: order.id,
+          title: title,
+          count: 1
+        })
+      })
+      .then(function(orderLine) {
+        return WechatAssets.update({
+          kerry_work_order_id: orderLine.kerry_work_order_id
+        }, {
+          where: {
+            id:{
+              $in: assetIds
+            }
           }
-        }
+        })
+      })
+      .then(function() {
+        return res.json({
+          success: true
+        })
+      })
+      .catch(function(err) {
+        console.log(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
+        })
       })
     })
-    .then(function() {
-      return res.json({
-        success: true
+    .catch(function(err) {
+      console.log(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
       })
     })
+
 
   })
 
@@ -97,10 +121,62 @@ module.exports = function(app, db, options){
   })
 
   router.post("/query", function(req, res, next) {
-    return res.json({
-      success: true,
-      data: 'to do'
+    var param = req.body,
+        offset = param.offset || 0,
+        limit = param.limit || 20,
+        unit_desc = param.unit_desc || '',
+        appId = param.appId
+
+    KerryWorkOrder.findAndCountAll({
+      subQuery: false,
+      include: [{
+        model: KerryWorkOrderLine,
+        as: 'kerry_work_order_lines',
+        attributes: ['id', 'title', 'price', 'count', 'amount']
+      }, {
+        model: sequelize.model("WechatAssets"),
+        attributes: ['id', 'media_id', 'url', 'type'],
+        as: 'wechat_assets'
+      }, {
+        model: sequelize.model("SysUser"),
+        as: "sys_user",
+        attributes: ["id", "firstName", "lastName"]
+      },  {
+        model: sequelize.model("User"),
+        as: "wechat_user",
+        attributes: ["username", "wechatId", "wechatNickname", "wechatSex", "wechatProvince", "wechatCity", "wechatHeadimage"]
+      }, {
+        model: sequelize.model("Units"),
+        as: 'unit',
+        attributes: ["id", "unit_number", "unit_desc"],
+        where: {
+          unit_desc: {
+            $like: '%'+unit_desc+'%'
+          }
+        },
+        include: [{
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          where: {
+            appId: appId
+          }
+        }]
+      }],
+      offset: offset,
+      limit: limit,
+      order: 'id desc'
     })
+    .then(function(results) {
+      return res.json({
+        success: true,
+        data: results.rows,
+        count: results.count,
+        offset: offset,
+        limit: limit
+      })
+    })
+
+
   })
 
 

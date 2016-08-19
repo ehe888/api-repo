@@ -250,5 +250,30 @@ module.exports = function(app, db, options){
     })
   })
 
+  router.post("/getByAppId", function(req, res, next) {
+    var param = req.body,
+        appId = param.appId;
+    KerryProperty.findOne({
+      where: {
+        appId: appId
+      },
+      attributes: ["name", "appId", "telephone", "start_time", "end_time", "bill_sync_day"]
+    })
+    .then(function(property) {
+      return res.json({
+        success: true,
+        data: property
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false
+          ,errMsg: err.message
+          ,errors: err
+        })
+      })
+    })
+  })
+
   app.use("/properties", router);
 }

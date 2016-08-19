@@ -15,7 +15,10 @@ module.exports = function(app, db, config){
     before(function(done) {
       db.sequelize.model("KerryWorkOrder").sync({force: false})
       .then(function() {
-        db.sequelize.model("KerryWorkOrderLine").sync({force: false})
+        return db.sequelize.model("KerryWorkOrderLine").sync({force: false})
+      })
+      .then(function() {
+        return db.sequelize.model("KerryWorkOrderComment").sync({force: false})
       })
       .then(function() {
         done()
@@ -25,7 +28,11 @@ module.exports = function(app, db, config){
     it("POST提交工单", function(done){
       request(app)
         .post("/api/workOrder/create")
-        .send()
+        .send({
+          unit_id: 2,
+          title: '灯坏了',
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
+        })
         .expect(200)
         .expect(function(res){
           console.log(res.body)
@@ -34,6 +41,19 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("POST查询工单", function(done){
+      request(app)
+        .post("/api/workOrder/query")
+        .send({
+          appId: 'shanghai'
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
 
   });
 }
