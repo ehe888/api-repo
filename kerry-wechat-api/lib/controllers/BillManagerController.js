@@ -279,6 +279,8 @@ module.exports = function(app, db, options){
     if (timeOption.length > 0) {
       query += ' AND ' + timeOption
     }
+
+    debug(is_pay)
     if (typeof is_pay != 'undefined' && is_pay != null && is_pay != '') {
       query += ' AND is_pay=' + is_pay
     }

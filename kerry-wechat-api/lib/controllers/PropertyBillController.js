@@ -740,7 +740,7 @@ module.exports = function(app, db, options){
         color: '#173177'
       },
       remark:{
-        value: '当期费用: '+amount+"元, 请您在线支付或前往管理处缴费。 谢谢您的配合！",
+        value: '当期费用: '+amount+"元, 请您在线支付或者前往管理处缴纳。 谢谢您的配合！",
         color: '#173177'
       }
     }
