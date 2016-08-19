@@ -291,6 +291,7 @@ module.exports = function(app, db, options){
     var wechat_user_id = req.body.wechat_user_id;
     KerrySuggestion
     .findAndCountAll({
+      subQuery: false,
       where: {
         wechat_user_id: wechat_user_id
       },
