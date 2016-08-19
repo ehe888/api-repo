@@ -465,7 +465,7 @@ module.exports = function(app, db, options){
                     openid: suggestion.wechat_id,
                     template_id: template.id,
                     content: contentStr,
-                    template_type: 'bill',
+                    template_type: 'suggestion_reply',
                     unit_id: unit_id
                   })
                   .then((log)=> {

@@ -107,6 +107,9 @@ module.exports = function(app, db, options){
   })
 
   router.post("/update", function(req, res, next) {
+    var param = req.body,
+        id = param.id;
+    
     return res.json({
       success: true,
       data: 'to do'
