@@ -161,7 +161,7 @@ module.exports = function(app, db, options){
       query += " AND unit_desc like '%"+unit_desc+"%' "
     }
 
-    if (typeof is_pay != 'undefined' && is_pay != null && is_pay != '') {
+    if (typeof is_pay != 'undefined' && is_pay != null && is_pay !== '') {
       query += ' AND is_pay=' + is_pay
     }
 
@@ -281,7 +281,8 @@ module.exports = function(app, db, options){
     }
 
     debug(is_pay)
-    if (typeof is_pay != 'undefined' && is_pay != null && is_pay != '') {
+
+    if (typeof is_pay != 'undefined' && is_pay != null && is_pay !== '') {
       query += ' AND is_pay=' + is_pay
     }
 
@@ -304,7 +305,7 @@ module.exports = function(app, db, options){
       if (timeOption.length > 0) {
         countQuery += ' AND ' + timeOption
       }
-      if (typeof is_pay != 'undefined' &&  is_pay != null && is_pay != '') {
+      if (typeof is_pay != 'undefined' &&  is_pay != null && is_pay !== '') {
         countQuery += ' AND is_pay=' + is_pay
       }
 
