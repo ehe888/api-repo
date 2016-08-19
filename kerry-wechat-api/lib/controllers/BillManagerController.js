@@ -174,9 +174,12 @@ module.exports = function(app, db, options){
 
       for (var i = 0; i < results.length; i++) {
         var result = results[i];
-        var payDateObj = new Date(result.pay_date),
+        var payDateObj,
             pay_date = ""
-        if (payDateObj != 'Invalid Date') {
+        if (result.pay_date) {
+          payDateObj = new Date(result.pay_date)
+        }
+        if (payDateObj && payDateObj != 'Invalid Date') {
           pay_date = payDateObj.getFullYear() +"-"+ (payDateObj.getMonth()+1)+"-"+ (payDateObj.getDate())
         }
         data.push({
