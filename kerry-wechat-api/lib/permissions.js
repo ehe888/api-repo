@@ -11,11 +11,11 @@ module.exports = [
       httpMethod: "POST",
       httpPath: "^\/api\/units(\/query|\/query_all)"
     },
-    {
-      name: "编辑户号",
-      httpMethod: "POST",
-      httpPath: "^\/api\/units.*"
-    },
+    // {
+    //   name: "编辑户号",
+    //   httpMethod: "POST",
+    //   httpPath: "^\/api\/units.*"
+    // },
     {
       name: "查询业主",
       httpMethod: "POST",
@@ -31,11 +31,11 @@ module.exports = [
       httpMethod: "POST",
       httpPath: "^\/api\/wechatUsers.*"
     },
-    {
-      name: "查询管家",
-      httpMethod: "POST",
-      httpPath: "^\/api\/sysuser"
-    },
+    // {
+    //   name: "查询管家",
+    //   httpMethod: "POST",
+    //   httpPath: "^\/api\/sysuser"
+    // },
     {
       name: "管家单元绑定",
       httpMethod: "POST",
@@ -78,9 +78,9 @@ module.exports = [
       httpMethod: "POST",
       httpPath: "^(\/api\/wechatAssets.*|\/wxapi.*)"
     },
-    {
-      name: "个人中心",
-      httpMethod: "POST",
-      httpPath: "^\/api(\/auth.*|\/sysusers\/deleteUnit|\/sysusers\/updateUnits)"
-    }
+    // {
+    //   name: "个人中心",
+    //   httpMethod: "POST",
+    //   httpPath: "^\/api(\/auth.*|\/sysusers\/deleteUnit|\/sysusers\/updateUnits)"
+    // }
 ]
