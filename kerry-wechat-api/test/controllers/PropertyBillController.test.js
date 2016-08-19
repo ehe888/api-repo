@@ -398,7 +398,7 @@ module.exports = function(app, db, config){
 
     it("根据支付日期查询账单", (done) => {
       var today = new Date('2016-08-18');
-      sequelize.model("PropertyBillLine").update({
+      db.sequelize.model("PropertyBillLine").update({
         pay_date: today
       }, {
         where: {

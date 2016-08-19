@@ -174,6 +174,11 @@ module.exports = function(app, db, options){
 
       for (var i = 0; i < results.length; i++) {
         var result = results[i];
+        var payDateObj = new Date(result.pay_date),
+            pay_date = ""
+        if (payDateObj != 'Invalid Date') {
+          pay_date = payDateObj.getFullYear() +"-"+ (payDateObj.getMonth()+1)+"-"+ (payDateObj.getDate())
+        }
         data.push({
           bill_line_id: result.bill_line_id,
           bill_number: result.bill_number,
@@ -187,7 +192,7 @@ module.exports = function(app, db, options){
           unit_desc: result.unit_desc,
           wechat_trade_no: result.wechat_trade_no,
           remark: result.remark,
-          pay_date: result.pay_date
+          pay_date: pay_date
         })
       }
 
