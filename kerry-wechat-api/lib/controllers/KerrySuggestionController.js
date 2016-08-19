@@ -262,7 +262,11 @@ module.exports = function(app, db, options){
         }
       }
       returnData.data = data;
-      return sequelize.query('SELECT count(1) FROM vw_suggestion WHERE app_id = ?',
+      var countQuery = 'SELECT count(1) FROM vw_suggestion WHERE app_id = ? '
+      if (req.units) {
+        countQuery += " AND unit_id in (" + req.units.join(",") + ") "
+      }
+      return sequelize.query(countQuery,
                        {
                          replacements: [appId],
                          type: sequelize.QueryTypes.SELECT
