@@ -29,7 +29,7 @@ module.exports = function(app, db, options){
         end_time = param.end_time,
         zipcode = param.zipcode,
         isjde = param.isjde,
-        bill_sync_date = param.bill_sync_date,
+        bill_sync_day = param.bill_sync_day,
         mch_id = param.mchId,
         partner_key = param.partnerKey
 
@@ -45,7 +45,7 @@ module.exports = function(app, db, options){
       end_time: end_time,
       zipcode: zipcode,
       isjde: isjde,
-      bill_sync_date: bill_sync_date,
+      bill_sync_day: bill_sync_day,
       mchId: mch_id,
       partnerKey: partner_key
     })
@@ -79,7 +79,7 @@ module.exports = function(app, db, options){
         end_time = param.end_time,
         zipcode = param.zipcode,
         isjde = param.isjde,
-        bill_sync_date = param.bill_sync_date,
+        bill_sync_day = param.bill_sync_day,
         mch_id = param.mchId,
         partner_key = param.partnerKey
 
@@ -102,7 +102,7 @@ module.exports = function(app, db, options){
           end_time: end_time,
           zipcode: zipcode,
           isjde: isjde,
-          bill_sync_date: bill_sync_date,
+          bill_sync_day: bill_sync_day,
           mchId: mch_id,
           partnerKey: partner_key
         })
