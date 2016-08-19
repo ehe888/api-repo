@@ -233,7 +233,7 @@ module.exports = function(app, db, options){
 
   router.post('/sync', function(req, res, next) {
     var now = new Date()
-    var syncExec = req.x_app_config.syncExec + ">sync_"+now.getFullYear()+(now.getMonth()+1)+now.getDate()
+    var syncExec = req.x_app_config.syncExec + "sync_"+now.getFullYear()+(now.getMonth()+1)+now.getDate()+".log"
     console.log("exec: "+syncExec)
     exec(syncExec, {maxBuffer: 1024 * 2000}, (error, stdout, stderr) => {
       if (error) {
