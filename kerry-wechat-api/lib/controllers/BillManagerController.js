@@ -173,8 +173,8 @@ module.exports = function(app, db, options){
                   'wechat_trade_no': '微信交易号', 'remark': '备注', 'pay_date': '支付日期'}];
 
       for (var i = 0; i < results.length; i++) {
-        var result = results[i];
-        var payDateObj,
+        let result = results[i];
+        let payDateObj,
             pay_date = ""
         if (result.pay_date) {
           payDateObj = new Date(result.pay_date)
