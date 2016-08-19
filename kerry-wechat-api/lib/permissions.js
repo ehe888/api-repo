@@ -60,8 +60,8 @@ module.exports = [
       name: "上传账单",
       httpMethod: "POST",
       httpPath: "^\/api(\/propertyBills\/queryPropertyBills|\/propertyBills\/queryUserBills|"+
-                "\/propertyBills\/queryPropertyBillsView|\/propertyBills\/queryPropertyBillsView)|"+
-                "\/propertyBills\/pushMessage)|\/propertyBills\/pushMessageAll)|\/propertyBills\/upload)"
+                "\/propertyBills\/queryPropertyBillsView|\/propertyBills\/queryPropertyBillsView|"+
+                "\/propertyBills\/pushMessage|\/propertyBills\/pushMessageAll|\/propertyBills\/upload)"
     },
     {
       name: "账单管理",
