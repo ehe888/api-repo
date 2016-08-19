@@ -718,8 +718,9 @@ module.exports = function(app, db, options){
           street = property.street?property.street:"",
           desc = bill.unit.unit_desc?bill.unit.unit_desc:""
       address = city + street + desc;
-      url = config.wechatHost+"/wechat/bill_history?unit_number="+bill.unit.unit_number
-            + "&unit_id="+bill.unit.id+"&appId="+app_id
+      debug(bill.unit)
+      url = config.wechatHost+"/wechat/unpaid_bill?unit_number="+bill.unit.unit_number
+            + "&unit_id="+bill.unit.id+"&appId="+app_id+"&unit_desc="+bill.unit.unit_desc
     }
 
 
