@@ -839,7 +839,7 @@ module.exports = function(app, db, options){
     var param = req.body,
         rows = param.data;
     var bill_lines = {};
-
+    var property_id
     sequelize.model("KerryProperty").findOne({
       where:{
         app_id: param.appId
@@ -852,7 +852,7 @@ module.exports = function(app, db, options){
           errMsg: '找不到对应物业'
         })
       }
-
+      property_id = property.id
       for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         if (row.field2 == '账单开始日期') {
@@ -961,7 +961,7 @@ module.exports = function(app, db, options){
                   }
                   else {
                     //插入临时表成功, 准备插入目标表
-                    insertToPropertyBill(function(err, results) {
+                    insertToPropertyBill(unitIds ,function(err, results) {
                       if (err) {
                         debug(err)
                         debug("insert to property bill error")
@@ -1227,7 +1227,7 @@ module.exports = function(app, db, options){
   }
 
   //把临时表内的数据插入到目标楼
-  function insertToPropertyBill(callback) {
+  function insertToPropertyBill(unitIds, callback) {
     var billLineTemps = []
     var billTemps = [];
     var billNumbers = [];
@@ -1260,86 +1260,117 @@ module.exports = function(app, db, options){
         })
       }
 
-      return sequelize.transaction(function(t1) {
-        return PropertyBill
-                .bulkCreate(billTemps, {transaction: t1})
-                .then(function() {
-                  return PropertyBillLine.destroy({
-                    where: {
-                      is_pay: false
-                    }
-                  }, {transaction: t1})
-                })
-      })
-      .then(function(results) {
-
-        var insertQuery = "INSERT INTO property_bill_lines(description, gross_amount, is_pay, bill_number, property_bill_id, created_at, updated_at) VALUES";
-        var replacement = [];
-        for (var i = 0; i < billLineTemps.length; i++) {
-          var temp = billLineTemps[i];
-          if (i == 0) {
-            insertQuery += "(?, ?, false, ?, (select id from property_bills where bill_number = ?), now(), now())"
-          }else {
-            insertQuery += ",(?, ?, false, ?, (select id from property_bills where bill_number = ?), now(), now())"
-          }
-          replacement = _.concat(replacement, [temp.description, temp.gross_amount, temp.bill_number, temp.bill_number]);
-        }
-        billNumbers.push(temp.bill_number)
-        return sequelize.query(insertQuery, {replacements: replacement})
-      })
-      .then(function(results) {
-
-        return PropertyBill.update({
-            is_push: false
-          }, {
-            where: {
-              bill_number: {
-                $in: billNumbers
-              }
-            }
-          })
-
-      })
-      .then(function(results) {
-        return callback(null, results)
-      })
-      .catch(function(err) {
-
-        //插入到目标表出现错误, 逻辑补偿, 将之前插入的数据全部清除
-        var bill_numbers = [];
-        for (var i = 0; i < billTemps.length; i++) {
-          var temp = billTemps[i];
-          if (temp.bill_number && temp.bill_number.length > 0) {
-            bill_numbers.push(temp.bill_number)
+      PropertyBill.findAll({
+        where: {
+          unit_id: {
+            $in: unitIds
           }
         }
-
-        PropertyBillLine.destroy({
-          where: {
-            bill_number: {
-              $in: bill_numbers
-            }
+      })
+      .then(function(bills) {
+        var billIds = [];
+        debug("billIds")
+        debug(bills)
+        if (bills && bills.length > 0) {
+          for (var i = 0; i < bills.length; i++) {
+            var bill = bills[i];
+            billIds.push(bill.id)
           }
+        }
+        debug(billIds)
+
+        return sequelize.transaction(function(t1) {
+          return PropertyBill
+                  .bulkCreate(billTemps, {transaction: t1})
+                  .then(function() {
+                    return PropertyBillLine.destroy({
+                      where: {
+                        is_pay: false,
+                        property_bill_id: {
+                          $in: billIds
+                        }
+                      }
+                    }, {transaction: t1})
+                  })
         })
-        .then(function() {
-          return PropertyBill.destroy({
+        .then(function(results) {
+
+          var insertQuery = "INSERT INTO property_bill_lines(description, gross_amount, is_pay, bill_number, property_bill_id, created_at, updated_at) VALUES";
+          var replacement = [];
+          for (var i = 0; i < billLineTemps.length; i++) {
+            var temp = billLineTemps[i];
+            if (i == 0) {
+              insertQuery += "(?, ?, false, ?, (select id from property_bills where bill_number = ?), now(), now())"
+            }else {
+              insertQuery += ",(?, ?, false, ?, (select id from property_bills where bill_number = ?), now(), now())"
+            }
+            replacement = _.concat(replacement, [temp.description, temp.gross_amount, temp.bill_number, temp.bill_number]);
+          }
+          billNumbers.push(temp.bill_number)
+          return sequelize.query(insertQuery, {replacements: replacement})
+        })
+        .then(function(results) {
+
+          return PropertyBill.update({
+              is_push: false
+            }, {
+              where: {
+                bill_number: {
+                  $in: billNumbers
+                }
+              }
+            })
+
+        })
+        .then(function(results) {
+          return callback(null, results)
+        })
+        .catch(function(err) {
+
+          //插入到目标表出现错误, 逻辑补偿, 将之前插入的数据全部清除
+          var bill_numbers = [];
+          for (var i = 0; i < billTemps.length; i++) {
+            var temp = billTemps[i];
+            if (temp.bill_number && temp.bill_number.length > 0) {
+              bill_numbers.push(temp.bill_number)
+            }
+          }
+
+          PropertyBillLine.destroy({
             where: {
               bill_number: {
                 $in: bill_numbers
               }
             }
           })
+          .then(function() {
+            return PropertyBill.destroy({
+              where: {
+                bill_number: {
+                  $in: bill_numbers
+                }
+              }
+            })
+          })
+          .then(function() {
+            return callback(err)
+          })
+          .catch(function(error) {
+            console.error("roll back error")
+            return callback(error)
+          })
+
+
         })
-        .then(function() {
-          return callback(err)
-        })
-        .catch(function(error) {
-          console.error("roll back error")
-          return callback(error)
-        })
+
 
 
       })
+      .catch(function(error) {
+        console.error("find PropertyBill all error")
+        return callback(error)
+      })
+
     })
   }
 

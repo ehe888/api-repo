@@ -17,12 +17,12 @@ module.exports = function(app, db, config){
       .then(function() {
         return db.sequelize.model("PropertyBillLineInsertTemp").sync({force: true})
       })
-      .then(function() {
-        return db.sequelize.query('DELETE FROM property_bill_lines')
-      })
-      .then(function() {
-        return db.sequelize.query('DELETE FROM property_bills')
-      })
+      // .then(function() {
+      //   return db.sequelize.query('DELETE FROM property_bill_lines')
+      // })
+      // .then(function() {
+      //   return db.sequelize.query('DELETE FROM property_bills')
+      // })
       .then(function() {
         done()
       })
