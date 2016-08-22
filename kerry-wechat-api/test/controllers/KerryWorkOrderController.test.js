@@ -36,22 +36,6 @@ module.exports = function(app, db, config){
 
     var id, line_id
 
-    it("上传素材", function(done) {
-      request(app)
-        .post("/api/wechatAssets/uploadWorkAssets")
-        .send({
-          media_id: "Q6Dcb2Acp0R07QsDl4Ffp5jEcyf49cryyyyjtQDJ6T1q3zBuFXK09wlPV_1IFFEv",
-          appId: "wxa0c45fc6d9e269ed"
-        })
-        .expect(200)
-        .expect(function(res){
-          console.log(res.body)
-          expect(res.body.success).to.be.true;
-
-        })
-        .end(done);
-    })
-
     it("POST提交工单", function(done){
       request(app)
         .post("/api/workOrder/create")
@@ -103,11 +87,26 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+
     it("微信查询未处理维修", function(done) {
       request(app)
         .post("/api/workOrder/queryUnderWorking")
         .send({
           wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done)
+    })
+
+    it("确认已完成", function(done) {
+      request(app)
+        .post("/api/workOrder/updateComplete")
+        .send({
+          id: id
         })
         .expect(200)
         .expect(function(res){
@@ -162,6 +161,19 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("POST查询工单行", function(done){
+      request(app)
+        .post("/api/workOrder/queryLines")
+        .send({
+          order_id: id
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
 
 
     it("微信查询处理完的维修", function(done) {
@@ -204,5 +216,5 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
-  });
+  })
 }

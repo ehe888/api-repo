@@ -227,6 +227,50 @@ module.exports = function(app, db, options){
     })
   })
 
+  //后台更新状态为已处理
+  router.post("/updateComplete", function(req, res, next) {
+    var param = req.body,
+        id = param.id;
+    KerryWorkOrder.findOne({
+      where: {
+        id: id
+      }
+    })
+    .then(function(order) {
+      if (!order) {
+        return res.status(400).json({
+          success: false,
+          errMsg: '找不到该维修单'
+        })
+      }
+      order.update({
+        status: 'UNPAY'
+      })
+      .then(function() {
+        return res.json({
+          success: true
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
+        })
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
+      })
+    })
+  })
+
   //删除维修单
   router.post("/delete", function(req, res, next) {
     var param = req.body,
@@ -361,6 +405,30 @@ module.exports = function(app, db, options){
 
   })
 
+  // 后台查询维修单行
+  router.post("/queryLines", function(req, res, next) {
+    var param = req.body,
+        order_id = param.order_id
+    KerryWorkOrderLine.findAll({
+      where: {
+        kerry_work_order_id: order_id
+      }
+    })
+    .then(function(orderLines) {
+      return res.json({
+        success: true,
+        data: orderLines
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
+      })
+    })
+  })
 
   //微信端查询处理中的维修单
   router.post("/queryUnderWorking", function(req, res, next) {
@@ -373,7 +441,7 @@ module.exports = function(app, db, options){
       where: {
         wechat_user_id: wechat_user_id,
         status: {
-          $in: ['APPLYING', 'WORKING', 'UNPAY']
+          $in: ['APPLYING', 'WORKING']
         },
         is_pay: false
       },
@@ -421,7 +489,7 @@ module.exports = function(app, db, options){
       where: {
         wechat_user_id: wechat_user_id,
         status: {
-          $in: ['PAID', 'FINISH']
+          $in: ['UNPAY', 'PAID', 'FINISH']
         },
         is_pay: true
       },
@@ -484,6 +552,12 @@ module.exports = function(app, db, options){
         return res.status(400).json({
           success: false,
           errMsg: "该维修单已支付"
+        })
+      }
+      else if (order.status != 'UNPAY') {
+        return res.status(400).json({
+          success: false,
+          errMsg: "维修正在处理中, 请完成后再付款"
         })
       }
 
