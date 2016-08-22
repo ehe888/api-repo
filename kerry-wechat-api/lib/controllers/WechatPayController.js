@@ -200,7 +200,7 @@ module.exports = function(app, db, options){
     var builder = new xml2js.Builder();
     var xml = builder.buildObject(data);
     var result = req.body.xml;
-            console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
+    console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
 
     try {
       if (result.return_code == 'SUCCESS') {

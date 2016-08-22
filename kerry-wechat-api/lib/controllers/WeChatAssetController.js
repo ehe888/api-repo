@@ -16,6 +16,7 @@ var router = express.Router();
 router.post("/", function(req, res, next) {
   var param = req.body,
       media_id = param.media_id,
+      type = param.type || 'image',
       appId = param.appId
 
   var bearer = req.headers['authorization'];
@@ -24,6 +25,7 @@ router.post("/", function(req, res, next) {
   WechatAssets.findOne({
     where: {
       media_id: media_id,
+      type: type,
       app_id: appId
     }
   })

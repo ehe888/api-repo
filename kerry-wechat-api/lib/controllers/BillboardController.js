@@ -28,7 +28,7 @@ module.exports = function(app, db, options){
         appId = param.appId
 
     var config = req.x_app_config,
-        host = config.apiHost;
+        host = config.apiLocal;
 
     KerryProperty.findOne({
       where: {
