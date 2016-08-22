@@ -20,7 +20,6 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body,
         unit_id = param.unit_id,
-        title = param.title,
         assetIds = param.assetIds || [],
         wechat_user_id = param.wechat_user_id,
         content = param.content
@@ -32,7 +31,7 @@ module.exports = function(app, db, options){
       })
     }
 
-    if (!title) {
+    if (!content) {
       return res.status(400).json({
         success: false,
         errMsg: '请输入内容'
@@ -87,7 +86,7 @@ module.exports = function(app, db, options){
         })
       })
       .catch(function(err) {
-        console.log(err)
+        console.error(err)
         return res.status(500).json({
           success: false,
           errMsg: err.message,
@@ -96,7 +95,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -105,6 +104,7 @@ module.exports = function(app, db, options){
     })
   })
 
+  //后台添加维修工单行
   router.post("/addOrderLine", function(req, res, next) {
     var param = req.body,
         id = param.id,
@@ -158,7 +158,7 @@ module.exports = function(app, db, options){
         })
       })
       .catch(function(err) {
-        console.log(err)
+        console.error(err)
         return res.status(500).json({
           success: false,
           errMsg: err.message,
@@ -167,7 +167,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -177,6 +177,55 @@ module.exports = function(app, db, options){
 
   })
 
+  //后台添加维修人员信息
+  router.post("/addWorker", function(req, res, next) {
+    var param = req.body,
+        id = param.id,
+        worker_name = param.worker_name,
+        worker_phone = param.worker_phone
+    KerryWorkOrder.findOne({
+      where: {
+        id: id
+      }
+    })
+    .then(function(order) {
+      if (!order) {
+        return res.status(400).json({
+          success: false,
+          errMsg: '找不到该维修单'
+        })
+      }
+
+      order.update({
+        worker_name: worker_name,
+        worker_phone: worker_phone,
+        status: 'WORKING'
+      })
+      .then(function() {
+        //todo 发送模板消息
+        return res.json({
+          success: true
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
+        })
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
+      })
+    })
+  })
 
   //删除维修单
   router.post("/delete", function(req, res, next) {
@@ -207,7 +256,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -215,7 +264,6 @@ module.exports = function(app, db, options){
       })
     })
   })
-
 
   //删除维修行
   router.post("/deleteLine", function(req, res, next) {
@@ -232,7 +280,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -240,7 +288,6 @@ module.exports = function(app, db, options){
       })
     })
   })
-
 
   //后台查询维修单
   router.post("/query", function(req, res, next) {
@@ -303,7 +350,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -354,7 +401,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -406,7 +453,7 @@ module.exports = function(app, db, options){
       })
     })
     .catch(function(err) {
-      console.log(err)
+      console.error(err)
       return res.status(500).json({
         success: false,
         errMsg: err.message,
@@ -415,7 +462,119 @@ module.exports = function(app, db, options){
     })
   })
 
+  //微信端支付
+  router.post("/pay", function(req, res, next) {
+    var param = req.body,
+        wechat_user_id = param.wechat_user_id,
+        id = param.id
+    KerryWorkOrder.findOne({
+      where: {
+        wechat_user_id: wechat_user_id,
+        id: id
+      }
+    })
+    .then(function(order) {
+      if (!order) {
+        return res.status(400).json({
+          success: fasle,
+          errMsg: '找不到该维修单!'
+        })
+      }
+      else if (order.is_pay) {
+        return res.status(400).json({
+          success: false,
+          errMsg: "该维修单已支付"
+        })
+      }
 
+      var gross_amount = order.gross_amount
+      //todo 微信支付
+
+      order.update({
+        is_pay: true,
+        status: 'PAID'
+      })
+      .then(function(order) {
+        return res.json({
+          success: true,
+          data: order
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
+        })
+      })
+
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
+      })
+    })
+
+  })
+
+
+  // 微信端评论
+  router.post("/comment", function(req, res, next) {
+    var param = req.body,
+        id = param.id,
+        wechat_user_id = param.wechat_user_id,
+        content = param.content
+    KerryWorkOrder.findOne({
+      where: {
+        wechat_user_id: wechat_user_id,
+        id: id,
+        status: 'PAID'
+      }
+    })
+    .then(function(order) {
+      if (!order) {
+        return res.status(400).json({
+          success: fasle,
+          errMsg: '找不到该维修单!'
+        })
+      }
+
+      KerryWorkOrderComment.create({
+        content: content,
+        kerry_work_order_id: id
+      })
+      .then(function(comment) {
+        return order.update({
+          status: 'FINISH'
+        })
+      })
+      .then(function() {
+        return res.json({
+          success: true
+        })
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
+        })
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
+      })
+    })
+  })
 
   app.use("/workOrder", router);
 

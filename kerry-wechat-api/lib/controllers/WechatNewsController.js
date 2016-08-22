@@ -96,7 +96,6 @@ router.post("/singleNews", function(req, res, next) {
 
   var bearer = req.headers['authorization'];
   var config = req.x_app_config;
-
   var url = config.apiLocal +'/wxapi/news/post_single_news?app_id='+appId
   var option = {
     uri: url,

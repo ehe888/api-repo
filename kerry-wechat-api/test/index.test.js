@@ -36,7 +36,7 @@ app.use(function(req, res, next){
                     ut: 'PROPERTY',
                     iat: 1469182996,
                     exp: 1469254996 };
-   req.headers['authorization'] = 'Bearer aaaaaa';
+   req.headers['authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIui2hee6p-eUqOaItyJdLCJ1dCI6IlBST1BFUlRZIiwiaWF0IjoxNDcxODQ0NjIzLCJleHAiOjIzMzU4NDQ2MjN9.1Qjtrwzp2xmo0Yse2KyWRhgjtwkqUgxAMZYSLofw4cg';
    return next();
   })
 
