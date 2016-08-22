@@ -21,6 +21,16 @@ router.post("/combineNews", function(req, res, next) {
   var bearer = req.headers['authorization'];
   var config = req.x_app_config;
 
+  for (var i = 0; i < news_item.length; i++) {
+    var news = news_item[i];
+    if (!news.content || news.content == '') {
+      return res.status(400).json({
+        success: false,
+        errMsg: '"'+news.title+'" 内容为空!'
+      })
+    }
+  }
+
   var url = config.apiLocal +'/wxapi/news/post_news?app_id='+appId
   var option = {
     uri: url,
