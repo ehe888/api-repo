@@ -23,7 +23,7 @@ module.exports = function(app, db, options){
         assetIds = param.assetIds || [],
         wechat_user_id = param.wechat_user_id,
         content = param.content
-
+    debug(assetIds)
     if (!unit_id) {
       return res.status(400).json({
         success: false,

@@ -21,6 +21,9 @@ module.exports = function(app, db, config){
         return db.sequelize.model("KerryWorkOrderComment").sync({force: false})
       })
       .then(function() {
+        return db.sequelize.query("UPDATE wechat_assets SET kerry_work_order_id = NULL")
+      })
+      .then(function() {
         return db.sequelize.query("DELETE FROM kerry_work_order_comments")
       })
       .then(function() {
@@ -42,7 +45,8 @@ module.exports = function(app, db, config){
         .send({
           unit_id: 2,
           content: '灯坏了',
-          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
+          assetIds: [5, 8]
         })
         .expect(200)
         .expect(function(res){
