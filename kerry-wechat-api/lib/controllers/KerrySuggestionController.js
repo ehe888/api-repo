@@ -212,7 +212,11 @@ module.exports = function(app, db, options){
 
     var query = "SELECT * FROM vw_suggestion WHERE app_id = ? "
     if (req.units) {
-      query += " AND unit_id in (" + req.units.join(",") + ") "
+      var unitsStr = "null"
+      if (req.units.length > 0) {
+        unitsStr = req.units.join(",")
+      }
+      query += " AND unit_id in (" + unitsStr + ") "
     }
     query += " ORDER BY id DESC OFFSET ? LIMIT ?";
 
