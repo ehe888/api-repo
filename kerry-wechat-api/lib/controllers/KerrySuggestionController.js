@@ -268,7 +268,11 @@ module.exports = function(app, db, options){
       returnData.data = data;
       var countQuery = 'SELECT count(1) FROM vw_suggestion WHERE app_id = ? '
       if (req.units) {
-        countQuery += " AND unit_id in (" + req.units.join(",") + ") "
+        var unitsStr = "null"
+        if (req.units.length > 0) {
+          unitsStr = req.units.join(",")
+        }
+        countQuery += " AND unit_id in (" + unitsStr + ") "
       }
       return sequelize.query(countQuery,
                        {
