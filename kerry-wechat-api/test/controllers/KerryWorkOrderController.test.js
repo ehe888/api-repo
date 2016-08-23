@@ -46,7 +46,7 @@ module.exports = function(app, db, config){
           unit_id: 2,
           content: '灯坏了',
           wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
-          assetIds: [5, 8]
+          assetIds: "5, 8"
         })
         .expect(200)
         .expect(function(res){
@@ -70,7 +70,7 @@ module.exports = function(app, db, config){
         .expect(function(res){
           console.log(res.body)
           expect(res.body.success).to.be.true;
-          line_id = res.body.id
+          line_id = res.body.data.id
         })
         .end(done);
     })

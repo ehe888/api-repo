@@ -316,15 +316,89 @@ module.exports = function(app, db, options){
   router.post("/deleteLine", function(req, res, next) {
     var param = req.body,
         order_line_id = param.order_line_id
-    KerryWorkOrderLine.destroy({
+
+    KerryWorkOrderLine.findOne({
       where: {
         id: order_line_id
       }
     })
-    .then(function() {
-      return res.json({
-        success: true
+    .then(function(orderLine) {
+      if (!orderLine) {
+        return res.status(400).json({
+          success: false,
+          errMsg: '找不到该维修项目'
+        })
+      }
+
+      var amount = orderLine.amount?parseFloat(orderLine.amount):0
+      KerryWorkOrder.findOne({
+        where: {
+          id: orderLine.kerry_work_order_id
+        }
       })
+      .then(function(order) {
+        if (!order) {
+          return res.status(400).json({
+            success: false,
+            errMsg: '找不到该维修单'
+          })
+        }
+        var gross_amount = order.gross_amount?parseFloat(order.gross_amount):0
+        if (!isNaN(gross_amount) && !isNaN(amount)) {
+          gross_amount -= amount
+          gross_amount = gross_amount < 0?0:gross_amount
+
+          order.update({
+            gross_amount: gross_amount
+          })
+          .then(function() {
+            KerryWorkOrderLine.destroy({
+              where: {
+                id: order_line_id
+              }
+            })
+            .then(function() {
+              return res.json({
+                success: true
+              })
+            })
+            .catch(function(err) {
+              console.error(err)
+              return res.status(500).json({
+                success: false,
+                errMsg: err.message,
+                errors: err
+              })
+            })
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.status(500).json({
+              success: false,
+              errMsg: err.message,
+              errors: err
+            })
+          })
+
+        }
+        else {
+          console.error(order.gross_amount, orderLine.amount)
+          return res.status(500).json({
+            success: false,
+            errMsg: '更新价格时出错'
+          })
+        }
+
+      })
+      .catch(function(err) {
+        console.error(err)
+        return res.status(500).json({
+          success: false,
+          errMsg: err.message,
+          errors: err
+        })
+      })
+
     })
     .catch(function(err) {
       console.error(err)
@@ -334,6 +408,7 @@ module.exports = function(app, db, options){
         errors: err
       })
     })
+
   })
 
   //后台查询维修单
