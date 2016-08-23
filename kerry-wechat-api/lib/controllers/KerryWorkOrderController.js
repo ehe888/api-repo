@@ -20,9 +20,12 @@ module.exports = function(app, db, options){
   router.post("/create", function(req, res, next) {
     var param = req.body,
         unit_id = param.unit_id,
-        assetIds = param.assetIds || [],
+        assetIds = param.assetIds,
         wechat_user_id = param.wechat_user_id,
         content = param.content
+    if (assetIds && assetIds.length > 0) {
+      assetIds = assetIds.split(",")
+    }
     debug(assetIds)
     if (!unit_id) {
       return res.status(400).json({
