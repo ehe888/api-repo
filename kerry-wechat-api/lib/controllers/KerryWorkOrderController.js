@@ -148,7 +148,7 @@ module.exports = function(app, db, options){
       })
       .then(function(_orderLine) {
         orderLine = _orderLine
-        var gross_amount = order.gross_amount || 0;
+        var gross_amount = order.gross_amount?parseFloat(order.gross_amount):0;
         gross_amount += amount;
         return order.update({
           gross_amount: gross_amount
