@@ -89,7 +89,8 @@ module.exports = function(app, db, options){
   router.post("/updatePay", function(req, res, next) {
     var param = req.body,
         id = param.id,
-        remark = param.remark || "";
+        remark = param.remark || "",
+        sys_user_id = param.sys_user_id
 
     PropertyBillLine.findOne({
       where: {
@@ -107,7 +108,8 @@ module.exports = function(app, db, options){
       line.update({
         is_pay: true,
         remark: remark,
-        pay_date: (new Date())
+        pay_date: (new Date()),
+        sys_user_id: sys_user_id
       })
       .then(function(line) {
         return res.json({

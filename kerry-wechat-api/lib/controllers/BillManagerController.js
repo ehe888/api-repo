@@ -69,7 +69,13 @@ module.exports = function(app, db, options){
                 pay_date: row.pay_date,
                 remark: row.remark,
                 expire_date: row.expire_date,
-                wechat_trade_no: row.wechat_trade_no
+                wechat_trade_no: row.wechat_trade_no,
+                sys_user: {
+                  id: row.sys_user_id,
+                  username: row.sys_username,
+                  first_name: row.first_name,
+                  last_name: row.last_name
+                }
               }],
               unit: [{
                 id: row.unit_id,
@@ -90,7 +96,13 @@ module.exports = function(app, db, options){
               pay_date: row.pay_date,
               remark: row.remark,
               expire_date: row.expire_date,
-              wechat_trade_no: row.wechat_trade_no
+              wechat_trade_no: row.wechat_trade_no,
+              sys_user: {
+                id: row.sys_user_id,
+                username: row.sys_username,
+                first_name: row.first_name,
+                last_name: row.last_name
+              }
             })
 
             bill.unit.push({
