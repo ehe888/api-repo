@@ -106,6 +106,20 @@ module.exports = function(app, db, config){
         .end(done)
     })
 
+    it("后台查询未处理维修个数", function(done) {
+      request(app)
+        .post("/api/workOrder/queryApplingCount")
+        .send({
+          appId: "shanghai"
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done)
+    })
+
     it("确认已完成", function(done) {
       request(app)
         .post("/api/workOrder/updateComplete")

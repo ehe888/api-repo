@@ -63,7 +63,7 @@ module.exports = function(app, db, options){
         $like: '%'+unit_desc+'%'
       }
     }
-    console.log(unitOption)
+    // console.log(unitOption)
 
     Units.findAndCountAll({
       where: unitOption,

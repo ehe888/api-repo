@@ -419,6 +419,18 @@ module.exports = function(app, db, options){
         unit_desc = param.unit_desc || '',
         appId = param.appId
 
+    var unitOption = {};
+    if (req.units) {
+      unitOption.id = {
+        $in: req.units
+      }
+    }
+    if (unit_desc && unit_desc.length > 0) {
+      unitOption.unit_desc =  {
+        $like: '%'+unit_desc+'%'
+      }
+    }
+
     KerryWorkOrder.findAndCountAll({
       subQuery: false,
       include: [{
@@ -445,11 +457,7 @@ module.exports = function(app, db, options){
         model: sequelize.model("Units"),
         as: 'unit',
         attributes: ["id", "unit_number", "unit_desc"],
-        where: {
-          unit_desc: {
-            $like: '%'+unit_desc+'%'
-          }
-        },
+        where: unitOption,
         include: [{
           model: sequelize.model("KerryProperty"),
           as: 'property',
@@ -506,6 +514,51 @@ module.exports = function(app, db, options){
         errors: err
       })
     })
+  })
+
+  // 后台查询未处理个数
+  router.post("/queryApplingCount", function(req, res, next) {
+    var param = req.body,
+        appId = param.appId
+
+    var unitOption = {};
+    if (req.units) {
+      unitOption.id = {
+        $in: req.units
+      }
+    }
+
+    KerryWorkOrder.count({
+      subQuery: false,
+      include: [{
+        model: sequelize.model("Units"),
+        as: 'unit',
+        attributes: ["id"],
+        where: unitOption,
+        include: [{
+          model: sequelize.model("KerryProperty"),
+          as: 'property',
+          where: {
+            appId: appId
+          }
+        }]
+      }]
+    })
+    .then(function(count) {
+      return res.json({
+        success: true,
+        data: count
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false,
+        errMsg: err.message,
+        errors: err
+      })
+    })
+
   })
 
   //微信端查询处理中的维修单
@@ -672,7 +725,6 @@ module.exports = function(app, db, options){
     })
 
   })
-
 
   // 微信端评论
   router.post("/comment", function(req, res, next) {
