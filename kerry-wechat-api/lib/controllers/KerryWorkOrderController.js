@@ -582,8 +582,7 @@ module.exports = function(app, db, options){
         wechat_user_id: wechat_user_id,
         status: {
           $in: ['APPLYING', 'WORKING']
-        },
-        is_pay: false
+        }
       },
       // subQuery: false,
       include: [{
@@ -630,8 +629,7 @@ module.exports = function(app, db, options){
         wechat_user_id: wechat_user_id,
         status: {
           $in: ['UNPAY', 'PAID', 'FINISH']
-        },
-        is_pay: true
+        }
       },
       include: [{
         model: KerryWorkOrderLine,
