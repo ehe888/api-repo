@@ -579,11 +579,7 @@ module.exports = function(app, db, options){
     var param = req.body;
     var id = param.id;
 
-    SysRoleUser.destroy({
-      where: {
-        sys_user_id: id
-      }
-    })
+    sequelize.query("DELETE FROM sys_role_users WHERE sys_user_id=?", {replacements: [id]})
     .then(function() {
 
       SysUser.findOne({
