@@ -634,6 +634,33 @@ module.exports = function(app, db, options){
     })
   })
 
+  // 查询未回复的反馈数量
+  router.post("/queryUnreplyCount", function(req, res, next) {
+    var param = req.body,
+        appId = param.appId,
+        sys_user_id = param.sys_user_id
+
+    sequelize.query("SELECT COUNT(1) FROM kerry_suggestions "+
+      " JOIN kerry_properties ON kerry_suggestions.property_id = kerry_properties.id "+
+      " WHERE kerry_suggestions.deleted_at IS NULL AND kerry_properties.app_id=? AND kerry_suggestions.id NOT IN "+
+      "(SELECT DISTINCT(kerry_suggestion_id) FROM kerry_suggestion_replies)",
+       {replacements: [appId],type: sequelize.QueryTypes.SELECT})
+    .then(function(results) {
+      return res.json({
+        success: true,
+        data: results
+      })
+    })
+    .catch(function(err) {
+      console.error(err)
+      return res.status(500).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
+
+  })
 
   app.use("/suggestions", router);
 }

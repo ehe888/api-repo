@@ -89,6 +89,20 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("查询未回复的反馈数量", function(done) {
+      request(app)
+        .post("/api/suggestions/queryUnreplyCount")
+        .send({
+          appId:'shanghai'
+        })
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.success).to.be.true;
+          console.log(res.body.data)
+        })
+        .end(done);
+    })
+
     it("提交回复", function(done) {
       request(app)
         .post("/api/suggestions/reply")
