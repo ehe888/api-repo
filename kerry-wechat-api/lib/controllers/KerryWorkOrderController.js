@@ -577,11 +577,12 @@ module.exports = function(app, db, options){
         offset = param.offset || 0,
         limit = param.limit || 10
 
-    KerryWorkOrder.findAndCountAll({
+    var results = {}
+    KerryWorkOrder.findAll({
       where: {
         wechat_user_id: wechat_user_id,
         status: {
-          $in: ['APPLYING', 'WORKING']
+          $in: ['APPLYING', 'WORKING', 'UNPAY']
         }
       },
       // subQuery: false,
@@ -598,13 +599,24 @@ module.exports = function(app, db, options){
       limit: limit,
       order: [[ sequelize.col('id') , 'DESC' ]]
     })
-    .then(function(results) {
+    .then(function(data) {
+      results.rows = data
+      return KerryWorkOrder.count({
+        where: {
+          wechat_user_id: wechat_user_id,
+          status: {
+            $in: ['APPLYING', 'WORKING', 'UNPAY']
+          }
+        }
+      })
+    })
+    .then(function(count) {
       return res.json({
         success: true,
         data: results.rows,
         offset: offset,
         limit: limit,
-        count: results.count
+        count: count
       })
     })
     .catch(function(err) {
@@ -624,11 +636,12 @@ module.exports = function(app, db, options){
         offset = param.offset,
         limit = param.limit
 
-    KerryWorkOrder.findAndCountAll({
+    var results = {}
+    KerryWorkOrder.findAll({
       where: {
         wechat_user_id: wechat_user_id,
         status: {
-          $in: ['UNPAY', 'PAID', 'FINISH']
+          $in: ['PAID', 'FINISH']
         }
       },
       include: [{
@@ -648,13 +661,24 @@ module.exports = function(app, db, options){
       limit: limit,
       order: [[ sequelize.col('id') , 'DESC' ]]
     })
-    .then(function(results) {
+    .then(function(data) {
+      results.rows = data
+      return KerryWorkOrder.count({
+        where: {
+          wechat_user_id: wechat_user_id,
+          status: {
+            $in: ['PAID', 'FINISH']
+          }
+        }
+      })
+    })
+    .then(function(count) {
       return res.json({
         success: true,
         data: results.rows,
         offset: offset,
         limit: limit,
-        count: results.count
+        count: count
       })
     })
     .catch(function(err) {
