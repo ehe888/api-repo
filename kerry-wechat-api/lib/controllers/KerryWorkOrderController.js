@@ -432,7 +432,7 @@ module.exports = function(app, db, options){
     }
 
     KerryWorkOrder.findAndCountAll({
-      subQuery: false,
+      // subQuery: false,
       include: [{
         model: KerryWorkOrderLine,
         as: 'kerry_work_order_lines',
@@ -468,7 +468,7 @@ module.exports = function(app, db, options){
       }],
       offset: offset,
       limit: limit,
-      order: 'id desc'
+      order: [[ sequelize.col('id') , 'DESC' ]]
     })
     .then(function(results) {
       return res.json({
@@ -585,7 +585,7 @@ module.exports = function(app, db, options){
         },
         is_pay: false
       },
-      subQuery: false,
+      // subQuery: false,
       include: [{
         model: KerryWorkOrderLine,
         as: 'kerry_work_order_lines',
@@ -597,7 +597,7 @@ module.exports = function(app, db, options){
       }],
       offset: offset,
       limit: limit,
-      order: 'id desc'
+      order: [[ sequelize.col('id') , 'DESC' ]]
     })
     .then(function(results) {
       return res.json({
@@ -633,7 +633,6 @@ module.exports = function(app, db, options){
         },
         is_pay: true
       },
-      subQuery: false,
       include: [{
         model: KerryWorkOrderLine,
         as: 'kerry_work_order_lines',
@@ -649,7 +648,7 @@ module.exports = function(app, db, options){
       }],
       offset: offset,
       limit: limit,
-      order: 'id desc'
+      order: [[ sequelize.col('id') , 'DESC' ]]
     })
     .then(function(results) {
       return res.json({
