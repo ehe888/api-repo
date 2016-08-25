@@ -519,7 +519,8 @@ module.exports = function(app, db, options){
   // 后台查询未处理个数
   router.post("/queryApplingCount", function(req, res, next) {
     var param = req.body,
-        appId = param.appId
+        appId = param.appId,
+        sys_user_id = param.sys_user_id
 
     var unitOption = {};
     if (req.units) {
@@ -528,8 +529,14 @@ module.exports = function(app, db, options){
       }
     }
 
+    var orderOption = {}
+    if (sys_user_id) {
+      orderOption.sys_user_id = sys_user_id
+    }
+
     KerryWorkOrder.count({
       subQuery: false,
+      where: orderOption,
       include: [{
         model: sequelize.model("Units"),
         as: 'unit',
