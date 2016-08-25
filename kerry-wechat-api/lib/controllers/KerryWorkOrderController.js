@@ -529,7 +529,9 @@ module.exports = function(app, db, options){
       }
     }
 
-    var orderOption = {}
+    var orderOption = {
+      status: 'APPLYING'
+    }
     if (sys_user_id) {
       orderOption.sys_user_id = sys_user_id
     }
