@@ -464,6 +464,15 @@ module.exports = function(app, db, options){
           where: {
             appId: appId
           }
+        }, {
+          model: sequelize.model("UserUnitBinding"),
+          as: "user_unit_binding",
+          attributes: ["user_type"],
+          where: {
+            wechat_user_id: {
+              $col: '"wechat_user"."username"'
+            }
+          }
         }]
       }],
       offset: offset,
