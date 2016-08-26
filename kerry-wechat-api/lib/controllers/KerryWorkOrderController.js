@@ -8,6 +8,11 @@ module.exports = function(app, db, options){
      sequelize = db.sequelize,  //The sequelize instance
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      models = options.db,
+     fs = require('fs'),
+     env = process.env.NODE_ENV,
+     xml2js = require('xml2js'),
+     Payment = require('../wechatPay/payment').Payment,
+     Paymentmiddleware = require('../wechatPay/middleware'),
      KerryWorkOrder = sequelize.model("KerryWorkOrder"),
      KerryWorkOrderLine = sequelize.model("KerryWorkOrderLine"),
      KerryWorkOrderComment = sequelize.model("KerryWorkOrderComment")
@@ -25,6 +30,9 @@ module.exports = function(app, db, options){
         content = param.content
     if (assetIds && assetIds.length > 0) {
       assetIds = assetIds.split(",")
+    }
+    else {
+      assetIds = []
     }
     debug(assetIds)
     if (!unit_id) {
@@ -704,7 +712,9 @@ module.exports = function(app, db, options){
   router.post("/pay", function(req, res, next) {
     var param = req.body,
         wechat_user_id = param.wechat_user_id,
-        id = param.id
+        id = param.id,
+        appId = param.appId
+
     KerryWorkOrder.findOne({
       where: {
         wechat_user_id: wechat_user_id,
@@ -734,14 +744,129 @@ module.exports = function(app, db, options){
       var gross_amount = order.gross_amount
       //todo 微信支付
 
-      order.update({
-        is_pay: true,
-        status: 'PAID'
+      var config = req.x_app_config;
+
+      var initalParam = {
+        trade_type: 'JSAPI',
+        spbill_create_ip: config.apiIp,
+        total_fee: gross_amount*100,
+        openid: wechat_user_id.replace('wechat_', '')
+      },
+      initalConfig = {
+        notifyUrl: config.apiHost+"/api/work/pay_callback"
+      }
+
+      sequelize.model("KerryProperty")
+      .findOne({
+        where: {
+          app_id: appId
+        }
       })
-      .then(function(order) {
-        return res.json({
-          success: true,
-          data: order
+      .then(function(property) {
+        //根据appId查询物业, 获取物业商户相关参数
+        if (!property) {
+          return res.json({
+            success: false,
+            errMsg: '没有对应物业'
+          })
+        }
+        initalParam.body = property.name + "维修单"
+        initalConfig.partnerKey = property.partnerKey
+        initalConfig.appId = property.appId
+        initalConfig.mchId = property.mchId;
+
+        sequelize.model("WechatPay").count()
+        .then(function(payCount) {
+          //提交微信统一下单接口
+          var now = new Date();
+          var year = now.getFullYear(),
+              month = (now.getMonth()+1)+"",
+              day = (now.getDate())+"";
+          month = pad(month, 2);
+          day = pad(day, 2);
+          payCount = pad(payCount+"", 7);
+          var trade_no = year+month+day+payCount;
+          initalParam.out_trade_no = trade_no;
+
+          var wechatPay = new Payment(initalConfig);
+          if (env=='development') {
+
+            //统一下单成功后, 创建WechatPay记录
+            sequelize.model("WechatPay").create({
+              trade_no: initalParam.out_trade_no,
+              prepay_id: (new Date()).getTime(),
+              description: initalParam.product_name,
+              bill_lines: order.id,
+              request_content: "",
+              wechat_user_id: wechat_user_id
+            })
+            .then(function() {
+              return order.update({
+                is_pay: true,
+                status: 'PAID'
+              })
+            })
+            .then(function(order) {
+              return res.json({
+                success: true,
+                data: order,
+                config: initalConfig,
+                param: initalParam
+              })
+            })
+            .catch(function(err) {
+              console.error(err)
+              return res.status(500).json({
+                success: false,
+                errMsg: err.message,
+                errors: err
+              })
+            })
+          }
+          else {
+            debug(initalParam);
+            wechatPay.getBrandWCPayRequestParams(initalParam, function(err, payargs) {
+              if (err) {
+                console.error(err);
+                return res.json({
+                  success: false,
+                  errMsg: err
+                })
+              }
+              //统一下单成功后, 创建WechatPay记录
+              sequelize.model("WechatPay").create({
+                trade_no: initalParam.out_trade_no,
+                prepay_id: payargs.package,
+                description: initalParam.product_name,
+                bill_lines: order.id,
+                request_content: JSON.stringify(payargs),
+                wechat_user_id: wechat_user_id
+              })
+              .then(function(pay) {
+                return res.json({
+                  success: true,
+                  data: payargs
+                })
+              })
+              .catch(function(err) {
+                console.error(err)
+                return res.status(500).json({
+                  success: false,
+                  errMsg: err.message,
+                  errors: err
+                })
+              })
+
+            })
+          }
+        })
+        .catch(function(err) {
+          console.error(err)
+          return res.status(500).json({
+            success: false,
+            errMsg: err.message,
+            errors: err
+          })
         })
       })
       .catch(function(err) {
@@ -752,7 +877,6 @@ module.exports = function(app, db, options){
           errors: err
         })
       })
-
     })
     .catch(function(err) {
       console.error(err)
@@ -818,6 +942,15 @@ module.exports = function(app, db, options){
       })
     })
   })
+
+
+  function pad(n, length) {
+    if (n.length < length) {
+      return pad("0"+n, length)
+    }else {
+      return n;
+    }
+  }
 
   app.use("/workOrder", router);
 

@@ -139,7 +139,8 @@ module.exports = function(app, db, config){
         .post("/api/workOrder/pay")
         .send({
           id: id,
-          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
+          wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE',
+          appId: 'shanghai'
         })
         .expect(200)
         .expect(function(res){
