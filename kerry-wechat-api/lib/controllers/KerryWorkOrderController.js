@@ -838,7 +838,6 @@ module.exports = function(app, db, options){
       }
 
       var gross_amount = order.gross_amount
-      //todo 微信支付
 
       var config = req.x_app_config;
 
@@ -921,7 +920,7 @@ module.exports = function(app, db, options){
             })
           }
           else {
-            debug(initalParam);
+            console.log(initalParam);
             wechatPay.getBrandWCPayRequestParams(initalParam, function(err, payargs) {
               if (err) {
                 console.error(err);
