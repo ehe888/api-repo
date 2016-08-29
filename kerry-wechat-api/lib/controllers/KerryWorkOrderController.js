@@ -894,7 +894,8 @@ module.exports = function(app, db, options){
               description: initalParam.product_name,
               bill_lines: order.id,
               request_content: "",
-              wechat_user_id: wechat_user_id
+              wechat_user_id: wechat_user_id,
+              type: 'work_order'
             })
             .then(function() {
               return order.update({
@@ -936,7 +937,8 @@ module.exports = function(app, db, options){
                 description: initalParam.product_name,
                 bill_lines: order.id,
                 request_content: JSON.stringify(payargs),
-                wechat_user_id: wechat_user_id
+                wechat_user_id: wechat_user_id,
+                type: 'work_order'
               })
               .then(function(pay) {
                 return res.json({
@@ -982,6 +984,89 @@ module.exports = function(app, db, options){
         errors: err
       })
     })
+
+  })
+
+  //微信支付回调
+  router.post("/pay_callback", function(req, res, next) {
+    res.set('Content-Type', 'text/xml');
+    var data = {
+      return_code: 'SUCCESS'
+    }
+    var builder = new xml2js.Builder();
+    var xml = builder.buildObject(data);
+    var result = req.body.xml;
+    console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
+
+    try {
+      if (result.return_code == 'SUCCESS') {
+        //支付回调成功,
+        if (result.result_code == 'SUCCESS') {
+          //支付成功
+          var trade_no = result.out_trade_no,
+              transaction_id = result.transaction_id;
+          sequelize.model("WechatPay").findOne({
+            where: {
+              trade_no: trade_no,
+              type: 'work_order'
+            }
+          })
+          .then(function(wechatpay) {
+            wechatpay.update({
+              status: "PAID",
+              wechat_response_content: JSON.stringify(req.body),
+              transaction_id: transaction_id
+            })
+            .then(function(instance) {
+              var orderId = wechatpay.bill_lines
+              return KerryWorkOrder.findOne({
+                where: {
+                  id: id
+                }
+              })
+            })
+            .then(function(order) {
+              return order.update({
+                is_pay: true,
+                status: 'PAID'
+              })
+            })
+            .then(function(order) {
+              return res.send(xml)
+            })
+            .catch(function(err) {
+              console.error(err)
+              return res.send(xml)
+            })
+          })
+          .catch(function(err) {
+            console.error(err)
+            return res.send(xml)
+          })
+
+          console.log('WECHAT PAY SUCCESS'+JSON.stringify(req.body));
+        }
+        else {
+          if (result.err_code) {
+            console.error("Wechat Pay Error")
+            console.error("err_code is ", result.err_code);
+            return res.send(xml);
+          }
+        }
+      }
+      else {
+        console.error("Wechat Pay Return Error")
+        if (result.return_msg) {
+          console.error("return_msg is ", result.return_msg);
+        }
+        return res.send(xml);
+      }
+
+    }
+    catch(e) {
+      console.error(e);
+      return res.send(xml);
+    }
 
   })
 

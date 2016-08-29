@@ -14,15 +14,6 @@ module.exports = function(app, db, options){
      Paymentmiddleware = require('../wechatPay/middleware'),
      UpdateWechatPayBill = require('../Utils/UpdateWechatPayBill');
 
-  // var initConfig = {
-  //  partnerKey: "w4go19um14n73r2v2v3wvderavvscgz0",  //w4go19um14n73r2v2v3wvderavvscgz0  API密钥，嘉里不夜城
-  //  appId: "wx59b13639314be7c8",
-  //  mchId: "1352525102",
-  //  notifyUrl: "http://www.weixin.qq.com/wxpay/pay.php"//,
-  //  //pfx: fs.readFileSync("../../cert/apiclient_cert.p12")
-  // };
-  // var payment = new Payment(initConfig);
-
   models = options.db;
 
   var router = express.Router();
