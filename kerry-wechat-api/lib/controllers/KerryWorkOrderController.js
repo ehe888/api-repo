@@ -21,6 +21,8 @@ module.exports = function(app, db, options){
   var router = express.Router();
   var env = process.env.NODE_ENV
 
+  var SendTemplateMessage = require('../Utils/SendTemplateMessage')
+
   //创建维修
   router.post("/create", function(req, res, next) {
     var param = req.body,
@@ -194,6 +196,11 @@ module.exports = function(app, db, options){
         id = param.id,
         worker_name = param.worker_name,
         worker_phone = param.worker_phone
+
+    var port = req.app.settings.port
+    var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port )
+    var config = req.x_app_config
+
     KerryWorkOrder.findOne({
       where: {
         id: id
@@ -214,8 +221,51 @@ module.exports = function(app, db, options){
       })
       .then(function() {
         //todo 发送模板消息
-        return res.json({
-          success: true
+        sequelize.model("Template").findOne({
+          where: {
+            template_type: 'work_order'
+          }
+        })
+        .then(function(template) {
+          if (!template) {
+            return res.json({
+              success: true
+            })
+          }
+          else {
+
+            var openid = order.wechat_user_id.replace("wechat_", "")
+            var template_id = template.id
+            var content = {},
+                contentStr = JSON.stringify(content)
+            var unit_id = order.unit_id
+
+            sequelize.model("PushMessageLog").create({
+              openid: openid,
+              template_id: template_id,
+              content: contentStr,
+              template_type: 'work_order',
+              unit_id: unit_id
+            })
+            .then((log)=> {
+              if (env == 'development') {
+                return res.json({
+                  success: true,
+                  data: log
+                })
+              }
+              var url = config.wechatHost+"/wechat/work_history?appId="+appId
+              var topcolor = '#173177';
+              var bearer = req.headers['authorization'];
+              var access_token = bearer.substring("Bearer".length).trim();
+              SendTemplateMessage([openid], contentStr, template.template_id, url, topcolor, access_token, appId, host, function() {
+                return res.json({
+                  success: true,
+                  data: reply
+                })
+              })
+            })
+          }
         })
       })
       .catch(function(err) {

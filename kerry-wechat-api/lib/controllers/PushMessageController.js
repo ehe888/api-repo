@@ -166,6 +166,7 @@ module.exports = function(app, db, options){
         appId = param.appId,
         deliveryId = param.deliveryId,
         replyId = param.replyId,
+        workId = param.workId,
         billId = param.billId;
 
     if (!deliveryId || !billId || !replyId) {
@@ -237,6 +238,28 @@ module.exports = function(app, db, options){
       }else {
         return template.update({
           template_id: replyId
+        })
+      }
+    })
+    .then(function() {
+      return Template.findOne({
+        where: {
+          template_type: 'work_order',
+          app_id: appId
+        }
+      })
+    })
+    .then(function() {
+      if (!template) {
+        return Template.create({
+          template_id: workId,
+          template_type: 'work_order',
+          data: '{}',
+          app_id: appId
+        })
+      }else {
+        return template.update({
+          template_id: workId
         })
       }
     })
