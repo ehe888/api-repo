@@ -249,7 +249,7 @@ module.exports = function(app, db, options){
         }
       })
     })
-    .then(function() {
+    .then(function(template) {
       if (!template) {
         return Template.create({
           template_id: workId,
