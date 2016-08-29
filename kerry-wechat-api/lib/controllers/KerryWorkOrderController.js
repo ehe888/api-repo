@@ -38,7 +38,7 @@ module.exports = function(app, db, options){
     }
     debug(assetIds)
     if (!unit_id) {
-      return res.status(400).json({
+      return res.status(500).json({
         success: false,
         errMsg: '无效的户号',
         errors: new Error('无效的户号!')
@@ -46,7 +46,7 @@ module.exports = function(app, db, options){
     }
 
     if (!content) {
-      return res.status(400).json({
+      return res.status(500).json({
         success: false,
         errMsg: '请输入内容',
         errors: new Error('请输入内容!')
@@ -54,7 +54,7 @@ module.exports = function(app, db, options){
     }
 
     if (!wechat_user_id) {
-      return res.status(400).json({
+      return res.status(500).json({
         success: false,
         errMsg: '无效的微信号',
         errors: new Error('无效的微信号!')
@@ -70,7 +70,7 @@ module.exports = function(app, db, options){
     })
     .then(function(userUnit) {
       if (!userUnit) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: '微信号没有与该单元绑定!',
           errors: new Error('微信号没有与该单元绑定!')
@@ -130,7 +130,7 @@ module.exports = function(app, db, options){
         title = param.title;
 
     if (isNaN(price) || isNaN(count)) {
-      return res.status(400).json({
+      return res.status(500).json({
         success: false,
         errMsg: '请输入正确的价格和数量',
         errors: new Error('请输入正确的价格和数量!')
@@ -148,7 +148,7 @@ module.exports = function(app, db, options){
     })
     .then(function(order) {
       if (!order) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: '找不到该维修单!',
           errors: new Error('找不到该维修单!')
@@ -220,7 +220,7 @@ module.exports = function(app, db, options){
     })
     .then(function(order) {
       if (!order) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: '找不到该维修单',
           errors: new Error('找不到该维修单!')
@@ -352,7 +352,7 @@ module.exports = function(app, db, options){
     })
     .then(function(order) {
       if (!order) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: '找不到该维修单',
           errors: new Error('找不到该维修单!')
@@ -436,7 +436,7 @@ module.exports = function(app, db, options){
     })
     .then(function(orderLine) {
       if (!orderLine) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: '找不到该维修项目',
           errors: new Error('找不到该维修单!')
@@ -451,7 +451,7 @@ module.exports = function(app, db, options){
       })
       .then(function(order) {
         if (!order) {
-          return res.status(400).json({
+          return res.status(500).json({
             success: false,
             errMsg: '找不到该维修单',
             errors: new Error('找不到该维修单!')
@@ -829,21 +829,21 @@ module.exports = function(app, db, options){
     })
     .then(function(order) {
       if (!order) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: fasle,
           errMsg: '找不到该维修单!',
           errors: new Error('找不到该维修单!')
         })
       }
       else if (order.is_pay) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: "该维修单已支付",
           errors: new Error('该微信单已支付!')
         })
       }
       else if (order.status != 'UNPAY') {
-        return res.status(400).json({
+        return res.status(500).json({
           success: false,
           errMsg: "维修正在处理中, 请完成后再付款",
           errors: new Error('维修正在处理中, 请完成后再付款')
@@ -1097,7 +1097,7 @@ module.exports = function(app, db, options){
     })
     .then(function(order) {
       if (!order) {
-        return res.status(400).json({
+        return res.status(500).json({
           success: fasle,
           errMsg: '找不到该维修单!',
           errors: new Error('找不到该维修单!')
