@@ -204,7 +204,12 @@ module.exports = function(app, db, options){
     KerryWorkOrder.findOne({
       where: {
         id: id
-      }
+      },
+      include: [{
+        model: sequelize.model("Units"),
+        as: "unit",
+        attributes: ["unit_number", "unit_desc"]
+      }]
     })
     .then(function(order) {
       if (!order) {
@@ -236,7 +241,47 @@ module.exports = function(app, db, options){
 
             var openid = order.wechat_user_id.replace("wechat_", "")
             var template_id = template.id
-            var content = {},
+            var title = order.content
+            if (title.length > 20) {
+              title = title.substr(0, 20) + "..."
+            }
+            var created_at = new Date(order.created_at)
+            var create_time = ""
+            if (created_at != 'Invalid Date') {
+              create_time = created_at.getFullYear()+"年"+(created_at.getMonth()+1)
+                            +"月"+created_at.getDate()+"日 " + created_at.getHours()
+                            +":"+created_at.getMinutes()
+            }
+            var now = new Date(),
+                nowTime = now.getFullYear()+"年"+(now.getMonth()+1)
+                              +"月"+now.getDate()+"日"
+            var content = {
+              first: "尊敬的业主, 您的报修有新的进展",
+              keyword1: {
+                value: order.unit.unit_desc,
+                color: '#173177'
+              },
+              keyword2: {
+                value: title,
+                color: '#173177'
+              },
+              keyword3: {
+                value: create_time,
+                color: '#173177'
+              },
+              keyword4: {
+                value: "已指派给维修人员"+worker_name+", 联系电话:"+worker_phone,
+                color: '#173177'
+              },
+              keyword5: {
+                value: nowTime,
+                color: '#173177'
+              },
+              remark: {
+                value: '上门前工作人员将提前与您预约，请保持电话畅通，谢谢。',
+                color: '#000000'
+              }
+            },
                 contentStr = JSON.stringify(content)
             var unit_id = order.unit_id
 
@@ -261,7 +306,7 @@ module.exports = function(app, db, options){
               SendTemplateMessage([openid], contentStr, template.template_id, url, topcolor, access_token, appId, host, function() {
                 return res.json({
                   success: true,
-                  data: reply
+                  data: log
                 })
               })
             })
