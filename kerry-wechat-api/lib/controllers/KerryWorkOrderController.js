@@ -195,7 +195,8 @@ module.exports = function(app, db, options){
     var param = req.body,
         id = param.id,
         worker_name = param.worker_name,
-        worker_phone = param.worker_phone
+        worker_phone = param.worker_phone,
+        appId = param.appId
 
     var port = req.app.settings.port
     var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port )
