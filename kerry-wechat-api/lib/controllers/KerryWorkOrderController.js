@@ -40,21 +40,24 @@ module.exports = function(app, db, options){
     if (!unit_id) {
       return res.status(400).json({
         success: false,
-        errMsg: '无效的户号'
+        errMsg: '无效的户号',
+        error: new Error('无效的户号!')
       })
     }
 
     if (!content) {
       return res.status(400).json({
         success: false,
-        errMsg: '请输入内容'
+        errMsg: '请输入内容',
+        error: new Error('请输入内容!')
       })
     }
 
     if (!wechat_user_id) {
       return res.status(400).json({
         success: false,
-        errMsg: '无效的微信号'
+        errMsg: '无效的微信号',
+        error: new Error('无效的微信号!')
       })
     }
 
@@ -69,7 +72,8 @@ module.exports = function(app, db, options){
       if (!userUnit) {
         return res.status(400).json({
           success: false,
-          errMsg: '微信号没有与该单元绑定!'
+          errMsg: '微信号没有与该单元绑定!',
+          error: new Error('微信号没有与该单元绑定!')
         })
       }
 
@@ -128,7 +132,8 @@ module.exports = function(app, db, options){
     if (isNaN(price) || isNaN(count)) {
       return res.status(400).json({
         success: false,
-        errMsg: '请输入正确的价格和数量'
+        errMsg: '请输入正确的价格和数量',
+        error: new Error('请输入正确的价格和数量!')
       })
     }
 
@@ -145,7 +150,8 @@ module.exports = function(app, db, options){
       if (!order) {
         return res.status(400).json({
           success: false,
-          errMsg: '找不到该维修单!'
+          errMsg: '找不到该维修单!',
+          error: new Error('找不到该维修单!')
         })
       }
       var amount = price * count;
@@ -216,7 +222,8 @@ module.exports = function(app, db, options){
       if (!order) {
         return res.status(400).json({
           success: false,
-          errMsg: '找不到该维修单'
+          errMsg: '找不到该维修单',
+          error: new Error('找不到该维修单!')
         })
       }
 
@@ -347,7 +354,8 @@ module.exports = function(app, db, options){
       if (!order) {
         return res.status(400).json({
           success: false,
-          errMsg: '找不到该维修单'
+          errMsg: '找不到该维修单',
+          error: new Error('找不到该维修单!')
         })
       }
       order.update({
@@ -430,7 +438,8 @@ module.exports = function(app, db, options){
       if (!orderLine) {
         return res.status(400).json({
           success: false,
-          errMsg: '找不到该维修项目'
+          errMsg: '找不到该维修项目',
+          error: new Error('找不到该维修单!')
         })
       }
 
@@ -444,7 +453,8 @@ module.exports = function(app, db, options){
         if (!order) {
           return res.status(400).json({
             success: false,
-            errMsg: '找不到该维修单'
+            errMsg: '找不到该维修单',
+            error: new Error('找不到该维修单!')
           })
         }
         var gross_amount = order.gross_amount?parseFloat(order.gross_amount):0
@@ -821,19 +831,22 @@ module.exports = function(app, db, options){
       if (!order) {
         return res.status(400).json({
           success: fasle,
-          errMsg: '找不到该维修单!'
+          errMsg: '找不到该维修单!',
+          error: new Error('找不到该维修单!')
         })
       }
       else if (order.is_pay) {
         return res.status(400).json({
           success: false,
-          errMsg: "该维修单已支付"
+          errMsg: "该维修单已支付",
+          error: new Error('该微信单已支付!')
         })
       }
       else if (order.status != 'UNPAY') {
         return res.status(400).json({
           success: false,
-          errMsg: "维修正在处理中, 请完成后再付款"
+          errMsg: "维修正在处理中, 请完成后再付款",
+          error: new Error('维修正在处理中, 请完成后再付款')
         })
       }
 
@@ -1086,7 +1099,8 @@ module.exports = function(app, db, options){
       if (!order) {
         return res.status(400).json({
           success: fasle,
-          errMsg: '找不到该维修单!'
+          errMsg: '找不到该维修单!',
+          error: new Error('找不到该维修单!')
         })
       }
 
