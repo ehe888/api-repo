@@ -861,7 +861,7 @@ module.exports = function(app, db, options){
         openid: wechat_user_id.replace('wechat_', '')
       },
       initalConfig = {
-        notifyUrl: config.apiHost+"/api/work/pay_callback"
+        notifyUrl: config.apiHost+"/api/workOrder/pay_callback"
       }
 
       sequelize.model("KerryProperty")
