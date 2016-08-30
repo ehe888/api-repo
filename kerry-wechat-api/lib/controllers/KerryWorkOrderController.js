@@ -1033,17 +1033,22 @@ module.exports = function(app, db, options){
               var orderId = wechatpay.bill_lines
               return KerryWorkOrder.findOne({
                 where: {
-                  id: id
+                  id: orderId
                 }
               })
             })
             .then(function(order) {
-              return order.update({
-                is_pay: true,
-                status: 'PAID',
-                remark: '微信支付',
-                pay_date: new Date()
-              })
+              if (!order) {
+                throw new Error("找不到维修单!")
+              }
+              else {
+                return order.update({
+                  is_pay: true,
+                  status: 'PAID',
+                  remark: '微信支付',
+                  pay_date: new Date()
+                })
+              }
             })
             .then(function(order) {
               return res.send(xml)
