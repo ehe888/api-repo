@@ -558,7 +558,7 @@ module.exports = function(app, db, options){
       }, {
         model: sequelize.model("SysUser"),
         as: "sys_user",
-        attributes: ["id", "firstName", "lastName"]
+        attributes: ["id", "firstName", "lastName", "username"]
       },  {
         model: sequelize.model("User"),
         as: "wechat_user",
@@ -1041,7 +1041,8 @@ module.exports = function(app, db, options){
               return order.update({
                 is_pay: true,
                 status: 'PAID',
-                remark: '微信支付'
+                remark: '微信支付',
+                pay_date: new Date()
               })
             })
             .then(function(order) {
@@ -1116,7 +1117,8 @@ module.exports = function(app, db, options){
           sys_user_id: sys_user_id,
           remark: remark,
           is_pay: true,
-          status: 'PAID'
+          status: 'PAID',
+          pay_date: new Date()
         })
       }
     })
