@@ -835,7 +835,7 @@ module.exports = function(app, db, options){
           errors: new Error('找不到该维修单!')
         })
       }
-      else if (order.is_pay) {
+      else if (order.is_pay || order.status == 'PAID' || order.status == 'FINISH') {
         return res.status(400).json({
           success: false,
           errMsg: "该维修单已支付",
@@ -1040,7 +1040,8 @@ module.exports = function(app, db, options){
             .then(function(order) {
               return order.update({
                 is_pay: true,
-                status: 'PAID'
+                status: 'PAID',
+                remark: '微信支付'
               })
             })
             .then(function(order) {
@@ -1082,6 +1083,59 @@ module.exports = function(app, db, options){
 
   })
 
+  //后台线下付款
+  router.post("/pay_offline", function(req, res, next) {
+    var param = req.body,
+        sys_user_id = param.sys_user_id,
+        remark = param.remark,
+        work_order_id = param.work_order_id
+    if (!remark || remark.length == 0) {
+      return res.status(400).json({
+        success: false,
+        errMsg: '请输入备注信息'
+      })
+    }
+    KerryWorkOrder.findOne({
+      where: {
+        id: work_order_id
+      }
+    })
+    .then(function(order) {
+      if (!order) {
+        var error = new Error('找不到该维修单!')
+        error.status = 400
+        throw error
+      }
+      else if (order.status == 'PAID' || order.status == 'FINISH' || order.is_pay) {
+        var error = new Error('维修单已经支付!')
+        error.status = 400
+        throw error
+      }
+      else {
+        return order.update({
+          sys_user_id: sys_user_id,
+          remark: remark,
+          is_pay: true,
+          status: 'PAID'
+        })
+      }
+    })
+    .then(function() {
+      return res.json({
+        success: true
+      })
+    })
+    .catch(function(error) {
+      console.error(error)
+      var status = error.status || 500
+      return res.status(status).json({
+        success: false,
+        errMsg: error.message,
+        errors: error
+      })
+    })
+  })
+
   // 微信端评论
   router.post("/comment", function(req, res, next) {
     var param = req.body,
@@ -1098,7 +1152,7 @@ module.exports = function(app, db, options){
     .then(function(order) {
       if (!order) {
         return res.status(400).json({
-          success: fasle,
+          success: false,
           errMsg: '找不到该维修单!',
           errors: new Error('找不到该维修单!')
         })

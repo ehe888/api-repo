@@ -78,6 +78,11 @@ module.exports = [
       httpMethod: "POST",
       httpPath: "^(\/api\/wechatAssets.*|\/wxapi.*)"
     },
+    {
+      name: "维修管理",
+      httpMethod: "POST",
+      httpPath: "^(\/api\/workOrder.*)"
+    },
     // {
     //   name: "个人中心",
     //   httpMethod: "POST",

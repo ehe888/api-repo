@@ -150,6 +150,39 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
+    it("后台线下支付", function(done) {
+
+      db.sequelize.model("KerryWorkOrder")
+      .update({
+        status: 'UNPAY',
+        is_pay: false
+      }, {
+        where: {
+          id: id
+        }
+      })
+      .then(function() {
+        request(app)
+          .post("/api/workOrder/pay_offline")
+          .send({
+            work_order_id: id,
+            remark: '现金',
+            sys_user_id: 1
+          })
+          .expect(200)
+          .expect(function(res){
+            console.log(res.body)
+            expect(res.body.success).to.be.true;
+          })
+          .end(done);
+      })
+      .catch(function(error) {
+        console.error(error)
+        done(error)
+      })
+
+    })
+
     it("微信端创建评论", function(done) {
       request(app)
         .post("/api/workOrder/comment")
