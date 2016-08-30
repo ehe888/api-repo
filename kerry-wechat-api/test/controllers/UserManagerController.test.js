@@ -11,48 +11,40 @@ module.exports = function(app, db, config){
 
   describe("API平台系统查询业主", function(){
 
-    // before(function(done){
-    //   var test_data = [
-    //     {
-    //       name: 'test1',
-    //       mobile: '123457674444',
-    //       reg_code: '5555355',
-    //       bind_date: (new Date())
-    //     },
-    //     {
-    //       name: 'test2',
-    //       mobile: '12322454444',
-    //       reg_code: '5325555',
-    //       bind_date: (new Date())
-    //     },
-    //     {
-    //       name: 'test3',
-    //       mobile: '1235454444',
-    //       reg_code: '551555',
-    //       bind_date: (new Date())
-    //     },
-    //     {
-    //       name: 'test4',
-    //       openid: '1563',
-    //       mobile: '1234544434',
-    //       reg_code: '555355',
-    //       bind_date: (new Date())
-    //     }
-    //   ]
-    //
-    //
-    //   db.sequelize.transaction(function(t) {
-    //     return db.sequelize.model("KerryUsers").bulkCreate(test_data)
-    //             .then(function(instance){
-    //               expect(instance).to.exist;
-    //               done()
-    //             })
-    //             .catch(function(err) {
-    //               done(err);
-    //             })
-    //   })
+    before(function(done){
+      db.sequelize.model("KerryUsers")
+      .sync({force: false})
+      .then(function() {
+        done()
+      })
 
-    // });
+    })
+
+    var id
+    it("创建业主", function(done) {
+      var now = new Date();
+      request(app)
+        .post("/api/user_settings/create")
+        .send({
+          name: 'test',
+          mobile: '15111111111',
+          sex:'male',
+          reg_code: '1234567890',
+          unit_desc: 'test',
+          appId: 'shanghai',
+          identity_no:'3102193818293821',
+          email:'test@testcomplete.com',
+          emergency_contact:'chenadaitest',
+          emergency_mobile:'13948271823',
+          expire_date: now
+        })
+        .expect(200)
+        .expect(function(res){
+          expect(res.body.success).to.be.true;
+          id = res.body.data.id
+        })
+        .end(done);
+    })
 
     it("查询业主", function(done){
 
@@ -94,11 +86,15 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/user_settings/update")
         .send({
-          id: 1,
+          id: id,
           expire_date: now,
           name: 'update name',
           mobile: '99999',
-          unit_number: '12-503'
+          sex:'female',
+          identity_no:'3102193818293821',
+          email:'test@testcomplete.com',
+          emergency_contact:'chenadaitest',
+          emergency_mobile:'13948271823'
         })
         .expect(200)
         .expect(function(res){
@@ -112,7 +108,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/user_settings/delete_bind")
         .send({
-          id: 1
+          id: id
         })
         .expect(200)
         .expect(function(res){
@@ -121,23 +117,7 @@ module.exports = function(app, db, config){
         .end(done);
     })
 
-    it("创建业主", function(done) {
-      var now = new Date();
-      request(app)
-        .post("/api/user_settings/create")
-        .send({
-          name: 'test',
-          mobile: '15111111111',
-          reg_code: '1234567890',
-          unit_number: '12-503',
-          expire_date: now
-        })
-        .expect(200)
-        .expect(function(res){
-          expect(res.body.success).to.be.true;
-        })
-        .end(done);
-    })
+
 
 
   })
