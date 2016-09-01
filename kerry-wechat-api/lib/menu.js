@@ -22,7 +22,7 @@ module.exports = [
     "link": "/messagesetting"
   },
   {
-    "name": "图文消息",
+    "name": "微信图文推送",
     "icon": "ti-image",
     "link": "/newspush"
   },
