@@ -61,7 +61,7 @@ module.exports = function(app, db, options){
       }, {
         model: KerryUsers,
         as: 'kerry_user',
-        require: true
+        required: true
       }]
     })
     .then(function(results) {
