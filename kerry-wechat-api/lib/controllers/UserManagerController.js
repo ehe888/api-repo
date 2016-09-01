@@ -141,7 +141,13 @@ module.exports = function(app, db, options){
         mobile = param.mobile || '',
         unit_id = param.unit_id,
         unit_desc = param.unit_desc || '',
-        id = param.id;
+        id = param.id,
+        sex = param.sex || '',
+        identity_no = param.identity_no || '',
+        email = param.email || '',
+        emergency_contact = param.emergency_contact || '',
+        emergency_mobile = param.emergency_mobile || '';
+
     KerryUserUnit.findOne({
       where: {
         id: id
@@ -197,6 +203,21 @@ module.exports = function(app, db, options){
           }
           if (mobile && mobile.length > 0) {
             updateOptioin.mobile = mobile
+          }
+          if (sex && sex.length > 0){
+            updateOptioin.sex = sex
+          }
+          if(identity_no && identity_no.length > 0){
+            updateOptioin.identity_no = identity_no
+          }
+          if(email && email.length > 0){
+            updateOptioin.email = email
+          }
+          if(emergency_contact && emergency_contact.length > 0){
+            updateOptioin.emergency_contact = emergency_contact
+          }
+          if(emergency_mobile && emergency_mobile.length > 0){
+            updateOptioin.emergency_mobile = emergency_mobile
           }
 
           user.update(updateOptioin)
