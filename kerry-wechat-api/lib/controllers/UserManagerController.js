@@ -60,7 +60,8 @@ module.exports = function(app, db, options){
         }]
       }, {
         model: KerryUsers,
-        as: 'kerry_user'
+        as: 'kerry_user',
+        require: true
       }]
     })
     .then(function(results) {
