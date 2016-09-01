@@ -169,7 +169,8 @@ router.post('/query', function(req, res, next) {
       app_id: appId
     },
     offset: offset,
-    limit: limit
+    limit: limit,
+    order: 'id desc'
   })
   .then(function(results) {
     var count = results.count;
@@ -203,7 +204,8 @@ router.post("/queryThisMonth", function(req, res, next) {
         $gt: thisMonth
       },
       app_id: req.body.appId
-    }
+    },
+    order: 'id desc'
   })
   .then(function(results) {
     return res.json({
