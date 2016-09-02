@@ -47,7 +47,7 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 //
 // require("./controllers/RoleController.test")(app, db, config);
 // require("./controllers/KerryPropertyController.test")(app, db, config);
-require("./controllers/UserManagerController.test")(app, db, config);
+// require("./controllers/UserManagerController.test")(app, db, config);
 // require("./controllers/UnitController.test")(app, db, config);
 // require("./controllers/SysUserController.test")(app, db, config);
 //
@@ -72,3 +72,4 @@ require("./controllers/UserManagerController.test")(app, db, config);
 // require("./controllers/SysUserUnitController.test")(app, db, config);
 // require("./controllers/KerrySync.test")(app, db, config);
 // require("./controllers/KerryWorkOrderController.test")(app, db, config);
+require("./controllers/KerryPropertyCalendarController.test")(app, db, config)
