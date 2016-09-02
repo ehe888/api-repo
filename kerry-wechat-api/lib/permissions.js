@@ -47,7 +47,7 @@ module.exports = [
       httpPath: "^\/api(\/pushMessage.*|\/delivery.*)"
     },
     {
-      name: "图文推送",
+      name: "微信图文推送",
       httpMethod: "POST",
       httpPath: "^\/api\/wechatNews.*"
     },
