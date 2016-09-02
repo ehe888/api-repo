@@ -728,7 +728,7 @@ module.exports = function(app, db, options){
     var content = {
       first: templateData.first,
       keyword1: {
-        value: "每月的01-30号",
+        value: "尽快",
         color: '#173177'
       },
       keyword2: {
@@ -740,7 +740,7 @@ module.exports = function(app, db, options){
         color: '#173177'
       },
       remark:{
-        value: '当期费用: '+amount+"元, 请您在线支付或者前往管理处缴纳。 谢谢您的配合！",
+        value: '当期费用: '+amount+"元, 请您在线支付或者前往物业服务中心缴纳。 谢谢您的配合！",
         color: '#173177'
       }
     }
