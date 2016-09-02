@@ -87,7 +87,8 @@ module.exports = function(app, db, options){
     KerryCalendar.findAll({
       where: {
         property_id: property_id
-      }
+      },
+      order: 'vacation_date'
     })
     .then((calendars) => {
       return res.json({
