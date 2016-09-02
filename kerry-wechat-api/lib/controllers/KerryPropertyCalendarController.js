@@ -18,24 +18,11 @@ module.exports = function(app, db, options){
 
   router.post("/create", (req, res, next) => {
     var param = req.body,
-        appId = param.appId,
+        property_id = param.property_id,
         vacationDate = param.vacationDate,
         desc = param.desc
 
-    var property_id
-    KerryProperty.findOne({
-      where: {
-        appId: appId
-      }
-    })
-    .then((property) => {
-      if (!property) {
-        var error = new Error('找不到物业!')
-        error.status = 400
-        throw error
-      }
-      property_id = property.id
-      return KerryCalendar.findOne({
+    KerryCalendar.findOne({
         where: {
           vacationDate: vacationDate,
           property_id: property.id
@@ -96,21 +83,9 @@ module.exports = function(app, db, options){
 
   router.post("/query", (req, res, next) => {
     var param = req.body,
-        appId = param.appId
+        property_id = param.property_id
 
-    KerryProperty.findOne({
-      where: {
-        appId: appId
-      }
-    })
-    .then((property) => {
-      if (!property) {
-        var error = new Error('找不到物业!')
-        error.status = 400
-        throw error
-      }
-
-      return KerryCalendar.findAll({
+    KerryCalendar.findAll({
         where: {
           property_id: property.id
         }
@@ -133,7 +108,7 @@ module.exports = function(app, db, options){
     })
   })
 
-  // 查询当前是否是休息时间
+  // 微信端查询当前是否是休息时间
   router.post("/check", (req ,res, next) => {
     var param = req.body,
         appId = param.appId
