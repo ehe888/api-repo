@@ -56,7 +56,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/calendar/create")
         .send({
-          appId: 'shanghai',
+          property_id: 5,
           vacationDate: now,
           desc: '中秋节'
         })
@@ -74,7 +74,7 @@ module.exports = function(app, db, config){
       request(app)
         .post("/api/calendar/query")
         .send({
-          appId: 'shanghai'
+          property_id: 5
         })
         .expect((res) => {
           var result = res.body

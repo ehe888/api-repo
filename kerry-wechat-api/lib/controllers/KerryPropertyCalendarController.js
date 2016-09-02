@@ -23,11 +23,10 @@ module.exports = function(app, db, options){
         desc = param.desc
 
     KerryCalendar.findOne({
-        where: {
-          vacationDate: vacationDate,
-          property_id: property.id
-        }
-      })
+      where: {
+        vacationDate: vacationDate,
+        property_id: property_id
+      }
     })
     .then((calendar) => {
       if (calendar && calendar.id) {
@@ -86,10 +85,9 @@ module.exports = function(app, db, options){
         property_id = param.property_id
 
     KerryCalendar.findAll({
-        where: {
-          property_id: property.id
-        }
-      })
+      where: {
+        property_id: property_id
+      }
     })
     .then((calendars) => {
       return res.json({
