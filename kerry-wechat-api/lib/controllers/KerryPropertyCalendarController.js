@@ -123,6 +123,7 @@ module.exports = function(app, db, options){
         error.status = 400
         throw error
       }
+
       var now = new Date(),
           nowHour = now.getHours(),
           nowMinute = now.getMinutes()
@@ -138,7 +139,8 @@ module.exports = function(app, db, options){
         if (nowHour < startHour || (nowHour == startHour && nowMinute < startMinute)) {
           return res.json({
             success: true,
-            isWorking: false
+            isWorking: false,
+            property: property
           })
         }
       }
@@ -151,7 +153,8 @@ module.exports = function(app, db, options){
         if (nowHour > endHour || (nowHour == endHour && nowMinute > endMinute)) {
           return res.json({
             success: true,
-            isWorking: false
+            isWorking: false,
+            property: property
           })
         }
       }
@@ -167,12 +170,14 @@ module.exports = function(app, db, options){
         if (!calendar) {
           return res.json({
             success: true,
-            isWorking: true
+            isWorking: true,
+            property: property
           })
         }
         return res.json({
           success: true,
-          isWorking: false
+          isWorking: false,
+          property: property
         })
       })
       .catch((err) => {
