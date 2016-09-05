@@ -55,22 +55,27 @@ module.exports = function(app, db, options){
       var wechatLinks = [{
         name: "我的单元",
         link: "/wechat/my_bind",
+        need_bind: true,
         property_id: property.id
       },{
         name: "物业缴费",
         link: "/wechat/unpaid_bill",
+        need_bind: true,
         property_id: property.id
       },{
         name: "缴费历史",
         link: "/wechat/bill_history",
+        need_bind: true,
         property_id: property.id
       }, {
         name: "意见反馈",
         link: "/wechat/see_suggestion",
+        need_bind: true,
         property_id: property.id
       }, {
         name: "写反馈",
         link: "/wechat/suggestion",
+        need_bind: true,
         property_id: property.id
       }, {
         name: "小区公告",
@@ -95,10 +100,12 @@ module.exports = function(app, db, options){
       }, {
         name: "我要报修",
         link: "/wechat/work",
+        need_bind: true,
         property_id: property.id
       }, {
         name: "报修查询",
         link: "/wechat/work_history",
+        need_bind: true,
         property_id: property.id
       }]
 
