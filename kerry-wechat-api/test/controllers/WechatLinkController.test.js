@@ -98,5 +98,20 @@ module.exports = function(app, db, config){
         .end(done)
     })
 
+    it("根据link 查询", (done) => {
+      request(app)
+        .post("/api/wechatLink/check")
+        .send({
+          appId: appId,
+          link: '/wechat/my_bind'
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log(res.body)
+          expect(res.body.success).to.be.true
+        })
+        .end(done)
+    })
+
   })
 }

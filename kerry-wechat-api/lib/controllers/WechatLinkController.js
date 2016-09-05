@@ -82,7 +82,48 @@ module.exports = function(app, db, options){
         ,errors: err
       })
     })
+  })
 
+  // 根据path查询
+  router.post("/check", (req, res, next) => {
+    var param = req.body,
+        appId = param.appId,
+        link = param.link
+    sequelize.model("KerryProperty").findOne({
+      where: {
+        appId: appId
+      }
+    })
+    .then((property) => {
+      if (!property) {
+        var error = new Error("找不到物业!")
+        error.status = 400
+        throw error
+      }
+      return WechatLink.findOne({
+        where: {
+          property_id: property.id,
+          link: link
+        },
+        attributes: ["is_open", "need_bind"],
+        order: sequelize.col("id")
+      })
+    })
+    .then((links) => {
+      return res.json({
+        success: true,
+        data: links
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+      var status = err.status || 500
+      return res.status(status).json({
+        success: false
+        ,errMsg: err.message
+        ,errors: err
+      })
+    })
   })
 
   app.use("/wechatLink", router);
