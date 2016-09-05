@@ -72,4 +72,5 @@ var kerryApp = require("../lib/")(app, "/api", db, {})
 // require("./controllers/SysUserUnitController.test")(app, db, config);
 // require("./controllers/KerrySync.test")(app, db, config);
 // require("./controllers/KerryWorkOrderController.test")(app, db, config);
-require("./controllers/KerryPropertyCalendarController.test")(app, db, config)
+// require("./controllers/KerryPropertyCalendarController.test")(app, db, config)
+require("./controllers/WechatLinkController.test")(app, db, config)

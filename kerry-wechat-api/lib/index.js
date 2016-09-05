@@ -41,7 +41,7 @@ module.exports = function(app, path, db, options){
   require("./controllers/SysUserUnitController")(subapp, db, options)
   require("./controllers/KerryWorkOrderController")(subapp, db, options)
   require("./controllers/KerryPropertyCalendarController")(subapp, db, options)
-
+  require("./controllers/WechatLinkController")(subapp, db, options)
 
   //当角色为物业管家时, 需要过滤查询用的unit
   app.use("/", function(req, res, next) {

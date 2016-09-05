@@ -17,6 +17,7 @@ module.exports = function(app, db, options){
 
 
   //创建物业
+  // 2016.09.05新增功能, 创建物业后, 插入wechat link model
   router.post("/create", function(req, res, next) {
     var param = req.body;
     var name = param.name,
@@ -33,7 +34,7 @@ module.exports = function(app, db, options){
         mch_id = param.mchId,
         partner_key = param.partnerKey
 
-
+    var _property;
     KerryProperty.create({
       name: name,
       appId: app_id,
@@ -50,10 +51,64 @@ module.exports = function(app, db, options){
       partnerKey: partner_key
     })
     .then(function(property) {
+      _property = property
+      var wechatLinks = [{
+        name: "我的单元",
+        link: "/wechat/my_bind",
+        property_id: property.id
+      },{
+        name: "物业缴费",
+        link: "/wechat/unpaid_bill",
+        property_id: property.id
+      },{
+        name: "缴费历史",
+        link: "/wechat/bill_history",
+        property_id: property.id
+      }, {
+        name: "意见反馈",
+        link: "/wechat/see_suggestion",
+        property_id: property.id
+      }, {
+        name: "写反馈",
+        link: "/wechat/suggestion",
+        property_id: property.id
+      }, {
+        name: "小区公告",
+        link: "/wechat/billboard",
+        property_id: property.id
+      }, {
+        name: "小区活动",
+        link: "/wechat/activity",
+        property_id: property.id
+      }, {
+        name: "办事指南",
+        link: "/wechat/guide",
+        property_id: property.id
+      }, {
+        name: "周边生活",
+        link: "/wechat/surroundings",
+        property_id: property.id
+      }, {
+        name: "享生活",
+        link: "/wechat/life_style",
+        property_id: property.id
+      }, {
+        name: "我要报修",
+        link: "/wechat/work",
+        property_id: property.id
+      }, {
+        name: "报修查询",
+        link: "/wechat/work_history",
+        property_id: property.id
+      }]
+
+      return sequelize.model("WechatLink").bulkCreate(wechatLinks)
+    })
+    .then(function() {
       return res.json({
         success: true,
-        data: property
-      });
+        data: _property
+      })
     })
     .catch(function(err) {
       console.log(err)
