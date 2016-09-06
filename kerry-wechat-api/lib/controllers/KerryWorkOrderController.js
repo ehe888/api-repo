@@ -555,7 +555,8 @@ module.exports = function(app, db, options){
       }
     }
 
-    KerryWorkOrder.findAndCountAll({
+    var data
+    KerryWorkOrder.findAll({
       // subQuery: false,
       include: [{
         model: KerryWorkOrderLine,
@@ -603,11 +604,17 @@ module.exports = function(app, db, options){
       limit: limit,
       order: [[ sequelize.col('priority') , 'ASC' ], [ sequelize.col('id') , 'DESC' ]]
     })
-    .then(function(results) {
+    .then(function(_data) {
+      data = _data
+
+      return KerryWorkOrder.count()
+
+    })
+    .then(function(count) {
       return res.json({
         success: true,
-        data: results.rows,
-        count: results.count,
+        data: data,
+        count: count,
         offset: offset,
         limit: limit
       })
