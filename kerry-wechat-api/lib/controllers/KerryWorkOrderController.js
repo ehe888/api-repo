@@ -267,8 +267,8 @@ module.exports = function(app, db, options){
             var create_time = ""
             if (created_at != 'Invalid Date') {
               create_time = created_at.getFullYear()+"年"+(created_at.getMonth()+1)
-                            +"月"+created_at.getDate()+"日 " + created_at.getHours()
-                            +":"+created_at.getMinutes()
+                            +"月"+created_at.getDate()+"日 " + pad(created_at.getHours(), 2)
+                            +":"+pad(created_at.getMinutes(), 2)
             }
             var now = new Date(order.p_end),
                 nowTime = now.getFullYear()+"年"+(now.getMonth()+1)
