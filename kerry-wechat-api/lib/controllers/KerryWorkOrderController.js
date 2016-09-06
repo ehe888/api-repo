@@ -270,7 +270,7 @@ module.exports = function(app, db, options){
                             +"月"+created_at.getDate()+"日 " + created_at.getHours()
                             +":"+created_at.getMinutes()
             }
-            var now = new Date(),
+            var now = new Date(order.p_end),
                 nowTime = now.getFullYear()+"年"+(now.getMonth()+1)
                               +"月"+now.getDate()+"日"
             var content = {
