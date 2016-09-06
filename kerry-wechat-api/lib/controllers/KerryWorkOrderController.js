@@ -214,6 +214,7 @@ module.exports = function(app, db, options){
     var host = req.protocol+"://"+req.hostname + ( port == 80 || port == 443 ? '' : ':'+port )
     var config = req.x_app_config
 
+    debug(param)
     KerryWorkOrder.findOne({
       where: {
         id: id
