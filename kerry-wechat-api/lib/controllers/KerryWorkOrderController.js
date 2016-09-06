@@ -602,7 +602,7 @@ module.exports = function(app, db, options){
       }],
       offset: offset,
       limit: limit,
-      order: [[ sequelize.col('priority') , 'ASC' ], [ sequelize.col('id') , 'DESC' ]]
+      order: [[ sequelize.col('priority') , 'DESC' ], [ sequelize.col('id') , 'DESC' ]]
     })
     .then(function(_data) {
       data = _data

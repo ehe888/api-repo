@@ -143,12 +143,21 @@ module.exports = function(app, db, options){
               }
             }
 
+            var priority = ""
+            if (_order.priority == 1) {
+              priority = "低"
+            }else if (_order.priority == 5) {
+              priority = "中"
+            }else if (_order.priority == 10) {
+              priority = "高"
+            }
+
             var print = {
               "Company_cs": _order.unit.property.name,
               "Doc": _order.order_number,
               "Or Ty": "服务工作单",
               "Wo Ty": "现场工作单",
-              "Priority": _order.priority||"",
+              "Priority": priority,
               "Dt_Init": formatDate(created_at),
               "Dt_PSta": p_start?formatDate(p_start):"",
               "Dt_PEnd": p_end?formatDate(p_end):"",
@@ -215,12 +224,19 @@ module.exports = function(app, db, options){
                    .generate({type:"nodebuffer"})
               fs.writeFile(filePath, buf, (err) => {
                 if (err) throw err
-                return res.json({
-                  success: true,
-                  order: _order,
-                  bind: binding,
-                  data: print
-                })
+                
+                if (env == 'development') {
+                  return res.json({
+                    success: true,
+                    order: _order,
+                    bind: binding,
+                    data: print
+                  })
+                }
+                else {
+                  return res.download(filePath)
+                }
+
               })
             })
 
