@@ -81,7 +81,7 @@ module.exports = [
     {
       name: "维修管理",
       httpMethod: "POST",
-      httpPath: "^(\/api\/workOrder.*)"
+      httpPath: "^(\/api\/workOrder.*|\/orderPrint.*)"
     },
     // {
     //   name: "微信链接管理",

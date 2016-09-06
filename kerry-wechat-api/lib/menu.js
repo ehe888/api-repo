@@ -51,6 +51,11 @@ module.exports = [
     "icon": "ti-announcement",
     "link": "/billboard"
   },
+  // {
+  //   "name": "微信链接管理",
+  //   "icon": "ti-mobile",
+  //   "link": "/wechatLink"
+  // },
   {
     "name": "意见反馈",
     "icon": "ti-comment-alt",

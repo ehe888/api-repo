@@ -9,6 +9,7 @@ module.exports = function(app, db, options){
      Sequelize = db.Sequelize,  //The Sequelize Class via require("sequelize")
      models = options.db,
      fs = require('fs'),
+     bwipjs = require('bwip-js'),
      env = process.env.NODE_ENV,
      xml2js = require('xml2js'),
      Payment = require('../wechatPay/payment').Payment,
@@ -16,9 +17,11 @@ module.exports = function(app, db, options){
      KerryWorkOrder = sequelize.model("KerryWorkOrder"),
      KerryWorkOrderLine = sequelize.model("KerryWorkOrderLine"),
      KerryWorkOrderComment = sequelize.model("KerryWorkOrderComment")
-     WechatAssets = sequelize.model("WechatAssets")
+     WechatAssets = sequelize.model("WechatAssets"),
+     Docxtemplater = require('docxtemplater'),
+     ImageModule=require('docxtemplater-image-module')
 
-  var router = express.Router();
+  var router = express.Router()
   var env = process.env.NODE_ENV
 
   var SendTemplateMessage = require('../Utils/SendTemplateMessage')
@@ -202,6 +205,9 @@ module.exports = function(app, db, options){
         id = param.id,
         worker_name = param.worker_name,
         worker_phone = param.worker_phone,
+        p_start = param.p_start,
+        p_end = param.p_end,
+        priority = param.priority,
         appId = param.appId
 
     var port = req.app.settings.port
@@ -230,7 +236,10 @@ module.exports = function(app, db, options){
       order.update({
         worker_name: worker_name,
         worker_phone: worker_phone,
-        status: 'WORKING'
+        status: 'WORKING',
+        p_start: p_start,
+        p_end: p_end,
+        priority: priority
       })
       .then(function() {
         //todo 发送模板消息
@@ -591,7 +600,7 @@ module.exports = function(app, db, options){
       }],
       offset: offset,
       limit: limit,
-      order: [[ sequelize.col('id') , 'DESC' ]]
+      order: [[ sequelize.col('priority') , 'ASC' ], [ sequelize.col('id') , 'DESC' ]]
     })
     .then(function(results) {
       return res.json({
@@ -1198,13 +1207,50 @@ module.exports = function(app, db, options){
     })
   })
 
-
   function pad(n, length) {
+    n = n + ""
     if (n.length < length) {
       return pad("0"+n, length)
     }else {
       return n;
     }
+  }
+
+  /**
+   * generate base64 string of barcode image
+   * @param  {[type]} code [description]
+   * @return {base64}      base64 represent of Code128 barcode
+   */
+  function generateBarcodeBase64(code, cb){
+    bwipjs.toBuffer({
+        bcid:           'code128',      // Barcode type
+        text:           code,           // Text to encode
+        scale:          2,              // 3x scaling factor
+        height:         10,             // Bar height, in millimeters
+        includetext:    true,           // Show human-readable text
+        textxalign:     'center',       // Always good to set this
+        textsize:       13              // Font size, in points
+    }, function (err, png) {
+        if (err) {
+            // Decide how to handle the error
+            // `err` may be a string or Error object
+            debug("Error in generating barcode", err);
+            return cb(err);
+
+        } else {
+            // `png` is a Buffer
+            // png.length           : PNG file length
+            // png.readUInt32BE(16) : PNG image width
+            // png.readUInt32BE(20) : PNG image height
+            //Convert png buffer to base64
+            return cb(null, png.toString('base64'));
+        }
+    });
+  }
+
+  function formatDate(date) {
+    return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate())
+          + " "+date.getHours()+":"+date.getMinutes()
   }
 
   app.use("/workOrder", router);

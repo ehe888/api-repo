@@ -76,12 +76,18 @@ module.exports = function(app, db, config){
     })
 
     it("添加维修人员信息, 状态改为处理中", function(done) {
+      var start = new Date()
+      var end = new Date(start.getFullYear(), start.getMonth(), start.getDate(),
+                        start.getHours()+2, start.getMinutes(), 0)
       request(app)
         .post("/api/workOrder/addWorker")
         .send({
           id: id,
           worker_name: "王",
-          worker_phone: "13123454345"
+          worker_phone: "13123454345",
+          priority: 5,
+          p_start: start,
+          p_end: end
         })
         .expect(200)
         .expect(function(res){
@@ -233,6 +239,20 @@ module.exports = function(app, db, config){
         .post("/api/workOrder/queryPaid")
         .send({
           wechat_user_id: 'wechat_ossPrw6Uu6gK69mwwyv151LbPgJE'
+        })
+        .expect(200)
+        .expect(function(res){
+          console.log(res.body)
+          expect(res.body.success).to.be.true;
+        })
+        .end(done);
+    })
+
+    it("打印工单", function(done) {
+      request(app)
+        .post("/api/orderPrint/print")
+        .send({
+          id: id
         })
         .expect(200)
         .expect(function(res){
