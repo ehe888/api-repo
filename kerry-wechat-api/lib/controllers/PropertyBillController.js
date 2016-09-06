@@ -631,6 +631,9 @@ module.exports = function(app, db, options){
         })
       }
       PropertyBill.findAll({
+        where: {
+          is_push: false
+        },
         include:[{
           model: sequelize.model("Units"),
           as: 'unit',
