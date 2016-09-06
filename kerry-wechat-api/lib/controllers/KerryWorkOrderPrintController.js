@@ -88,7 +88,7 @@ module.exports = function(app, db, options){
       }
 
       // 生成维修单条形码
-      var barcodePath = req.x_app_config.billPath + "/" + _order.order_number + ".png"
+      var barcodePath = req.x_app_config.billPath + _order.order_number + ".png"
       generateBarcodeBase64(_order.order_number, (err, base64) => {
         if (err) throw err
 
@@ -189,7 +189,7 @@ module.exports = function(app, db, options){
             }
 
             debug(barcodePath)
-            var filePath = req.x_app_config.billPath + "/" +_order.order_number + ".docx"
+            var filePath = req.x_app_config.billPath + _order.order_number + ".docx"
             fs.readFile(__dirname+'/template/R5548004_both_V2.docx', 'binary', (err, data) => {
               if (err) {
                 throw err

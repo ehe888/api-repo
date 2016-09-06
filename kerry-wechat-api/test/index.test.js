@@ -22,7 +22,7 @@ var app = express();
 app.use(cookieParser());
 app.use(bodyParser());
 app.use(xmlparser({ explicitArray: false }));
-config.billPath = __dirname
+config.billPath = __dirname+"/upload/"
 config.syncExec = 'node ./test/test_sync.js'
 app.locals.config = config;
 

@@ -5,12 +5,29 @@ let _   = require("lodash"),
   	express = require('express'),
     request = require('supertest'),
   	should = require('chai').should,
-    jwt = require('jsonwebtoken');
+    jwt = require('jsonwebtoken'),
+    fs = require('fs'),
+    debug = require('debug')('core-api')
 
 module.exports = function(app, db, config){
 
 
   describe("维修工单", function(){
+
+    function ensureExists(path, mask, cb) {
+      debug(path)
+      if (typeof mask == 'function') { // allow the `mask` parameter to be optional
+          cb = mask;
+          mask = 0777;
+      }
+      fs.mkdir(path, mask, function(err) {
+        debug("mkdir error: "+err)
+          if (err) {
+              if (err.code == 'EEXIST') cb(null); // ignore the error if the folder already exists
+              else cb(err); // something else went wrong
+          } else cb(null); // successfully created folder
+      });
+    }
 
     before(function(done) {
       db.sequelize.model("KerryWorkOrder").sync({force: false})
@@ -33,7 +50,12 @@ module.exports = function(app, db, config){
         return db.sequelize.query("DELETE FROM kerry_work_orders")
       })
       .then(function() {
-        done()
+        ensureExists('test/upload/', 0777, (err) => {
+
+          done()
+        })
+
+
       })
     })
 
